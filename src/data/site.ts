@@ -16,7 +16,7 @@ export interface SiteConfig {
     referral: Referral;
     steps: Step[];
 }
-const referralCode = "AM397158";
+const referralCode = "MBPINOY2027";
 const referralBonus = "₱588";
 export const siteData: SiteConfig = {
     referral: {
