@@ -1,0 +1,100 @@
+---
+import App from "@/components/app.astro";
+import CopyButton from "@/components/ui/CopyButton.astro";
+import PostRow from "@/components/ui/PostRow.astro";
+import { getPosts, formatDate } from "@/lib/posts";
+import { siteData } from "@/data/site";
+
+export function getStaticPaths() {
+	return getPosts().map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = post;
+const { url, name, referral } = siteData;
+const pageUrl = `${url}/blog/${post.slug}/`;
+const more = getPosts().filter((p) => p.slug !== post.slug).slice(0, 2);
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "BlogPosting",
+			headline: post.meta.title,
+			description: post.meta.description,
+			datePublished: post.pubDate.toISOString(),
+			dateModified: post.updatedDate.toISOString(),
+			inLanguage: "en-PH",
+			mainEntityOfPage: pageUrl,
+			image: `${url}/images/og-maribank.jpg`,
+			author: { "@type": "Organization", name, url: `${url}/` },
+			publisher: { "@type": "Organization", name, url: `${url}/` },
+		},
+		{
+			"@type": "BreadcrumbList",
+			itemListElement: [
+				{ "@type": "ListItem", position: 1, name: "Home", item: `${url}/` },
+				{ "@type": "ListItem", position: 2, name: "Blog", item: `${url}/blog/` },
+				{ "@type": "ListItem", position: 3, name: post.meta.title, item: pageUrl },
+			],
+		},
+	],
+};
+---
+
+<App
+	title={`${post.meta.title} | Pinoy Techie`}
+	description={post.meta.description}
+	type="article"
+	publishedTime={post.pubDate.toISOString()}
+	modifiedTime={post.updatedDate.toISOString()}
+	jsonLd={jsonLd}>
+	<article class="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-16">
+		<nav aria-label="Breadcrumb" class="text-sm font-medium text-slate">
+			<a href="/" class="hover:underline">Home</a>
+			<span aria-hidden="true"> / </span>
+			<a href="/blog/" class="hover:underline">Blog</a>
+		</nav>
+
+		<header class="mt-6 max-w-3xl">
+			<h1 class="font-display text-4xl font-extrabold leading-[1.08] tracking-tight md:text-5xl">
+				{post.meta.title}
+			</h1>
+			<p class="mt-4 font-text text-xl text-slate">{post.meta.description}</p>
+			<p class="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-slate">
+				<span>Updated <time datetime={post.updatedDate.toISOString()}>{formatDate(post.updatedDate)}</time></span>
+				<span>{post.minutes} min read</span>
+			</p>
+		</header>
+
+		<div class="article mt-10">
+			<Content />
+		</div>
+
+		<aside class="mt-14 max-w-2xl rounded-2xl border-2 border-ink bg-sun p-6 md:p-8" aria-labelledby="cta-title">
+			<h2 id="cta-title" class="font-display text-2xl font-extrabold">Trying MariBank?</h2>
+			<p class="mt-2 font-text">
+				Enter <strong>{referral.code}</strong> during sign-up. Deposit {referral.minDeposit}, keep it
+				for {referral.holdDays} days, and you receive {referral.bonus}. Terms are set by MariBank and
+				can change.
+			</p>
+			<div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+				<CopyButton code={referral.code} />
+				<a href="/#download" class="font-semibold underline decoration-ink decoration-4 underline-offset-4">
+					Get the app
+				</a>
+			</div>
+		</aside>
+	</article>
+
+	{
+		more.length > 0 && (
+			<section class="mx-auto max-w-6xl px-4 pb-16 md:px-6" aria-labelledby="more-title">
+				<h2 id="more-title" class="mb-4 font-display text-2xl font-extrabold">Keep reading</h2>
+				<div class="border-b border-line">
+					{more.map((p) => <PostRow post={p} />)}
+				</div>
+			</section>
+		)
+	}
+</App>

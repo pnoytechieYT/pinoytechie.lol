@@ -1,8 +1,43 @@
-<footer
-	class="bg-black/60 text-white text-center py-4 md:py-5 px-4 text-xs md:text-sm leading-relaxed">
-	<p>
-		<strong>Disclaimer:</strong> This is an independent website providing MariBank
-		referral code information. MariBank and its logo are trademarks of MariBank PH.
-		This website is not affiliated with or endorsed by MariBank or SeaBank Inc.
-	</p>
+---
+import { siteData } from "@/data/site";
+const { social } = siteData;
+---
+
+<footer class="bg-ink text-white">
+	<div
+		class="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-12 md:px-6">
+		<div class="md:col-span-5">
+			<p class="font-display text-xl font-extrabold">Pinoy Techie</p>
+			<p class="mt-2 max-w-sm font-text text-white/80">{siteData.tagline}</p>
+		</div>
+
+		<nav aria-label="Footer" class="md:col-span-3">
+			<ul class="space-y-2 font-semibold">
+				<li><a class="hover:underline" href="/">MariBank referral code</a></li>
+				<li><a class="hover:underline" href="/blog/">Blog</a></li>
+				<li><a class="hover:underline" href="/about/">About</a></li>
+				<li><a class="hover:underline" href="/about/#disclosure">Referral disclosure</a></li>
+				{
+					social.youtube && (
+						<li>
+							<a
+								class="hover:underline"
+								href={social.youtube}
+								rel="noopener noreferrer"
+								target="_blank">
+								YouTube
+							</a>
+						</li>
+					)
+				}
+			</ul>
+		</nav>
+
+		<p class="text-sm leading-relaxed text-white/70 md:col-span-4">
+			<strong class="text-white">Disclaimer:</strong> Pinoy Techie is an independent
+			website. MariBank and its logo are trademarks of MariBank Philippines. This site
+			is not affiliated with or endorsed by MariBank or Sea Group. Rates, rewards, and
+			terms can change, so confirm them in the app. Nothing here is financial advice.
+		</p>
+	</div>
 </footer>

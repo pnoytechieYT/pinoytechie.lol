@@ -1,54 +1,40 @@
 ---
-interface Props {
-	title: string;
-	description: string;
-	image?: string;
-	jsonLd?: Record<string, unknown>;
-}
+import { siteData } from "@/data/site";
 
-const {
-	title,
-	description,
-	image = "/images/og-maribank.jpg",
-	jsonLd,
-} = Astro.props;
-
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const imageURL = new URL(image, Astro.site);
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+	href === "/" ? path === "/" : path.startsWith(href);
 ---
 
-<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-	<title>{title}</title>
-	<meta name="description" content={description} />
-	<meta name="robots" content="index, follow, max-image-preview:large" />
-	<meta name="theme-color" content="#f97316" />
-	<link rel="canonical" href={canonicalURL} />
-
-	<link rel="icon" href="/favicon.ico" sizes="any" />
-	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Pinoy Techie" />
-	<meta property="og:locale" content="en_PH" />
-	<meta property="og:url" content={canonicalURL} />
-	<meta property="og:title" content={title} />
-	<meta property="og:description" content={description} />
-	<meta property="og:image" content={imageURL} />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content={title} />
-	<meta name="twitter:description" content={description} />
-	<meta name="twitter:image" content={imageURL} />
-
-	<link rel="preload" as="image" href="/images/banner-3.webp" fetchpriority="high" />
-
-	{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
-
-	<meta name="google-site-verification" content="vTIvCa0HAYNx_WC4BmJOGzhgaNgLdWyI0aM6nYGhOrw" />
-</head>
+<header class="border-b border-line bg-white">
+	<div
+		class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+		<a
+			href="/"
+			class="flex items-center font-display text-xl font-extrabold tracking-tight">
+			<span class="rounded-md bg-promo px-1.5 pb-0.5">Pinoy</span>
+			<span class="ml-1 ">Techie</span>
+		</a>
+		<nav aria-label="Main">
+			<ul class="flex items-center gap-1 text-sm font-semibold md:text-base">
+				{
+					siteData.nav.map((item) => (
+						<li>
+							<a
+								href={item.href}
+								aria-current={isActive(item.href) ? "page" : undefined}
+								class:list={[
+									"rounded-full px-3 py-2 transition-colors",
+									isActive(item.href)
+										? "bg-ink text-white"
+										: "hover:bg-fog",
+								]}>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+	</div>
+</header>

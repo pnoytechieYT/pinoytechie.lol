@@ -14,14 +14,14 @@ const { href, src, alt, label } = Astro.props;
 <a
 	href={href}
 	target="_blank"
-	class="inline-flex items-center justify-center gap-4 hover:scale-110 transition-transform duration-300"
 	rel="noopener noreferrer"
-	aria-label={label}>
+	aria-label={label}
+	class="inline-flex transition-transform duration-200 hover:-translate-y-1">
 	<Image
 		src={src}
 		alt={alt}
 		width={200}
 		height={60}
-		class="h-14 md:h-16 lg:h-20 w-auto"
+		class="h-14 w-auto md:h-16"
 	/>
 </a>

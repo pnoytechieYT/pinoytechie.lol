@@ -1,27 +1,36 @@
 ---
 import "@/styles/global.css";
-import Footer from "@/components/includes/footer.astro";
+import Head from "@/components/includes/head.astro";
 import Header from "@/components/includes/header.astro";
+import Footer from "@/components/includes/footer.astro";
 
 interface Props {
 	title: string;
 	description: string;
+	image?: string;
+	jsonLd?: Record<string, unknown>;
+	type?: "website" | "article";
+	publishedTime?: string;
+	modifiedTime?: string;
+	noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const props = Astro.props;
 ---
 
-<html lang="en">
-	<Header
-		title={title}
-		description={description}
-	/>
-	<body
-		class="font-poppins bg-linear-to-br from-orange-500 to-orange-600 min-h-screen">
-		<!-- content -->
-		<slot />
-
-		<!-- footer -->
+<html lang="en-PH">
+	<Head {...props} />
+	<body class="min-h-screen">
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-sun focus:px-3 focus:py-2 focus:font-semibold"
+		>
+			Skip to content
+		</a>
+		<Header />
+		<main id="main">
+			<slot />
+		</main>
 		<Footer />
 	</body>
 </html>

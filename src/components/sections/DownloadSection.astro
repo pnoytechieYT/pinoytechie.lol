@@ -1,24 +1,33 @@
 ---
 import StoreButton from "@/components/ui/StoreButton.astro";
+import CopyButton from "@/components/ui/CopyButton.astro";
+import { siteData } from "@/data/site";
 ---
 
-<div class="text-center py-10 md:py-12 pb-16 md:pb-20 px-4">
-	<h2
-		class="text-white text-2xl md:text-3xl lg:text-4xl font-bold mb-8 md:mb-10 drop-shadow-lg leading-tight">
-		Download MariBank Now!
-	</h2>
-	<div class="flex justify-center gap-4 md:gap-5 flex-wrap">
-		<StoreButton
-			href="https://play.google.com/store/apps/details?id=ph.seabank.seabank&hl=en"
-			src="/images/playstore-btn.webp"
-			alt="Google Play Store"
-			label="Download MariBank from Google Play Store"
-		/>
-		<StoreButton
-			href="https://apps.apple.com/ph/app/maribank-ph-seabank/id1592249158"
-			src="/images/appstore-btn.webp"
-			alt="Apple App Store"
-			label="Download MariBank from Apple App Store"
-		/>
+<section id="download" class="bg-deep bg-cover bg-center text-white" style="background-image: url(/images/bg.webp)" aria-labelledby="download-title">
+	<div class="mx-auto grid max-w-6xl gap-8 px-4 py-14 md:grid-cols-12 md:items-center md:px-6 md:py-20">
+		<div class="md:col-span-7">
+			<h2 id="download-title" class="font-display text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">
+				Open your MariBank account with {siteData.referral.code}
+			</h2>
+			<p class="mt-3 max-w-xl text-xl font-bold">
+				Use the official store links, then enter the code during sign-up.
+			</p>
+			<CopyButton code={siteData.referral.code} class="mt-6 !border-ink !bg-white !text-ink hover:!bg-sun" />
+		</div>
+		<div class="flex flex-wrap gap-4 md:col-span-5 md:justify-end">
+			<StoreButton
+				href="https://play.google.com/store/apps/details?id=ph.seabank.seabank&hl=en"
+				src="/images/playstore-btn.webp"
+				alt="Get it on Google Play"
+				label="Download MariBank from Google Play Store"
+			/>
+			<StoreButton
+				href="https://apps.apple.com/ph/app/maribank-ph-seabank/id1592249158"
+				src="/images/appstore-btn.webp"
+				alt="Download on the App Store"
+				label="Download MariBank from Apple App Store"
+			/>
+		</div>
 	</div>
-</div>
+</section>

@@ -1,0 +1,60 @@
+---
+import CopyButton from "@/components/ui/CopyButton.astro";
+import { siteData } from "@/data/site";
+
+const { referral } = siteData;
+const asOf = new Date(referral.usersCountAsOf).toLocaleDateString("en-PH", {
+	month: "long",
+	day: "numeric",
+	year: "numeric",
+	timeZone: "UTC",
+});
+---
+
+<section
+	aria-labelledby="hero-title"
+	class="mx-auto grid max-w-6xl gap-12 px-4 pb-16 pt-10 md:grid-cols-12 md:items-center md:gap-8 md:px-6 md:pb-24 md:pt-16">
+	<div class="md:col-span-7">
+		<h1
+			id="hero-title"
+			class="font-display text-4xl font-extrabold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
+			MariBank referral code {referral.code}: get {referral.bonus} when you sign up
+		</h1>
+		<p class="mt-5 max-w-xl font-text text-lg leading-relaxed text-slate md:text-xl">
+			Enter this code when you open a new MariBank account. Deposit {referral.minDeposit},
+			keep it in for {referral.holdDays} days, and you receive the {referral.bonus} reward.
+		</p>
+		<div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+			<a
+				href="#download"
+				class="rounded-full bg-promo px-6 py-3 font-bold text-ink transition-transform hover:-translate-y-0.5">
+				Download MariBank
+			</a>
+			<a href="#how-it-works" class="font-semibold underline decoration-promo decoration-4 underline-offset-4">
+				See how it works
+			</a>
+		</div>
+		<p class="mt-6 text-sm text-slate">
+			{referral.usersCount.toLocaleString("en-PH")} people have used this code, as of {asOf}.
+			Reward terms are set by MariBank and can change.
+		</p>
+	</div>
+
+	<div class="md:col-span-5">
+		<div class="ticket mx-auto w-full max-w-md" role="group" aria-label="Referral code">
+			<div class="p-6 md:p-8">
+				<p class="font-semibold">Your MariBank referral code</p>
+				<p class="mt-2 break-all text-4xl font-extrabold tracking-wider md:text-5xl">
+					{referral.code}
+				</p>
+				<CopyButton code={referral.code} class="mt-5" />
+			</div>
+			<div class="tear" aria-hidden="true"></div>
+			<dl class="space-y-2 p-6 pt-5 md:p-8 md:pt-5">
+				<div class="leader"><dt>First deposit</dt><dd>{referral.minDeposit}</dd></div>
+				<div class="leader"><dt>Keep it for</dt><dd>{referral.holdDays} days</dd></div>
+				<div class="leader"><dt>Reward</dt><dd>{referral.bonus}</dd></div>
+			</dl>
+		</div>
+	</div>
+</section>

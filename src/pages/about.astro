@@ -1,0 +1,52 @@
+---
+import App from "@/components/app.astro";
+import { siteData } from "@/data/site";
+
+const { social, referral } = siteData;
+---
+
+<App
+	title="About Pinoy Techie and Referral Disclosure"
+	description="Pinoy Techie makes short tech tips and tutorials for Filipinos. Here's who runs this site, how referral rewards work, and how to reach out.">
+	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-20">
+		<h1 class="font-display text-4xl font-extrabold tracking-tight md:text-6xl">About Pinoy Techie</h1>
+
+		<div class="article mt-8">
+			<p>
+				Pinoy Techie makes short tech tips and tutorials for Filipinos. This website is where I
+				put the longer, searchable version of the money-app topics people keep asking about,
+				starting with MariBank.
+			</p>
+			<p>
+				Each guide says what is verified, what changes often (like savings rates), and where to
+				confirm the latest numbers in the app.
+			</p>
+
+			<h2 id="disclosure">Referral disclosure</h2>
+			<p>
+				This site shares the MariBank referral code <strong>{referral.code}</strong>. New users who
+				sign up with it can receive {referral.bonus} after meeting MariBank's deposit conditions.
+				Referral programs usually reward the person who shared the code too, so I may earn a
+				reward when you sign up with it.
+			</p>
+			<p>
+				Pinoy Techie is independent and is not affiliated with or endorsed by MariBank or Sea
+				Group. MariBank sets and can change the reward terms. Nothing on this site is financial
+				advice.
+			</p>
+
+			<h2>Contact</h2>
+			<p>
+				{
+					social.email ? (
+						<>Email <a href={`mailto:${social.email}`}>{social.email}</a>.</>
+					) : social.youtube ? (
+						<>Message me on <a href={social.youtube}>YouTube</a>.</>
+					) : (
+						<>Contact details are coming soon.</>
+					)
+				}
+			</p>
+		</div>
+	</div>
+</App>
