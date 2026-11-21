@@ -9,7 +9,7 @@ MariBank's app advertises several recurring perks alongside its savings rate. So
 
 ## The Referral Reward: Up to ₱588
 
-This is the highest-value promo MariBank offers, but it requires action from both parties. The new user must enter a code, deposit **₱1,000 in one transaction**, and hold it for **three days** [citation:8]. The reward is paid the following week.
+This is the highest-value promo MariBank offers, but it requires action from both parties. The new user must enter a code, deposit **₱1,000 in one transaction**, and hold it for **three days**. The reward is paid the following week.
 
 Worth using if you are opening an account anyway. Not worth opening an account solely for the ₱588 if you do not intend to use MariBank afterward—the holding requirement and the follow-up needed to confirm the payout add friction.
 

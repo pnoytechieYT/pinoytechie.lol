@@ -19,7 +19,8 @@ const path = `/blog/${post.slug}/`;
 const pageUrl = abs(path);
 const image = post.meta.image ?? siteData.ogImage;
 const related = getRelated(post, 3);
-const toc = post.headings.filter((h) => h.depth === 2);
+const toc = post.headings.filter((h) => (h.depth === 2 || h.depth === 3) && h.slug !== "footnote-label");
+const tocH2Count = toc.filter((h) => h.depth === 2).length;
 const seoTitle = post.meta.seoTitle ?? post.meta.title;
 // Only append the brand when the result still fits in a typical Google title (~60 chars).
 const withBrand = `${seoTitle} | ${name}`.length <= 62;
@@ -70,25 +71,26 @@ const schema = [
 	modifiedTime={post.updatedDate.toISOString()}
 	tags={post.tags}
 	schema={schema}>
-	<div class="border-b border-slate-200 bg-white">
+	<div id="read-progress" class="fixed inset-x-0 top-0 z-50 h-1 origin-left scale-x-0 bg-gold-400" aria-hidden="true"></div>
+	<div class="border-b border-line glass">
 		<div class="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
 			<Breadcrumbs items={crumbs} />
 			<div class="mt-5 flex flex-wrap items-center gap-2 text-xs font-medium">
 				{
 					post.tags.map((tag) => (
-						<a href={`/blog/tag/${slugify(tag)}/`} class="rounded-full bg-brand-50 px-2.5 py-1 text-brand-700 hover:bg-brand-100">
+						<a href={`/blog/tag/${slugify(tag)}/`} class="rounded-full bg-tint px-2.5 py-1 text-accent-strong hover:bg-tint-strong">
 							{tag}
 						</a>
 					))
 				}
 				{post.isScheduled && <span class="rounded-full bg-gold-300 px-2.5 py-1 text-navy-950">Scheduled: not public yet (dev preview)</span>}
 			</div>
-			<h1 class="mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-navy-900 md:text-5xl">
+			<h1 class="mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-ink md:text-5xl">
 				{post.meta.title}
 			</h1>
-			<p class="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">{post.meta.description}</p>
-			<p class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
-				<span>By <a href="/about/" class="font-medium text-slate-700 hover:underline">{siteData.author.name}</a></span>
+			<p class="mt-4 max-w-3xl text-lg leading-relaxed text-body">{post.meta.description}</p>
+			<p class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+				<span>By <a href="/about/" class="font-medium text-body hover:underline">{siteData.author.name}</a></span>
 				<span aria-hidden="true">·</span>
 				<span>Published <time datetime={post.pubDate.toISOString()}>{formatDateTime(post.pubDate)}</time></span>
 				{
@@ -110,22 +112,22 @@ const schema = [
 			<div class="prose-article">
 				<Content />
 			</div>
-			<p class="mt-12 max-w-2xl rounded-lg border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-500">
-				<strong class="text-slate-700">Not financial advice.</strong>
+			<p class="mt-12 max-w-2xl rounded-lg border border-line glass p-4 text-sm leading-relaxed text-muted">
+				<strong class="text-body">Not financial advice.</strong>
 				{name} is independent and not affiliated with MariBank or Sea Group. Rates, fees and rewards change, so confirm current
-				terms in the app. See our <a href="/disclosure/" class="text-brand-600 underline">referral disclosure</a>.
+				terms in the app. See our <a href="/disclosure/" class="text-accent underline">referral disclosure</a>.
 			</p>
 		</article>
 
 		<aside class="space-y-6 lg:sticky lg:top-24 lg:self-start" aria-label="Sidebar">
 			{
-				toc.length >= 3 && (
-					<nav aria-labelledby="toc-title" class="rounded-xl border border-slate-200 bg-white p-5">
-						<h2 id="toc-title" class="text-sm font-semibold uppercase tracking-wider text-slate-500">On this page</h2>
+				tocH2Count >= 3 && (
+					<nav aria-labelledby="toc-title" class="rounded-xl border border-line glass p-5">
+						<h2 id="toc-title" class="text-sm font-semibold uppercase tracking-wider text-muted">On this page</h2>
 						<ul class="mt-3 space-y-2 text-sm">
 							{toc.map((h) => (
-								<li>
-									<a href={`#${h.slug}`} class="text-slate-600 hover:text-brand-700">
+								<li class={h.depth === 3 ? "ml-3 border-l border-line pl-3 text-[0.8125rem]" : ""}>
+									<a href={`#${h.slug}`} data-toc-link class="block text-body transition-colors hover:text-accent-strong [&.is-active]:font-semibold [&.is-active]:text-accent-strong">
 										{h.text}
 									</a>
 								</li>
@@ -134,7 +136,7 @@ const schema = [
 					</nav>
 				)
 			}
-			<div class="rounded-xl bg-navy-900 p-6 text-white" aria-labelledby="cta-title">
+			<div class="glass-dark rounded-xl p-6 text-white" aria-labelledby="cta-title">
 				<h2 id="cta-title" class="text-lg font-semibold">Trying MariBank?</h2>
 				<p class="mt-2 text-sm leading-relaxed text-slate-300">
 					Enter <strong class="text-gold-400">{referral.code}</strong> during sign-up. Deposit {referral.minDeposit}, keep it for
@@ -150,9 +152,9 @@ const schema = [
 
 	{
 		related.length > 0 && (
-			<section class="border-t border-slate-200 bg-white" aria-labelledby="more-title">
+			<section class="border-t border-line glass" aria-labelledby="more-title">
 				<div class="mx-auto max-w-6xl px-4 py-14 md:px-6">
-					<h2 id="more-title" class="text-2xl font-bold tracking-tight text-navy-900">Keep reading</h2>
+					<h2 id="more-title" class="text-2xl font-bold tracking-tight text-ink">Keep reading</h2>
 					<div class="mt-8 grid gap-6 md:grid-cols-3">
 						{related.map((p) => <PostCard post={p} />)}
 					</div>
@@ -161,3 +163,52 @@ const schema = [
 		)
 	}
 </BaseLayout>
+
+<script>
+	// Reading progress bar
+	const bar = document.getElementById("read-progress");
+	const article = document.querySelector("article");
+	if (bar && article) {
+		const update = () => {
+			const r = article.getBoundingClientRect();
+			const total = r.height - window.innerHeight * 0.6;
+			const done = Math.min(1, Math.max(0, -r.top / Math.max(total, 1)));
+			bar.style.transform = `scaleX(${done})`;
+		};
+		addEventListener("scroll", update, { passive: true });
+		addEventListener("resize", update);
+		update();
+	}
+
+	// Copy buttons on code blocks
+	document.querySelectorAll<HTMLButtonElement>("[data-copy-code]").forEach((btn) => {
+		btn.addEventListener("click", async () => {
+			const code = btn.closest(".code-block")?.querySelector("pre")?.innerText ?? "";
+			try {
+				await navigator.clipboard.writeText(code);
+				btn.textContent = "Copied!";
+			} catch {
+				btn.textContent = "Press Ctrl+C";
+			}
+			setTimeout(() => (btn.textContent = "Copy"), 1800);
+		});
+	});
+
+	// Highlight the current section in "On this page"
+	const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")];
+	const targets = links
+		.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+		.filter((el): el is HTMLElement => !!el);
+	if (targets.length && "IntersectionObserver" in window) {
+		const io = new IntersectionObserver(
+			(entries) => {
+				for (const e of entries) {
+					if (!e.isIntersecting) continue;
+					links.forEach((a) => a.classList.toggle("is-active", a.hash === `#${e.target.id}`));
+				}
+			},
+			{ rootMargin: "-80px 0px -70% 0px" },
+		);
+		targets.forEach((t) => io.observe(t));
+	}
+</script>

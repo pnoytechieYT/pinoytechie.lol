@@ -17,14 +17,14 @@ const items = [
 ];
 ---
 
-<section class="border-b border-slate-200 bg-white" aria-label="Key facts">
-	<dl class="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-slate-200 md:grid-cols-4">
+<section aria-label="Key facts">
+	<dl class="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-8 md:grid-cols-4 md:px-6">
 		{
 			items.map((item) => (
-				<div class="bg-white px-4 py-6 text-center md:px-6">
+				<div class="glass rounded-2xl border border-line px-4 py-6 text-center md:px-6">
 					<dt class="sr-only">{item.label}</dt>
-					<dd class="text-2xl font-bold tracking-tight text-navy-900 md:text-3xl">{item.value}</dd>
-					<p class="mt-1 text-xs text-slate-500 md:text-sm" aria-hidden="true">{item.label}</p>
+					<dd class="text-2xl font-bold tracking-tight text-ink md:text-3xl">{item.value}</dd>
+					<p class="mt-1 text-xs text-muted md:text-sm" aria-hidden="true">{item.label}</p>
 				</div>
 			))
 		}

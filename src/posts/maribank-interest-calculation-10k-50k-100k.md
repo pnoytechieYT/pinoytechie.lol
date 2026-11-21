@@ -5,13 +5,13 @@ pubDate: "2026-11-25T12:00:00+08:00"
 tags: ["MariBank", "Savings", "Interest Rates"]
 ---
 
-MariBank advertises **3.25% per annum** on balances up to ₱1,000,000, credited daily, subject to **20% withholding tax** [citation:1]. The advertised rate is gross. What lands in your account is lower. Here is what that looks like at three common balance levels.
+MariBank advertises **3.25% per annum** on balances up to ₱1,000,000, credited daily, subject to **20% withholding tax**. The advertised rate is gross. What lands in your account is lower. Here is what that looks like at three common balance levels.
 
 ## The Tax Math
 
 A 20% withholding tax applies to interest earned. The net rate is therefore **3.25% × 0.80 = 2.60%** per annum for balances under ₱1M. For the portion above ₱1M, the gross rate is 3.75%, and the net is **3.00%**.
 
-MariBank's own example on its savings page shows that a **₱30,000** balance earns approximately **₱2,600** in net interest over one year, which corresponds to the 2.60% net rate [citation:1]. That confirms the tax treatment and the daily crediting method produce the expected result.
+MariBank's own example on its savings page shows that a **₱30,000** balance earns approximately **₱2,600** in net interest over one year, which corresponds to the 2.60% net rate. That confirms the tax treatment and the daily crediting method produce the expected result.
 
 ## ₱10,000
 
@@ -35,7 +35,7 @@ Gross annual interest: **₱3,250**
 Net after 20% tax: **₱2,600**
 Monthly average net: approximately **₱216.67**
 
-This is where the daily crediting becomes visible in the app. At ₱100,000, you are earning roughly **₱7.12 gross per day**, or about **₱5.70 net** [citation:1]. Over a month, the balance grows by a little over ₱170 net.
+This is where the daily crediting becomes visible in the app. At ₱100,000, you are earning roughly **₱7.12 gross per day**, or about **₱5.70 net**. Over a month, the balance grows by a little over ₱170 net.
 
 ## What the Table Does Not Show
 

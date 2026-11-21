@@ -2,25 +2,25 @@
 import { siteData } from "@/data/site";
 ---
 
-<section class="bg-white" aria-labelledby="faq-title">
+<section class="glass" aria-labelledby="faq-title">
 	<div class="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-12 md:px-6 md:py-20">
 		<div class="md:col-span-4">
-			<p class="text-sm font-semibold uppercase tracking-wider text-brand-600">FAQ</p>
-			<h2 id="faq-title" class="mt-2 text-3xl font-bold tracking-tight text-navy-900 md:text-4xl">Common questions</h2>
-			<p class="mt-3 text-slate-600">
+			<p class="text-sm font-semibold uppercase tracking-wider text-accent">FAQ</p>
+			<h2 id="faq-title" class="mt-2 text-3xl font-bold tracking-tight text-ink md:text-4xl">Common questions</h2>
+			<p class="mt-3 text-body">
 				Short answers about the referral code. For anything else, read our
-				<a href="/blog/" class="font-medium text-brand-600 underline underline-offset-4">guides</a>.
+				<a href="/blog/" class="font-medium text-accent underline underline-offset-4">guides</a>.
 			</p>
 		</div>
-		<div class="divide-y divide-slate-200 border-y border-slate-200 md:col-span-8">
+		<div class="divide-y divide-line border-y border-line md:col-span-8">
 			{
 				siteData.faqs.map((faq) => (
 					<details class="group py-5">
-						<summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold text-navy-900 [&::-webkit-details-marker]:hidden">
+						<summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold text-ink [&::-webkit-details-marker]:hidden">
 							{faq.question}
-							<span aria-hidden="true" class="text-2xl font-normal leading-none text-brand-600 transition-transform group-open:rotate-45">+</span>
+							<span aria-hidden="true" class="text-2xl font-normal leading-none text-accent transition-transform group-open:rotate-45">+</span>
 						</summary>
-						<p class="mt-3 max-w-2xl leading-relaxed text-slate-600">{faq.answer}</p>
+						<p class="mt-3 max-w-2xl leading-relaxed text-body">{faq.answer}</p>
 					</details>
 				))
 			}

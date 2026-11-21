@@ -4,6 +4,15 @@ import path from "node:path";
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import {
+	remarkStripCitations,
+	rehypeCallouts,
+	rehypeTables,
+	rehypeFigures,
+	rehypeHeadingAnchors,
+	rehypeExternalLinks,
+	rehypeCodeBlocks,
+} from "./src/plugins/markdown.mjs";
 
 const SITE = "https://pinoytechie.lol";
 const PH_OFFSET = "+08:00"; // Philippine time, keep in sync with src/data/site.ts
@@ -42,6 +51,14 @@ const postLastmods = readPostLastmods();
 export default defineConfig({
 	site: SITE,
 	compressHTML: true,
+	markdown: {
+		gfm: true, // tables, task lists, strikethrough, footnotes, autolinks
+		smartypants: true, // curly quotes, en/em dashes, ellipses
+		syntaxHighlight: "shiki",
+		shikiConfig: { theme: "github-dark-dimmed", wrap: false },
+		remarkPlugins: [remarkStripCitations],
+		rehypePlugins: [rehypeCallouts, rehypeTables, rehypeFigures, rehypeHeadingAnchors, rehypeExternalLinks, rehypeCodeBlocks],
+	},
 	vite: {
 		plugins: [tailwindcss()],
 	},

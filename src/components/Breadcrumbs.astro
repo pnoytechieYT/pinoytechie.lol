@@ -8,7 +8,7 @@ interface Props {
 const { items, dark = false } = Astro.props;
 ---
 
-<nav aria-label="Breadcrumb" class:list={["text-sm", dark ? "text-slate-300" : "text-slate-500"]}>
+<nav aria-label="Breadcrumb" class:list={["text-sm", dark ? "text-slate-300" : "text-muted"]}>
 	<ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
 		{
 			items.map((item, i) => (
@@ -17,7 +17,7 @@ const { items, dark = false } = Astro.props;
 					{i < items.length - 1 ? (
 						<a href={item.href} class="hover:underline">{item.name}</a>
 					) : (
-						<span aria-current="page" class:list={["inline-block max-w-[14rem] truncate align-bottom sm:max-w-md", dark ? "text-white" : "text-slate-700"]}>{item.name}</span>
+						<span aria-current="page" class:list={["inline-block max-w-[14rem] truncate align-bottom sm:max-w-md", dark ? "text-white" : "text-body"]}>{item.name}</span>
 					)}
 				</li>
 			))

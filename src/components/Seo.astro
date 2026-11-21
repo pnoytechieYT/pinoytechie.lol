@@ -56,7 +56,28 @@ const robots = noindex
 	<link rel="alternate" type="application/rss+xml" title={`${siteData.name} RSS feed`} href="/rss.xml" />
 	<link rel="sitemap" href="/sitemap-index.xml" />
 
-	<meta name="theme-color" content="#0a1d3f" />
+	<meta name="theme-color" content="#eaf1ff" />
+	<script is:inline>
+		// Runs before first paint so there is no light/dark flash. Choice: "system" (default) | "light" | "dark".
+		(function () {
+			var root = document.documentElement;
+			var mq = window.matchMedia("(prefers-color-scheme: dark)");
+			function pref() {
+				try { return localStorage.getItem("theme") || "system"; } catch (e) { return "system"; }
+			}
+			function apply() {
+				var p = pref();
+				var dark = p === "dark" || (p === "system" && mq.matches);
+				root.classList.toggle("dark", dark);
+				root.dataset.theme = p;
+				var m = document.querySelector('meta[name="theme-color"]');
+				if (m) m.setAttribute("content", dark ? "#060d1f" : "#eaf1ff");
+			}
+			window.__applyTheme = apply;
+			apply();
+			if (mq.addEventListener) mq.addEventListener("change", apply);
+		})();
+	</script>
 	<link rel="icon" href="/favicon.ico" sizes="48x48" />
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
 	<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />

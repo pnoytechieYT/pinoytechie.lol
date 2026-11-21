@@ -5,7 +5,7 @@ pubDate: "2026-11-28T12:00:00+08:00"
 tags: ["MariBank", "PDIC", "Safety"]
 ---
 
-Every MariBank guide correctly states that deposits are insured by the PDIC up to **₱1,000,000 per depositor** [citation:3]. What most guides do not explain is what to do when your savings exceed that amount.
+Every MariBank guide correctly states that deposits are insured by the PDIC up to **₱1,000,000 per depositor**. What most guides do not explain is what to do when your savings exceed that amount.
 
 ## The Rule
 
@@ -32,7 +32,7 @@ That cost is the price of insurance. Whether it is worth paying depends on your 
 
 ## What Counts as a Separate Bank
 
-Different brands under the same banking license do not count as separate banks for PDIC purposes. CIMB's UpSave and GSave products are both under CIMB Bank's license, so ₱600,000 in UpSave and ₱600,000 in GSave at the same time would be ₱1,200,000 at one bank, with only ₱1,000,000 insured [citation:3].
+Different brands under the same banking license do not count as separate banks for PDIC purposes. CIMB's UpSave and GSave products are both under CIMB Bank's license, so ₱600,000 in UpSave and ₱600,000 in GSave at the same time would be ₱1,200,000 at one bank, with only ₱1,000,000 insured.
 
 MariBank Philippines and MariBank Singapore are separate legal entities in separate jurisdictions with separate insurance schemes. A deposit in MariBank Philippines is covered by PDIC; a deposit in MariBank Singapore is covered by Singapore's deposit insurance scheme. They do not combine.
 

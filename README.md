@@ -46,7 +46,9 @@ GitHub pauses scheduled workflows in a public repo after 60 days with no commits
 
 | What | File |
 | --- | --- |
-| Site name, nav, referral code and reward, FAQ, YouTube video, social links | `src/data/site.ts` |
+| Site name, nav, referral code and reward, FAQ, social links | `src/data/site.ts` |
+| Videos (add, feature, categorize) | `src/data/videos.ts` |
+| Markdown plugins (callouts, tables, anchors, code blocks) | `src/plugins/markdown.mjs`, config in `astro.config.mjs` |
 | Colors and article typography | `src/styles/global.css` |
 | Page `<head>`, Open Graph, JSON-LD | `src/components/Seo.astro`, `src/lib/seo.ts` |
 | Post loading and scheduling logic | `src/lib/posts.ts` |
@@ -60,3 +62,36 @@ GitHub pauses scheduled workflows in a public repo after 60 days with no commits
 - Add your contact email: set `social.email` in `src/data/site.ts` (it appears on Contact, About, Privacy and in schema).
 - More videos: add entries to `videos` in `src/data/site.ts`.
 - Legal pages changed: bump `legalUpdated` in `src/data/site.ts`.
+
+## Markdown features in posts
+
+Everything below is styled automatically in `src/styles/global.css`.
+
+```md
+## Heading 2 / ### Heading 3 / #### Heading 4      (h2-h4 get a # link on hover; h2/h3 fill "On this page")
+**bold**  *italic*  ~~strike~~  `inline code`  <mark>highlight</mark>  <kbd>Ctrl</kbd>  H<sub>2</sub>O
+- bullets, 1. numbered, nested lists, and task lists:  - [x] done  - [ ] todo
+| Tables | with | alignment |   (wrapped in a scrollable box on phones)
+> Quote
+> [!TIP] Optional title
+> Callout text.            (also NOTE, INFO, IMPORTANT, WARNING, CAUTION, EXAMPLE)
+![Alt text](/image.png "Caption shown under the image")
+Footnote[^1]  ...  [^1]: The footnote text.
+<details><summary>Click to expand</summary>Hidden text</details>
+--- (divider)
+```
+
+Fenced code blocks get syntax highlighting, a language label and a Copy button.
+Leftover `[citation:7]` tags pasted from AI tools are removed automatically.
+
+## Videos
+
+Edit `src/data/videos.ts`. Set `featured: true` to pin a video at the top of `/videos/`
+(the first featured video is also the one on the home page). Give videos a `category`
+and filter buttons appear on `/videos/` automatically.
+
+## Theme (light / dark / system) and glass style
+
+- The header switch has three modes: System (default, follows the device), Light and Dark. The choice is saved in `localStorage` (`theme`) and applied before first paint by the inline script in `src/components/Seo.astro`.
+- Colors are tokens in `src/styles/global.css` (`:root` for light, `.dark` for dark): `text-ink`, `text-body`, `text-muted`, `border-line`, `bg-soft`, `bg-tint`, `text-accent`, `bg-btn`. Use these instead of `text-slate-*` / `bg-white` so both themes keep working.
+- Glass surfaces: `glass` (cards, bands), `glass-strong` (forms), `glass-dark` (dark panels), `glass-bar` (header). The colored glow they blur is `--page-glow`. Blur turns off automatically when the visitor asks for reduced transparency.

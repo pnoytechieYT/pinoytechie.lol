@@ -47,7 +47,7 @@ const schema = [
 					{tags.map((tag) => (
 						<a
 							href={`/blog/tag/${tag.slug}/`}
-							class="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:border-brand-500 hover:text-brand-700">
+							class="rounded-full border border-line glass px-3.5 py-1.5 text-sm font-medium text-body transition-colors hover:border-brand-500 hover:text-accent-strong">
 							{tag.name} <span class="text-slate-400">{tag.count}</span>
 						</a>
 					))}
@@ -61,7 +61,7 @@ const schema = [
 
 		{
 			posts.length === 0 && (
-				<p class="text-slate-600">
+				<p class="text-body">
 					No posts yet. Add a Markdown file to <code>src/posts</code> and it shows up here.
 				</p>
 			)

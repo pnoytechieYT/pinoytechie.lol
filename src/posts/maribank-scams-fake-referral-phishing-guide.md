@@ -11,7 +11,7 @@ MariBank's safety page covers the basics—don't share your OTP, install only fr
 
 The scam: a page or individual offers a "premium" MariBank referral code for a fee, promising a higher reward or guaranteed payout.
 
-The reality: **referral codes are free**. MariBank's official program pays up to ₱588 to both parties when the new user deposits ₱1,000 and holds it for three days [citation:8]. There is no premium tier, no paid code, and no legitimate reason to send money to anyone for a code. If a page asks for payment, it is not affiliated with MariBank.
+The reality: **referral codes are free**. MariBank's official program pays up to ₱588 to both parties when the new user deposits ₱1,000 and holds it for three days. There is no premium tier, no paid code, and no legitimate reason to send money to anyone for a code. If a page asks for payment, it is not affiliated with MariBank.
 
 ## Phishing Pages That Copy the App
 
@@ -19,7 +19,7 @@ The scam: a link claims to be a MariBank login page or a "verification" portal a
 
 The red flag: MariBank's app is the only place you should enter your credentials. The bank does not send links asking you to log in through a browser. If you receive an SMS or message with a link to "verify your account," do not click it. Open the app directly instead.
 
-The official app is available only on **Google Play, the Apple App Store, and Huawei App Gallery** [citation:8]. Any APK file sent through a messaging app or downloaded from a third-party site is a risk.
+The official app is available only on **Google Play, the Apple App Store, and Huawei App Gallery**. Any APK file sent through a messaging app or downloaded from a third-party site is a risk.
 
 ## Impersonators on Social Media
 

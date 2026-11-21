@@ -2,37 +2,56 @@
 import PageLayout from "@/layouts/PageLayout.astro";
 import YouTubeEmbed from "@/components/YouTubeEmbed.astro";
 import { siteData } from "@/data/site";
+import { featuredVideos, otherVideos, videoCategories } from "@/data/videos";
 
-const { videos, social, video } = siteData;
-const [featured, ...others] = videos;
+const { social } = siteData;
+const [mainFeatured, ...moreFeatured] = featuredVideos;
+const showFilters = videoCategories.length > 1;
+const thumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+const watch = (id: string) => `https://www.youtube.com/watch?v=${id}`;
 ---
 
 <PageLayout
 	title="Pinoy Techie Videos"
-	description="Watch Pinoy Techie tutorials on MariBank and everyday money apps in the Philippines. Short, practical walkthroughs from our YouTube channel."
-	lead="Short, practical walkthroughs on MariBank and everyday money apps."
+	description="Watch Pinoy Techie video tutorials and tech tips for Filipinos: money apps like MariBank, everyday tech and more. Short, practical and easy to follow."
+	lead="Tech tips, tutorials and walkthroughs from the Pinoy Techie YouTube channel."
 	path="/videos/"
 	prose={false}>
 	{
-		featured && (
+		mainFeatured && (
 			<section aria-labelledby="featured-title">
-				<h2 id="featured-title" class="text-2xl font-bold tracking-tight text-navy-900">Featured video</h2>
+				<div class="flex items-center gap-3">
+					<h2 id="featured-title" class="text-2xl font-bold tracking-tight text-ink">Featured</h2>
+					<span class="rounded-full bg-gold-300 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-navy-950">Pinned</span>
+				</div>
 				<div class="mt-6 grid gap-8 lg:grid-cols-12 lg:items-start">
 					<div class="lg:col-span-8">
-						<YouTubeEmbed id={featured.id} si={featured.id === video.id ? video.si : undefined} title={featured.title} />
+						<YouTubeEmbed id={mainFeatured.id} si={mainFeatured.si} title={mainFeatured.title} />
 					</div>
 					<div class="lg:col-span-4">
-						<h3 class="text-xl font-semibold text-navy-900">{featured.title}</h3>
-						<p class="mt-2 text-slate-600">{featured.description}</p>
-						{social.youtube && (
+						{mainFeatured.category && (
+							<p class="text-xs font-semibold uppercase tracking-wider text-accent">{mainFeatured.category}</p>
+						)}
+						<h3 class="mt-1 text-xl font-semibold text-ink">{mainFeatured.title}</h3>
+						{mainFeatured.description && <p class="mt-2 text-body">{mainFeatured.description}</p>}
+						<div class="mt-5 flex flex-wrap gap-3">
+							{social.youtube && (
+								<a
+									href={social.youtube}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="inline-flex rounded-md bg-btn px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-btn-hover">
+									Subscribe on YouTube
+								</a>
+							)}
 							<a
-								href={social.youtube}
+								href={watch(mainFeatured.id)}
 								target="_blank"
 								rel="noopener noreferrer"
-								class="mt-5 inline-flex rounded-md bg-navy-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-700">
-								Subscribe on YouTube
+								class="inline-flex rounded-md border border-line px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-soft">
+								Watch on YouTube
 							</a>
-						)}
+						</div>
 					</div>
 				</div>
 			</section>
@@ -40,27 +59,52 @@ const [featured, ...others] = videos;
 	}
 
 	{
-		others.length > 0 && (
-			<section class="mt-14" aria-labelledby="more-videos-title">
-				<h2 id="more-videos-title" class="text-2xl font-bold tracking-tight text-navy-900">More videos</h2>
+		moreFeatured.length > 0 && (
+			<div class="mt-10 grid gap-6 md:grid-cols-2">
+				{moreFeatured.map((v) => (
+					<div class="grid gap-4 sm:grid-cols-2">
+						<YouTubeEmbed id={v.id} si={v.si} title={v.title} />
+						<div>
+							{v.category && <p class="text-xs font-semibold uppercase tracking-wider text-accent">{v.category}</p>}
+							<h3 class="mt-1 font-semibold text-ink">{v.title}</h3>
+							{v.description && <p class="mt-1 text-sm text-body">{v.description}</p>}
+						</div>
+					</div>
+				))}
+			</div>
+		)
+	}
+
+	{
+		otherVideos.length > 0 && (
+			<section class={mainFeatured ? "mt-16" : ""} aria-labelledby="all-videos-title">
+				<div class="flex flex-wrap items-end justify-between gap-4">
+					<h2 id="all-videos-title" class="text-2xl font-bold tracking-tight text-ink">
+						{mainFeatured ? "More videos" : "All videos"}
+					</h2>
+					{showFilters && (
+						<div class="flex flex-wrap gap-2" role="group" aria-label="Filter videos by topic" data-video-filters>
+							<button type="button" data-filter="all" aria-pressed="true" class="filter-chip">All</button>
+							{videoCategories.map((c) => (
+								<button type="button" data-filter={c} aria-pressed="false" class="filter-chip">{c}</button>
+							))}
+						</div>
+					)}
+				</div>
 				<div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-					{others.map((v) => (
-						<article class="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-							<img
-								src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
-								alt=""
-								width="480"
-								height="360"
-								loading="lazy"
-								class="aspect-video w-full object-cover"
-							/>
+					{otherVideos.map((v) => (
+						<article
+							data-category={v.category ?? ""}
+							class="group relative overflow-hidden rounded-xl border border-line glass shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+							<img src={thumb(v.id)} alt="" width="480" height="360" loading="lazy" class="aspect-video w-full object-cover" />
 							<div class="p-5">
-								<h3 class="font-semibold text-navy-900">
-									<a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noopener noreferrer" class="after:absolute after:inset-0">
+								{v.category && <p class="text-xs font-semibold uppercase tracking-wider text-accent">{v.category}</p>}
+								<h3 class="mt-1 font-semibold text-ink">
+									<a href={watch(v.id)} target="_blank" rel="noopener noreferrer" class="after:absolute after:inset-0 group-hover:text-accent-strong">
 										{v.title}
 									</a>
 								</h3>
-								<p class="mt-1 text-sm text-slate-600">{v.description}</p>
+								{v.description && <p class="mt-1 text-sm text-body">{v.description}</p>}
 							</div>
 						</article>
 					))}
@@ -69,11 +113,50 @@ const [featured, ...others] = videos;
 		)
 	}
 
-	<section class="mt-14 rounded-xl border border-slate-200 bg-white p-6 md:p-8">
-		<h2 class="text-xl font-semibold text-navy-900">Prefer to read?</h2>
-		<p class="mt-2 max-w-2xl text-slate-600">
-			Every video topic has a written guide with the details, tables and up-to-date numbers.
+	<section class="mt-14 rounded-xl border border-line glass p-6 md:p-8">
+		<h2 class="text-xl font-semibold text-ink">Prefer to read?</h2>
+		<p class="mt-2 max-w-2xl text-body">
+			Many video topics have a written guide with the details, tables and up-to-date numbers.
 		</p>
-		<a href="/blog/" class="mt-4 inline-flex font-semibold text-brand-600 hover:text-brand-700">Browse the guides →</a>
+		<a href="/blog/" class="mt-4 inline-flex font-semibold text-accent hover:text-accent-strong">Browse the guides →</a>
 	</section>
 </PageLayout>
+
+<style>
+	.filter-chip {
+		cursor: pointer;
+		border: 1px solid var(--line);
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
+		color: var(--body);
+		border-radius: 9999px;
+		padding: 0.3rem 0.9rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+	}
+	.filter-chip:hover {
+		border-color: var(--color-brand-500);
+	}
+	.filter-chip[aria-pressed="true"] {
+		background: var(--btn);
+		border-color: var(--btn);
+		color: #fff;
+	}
+</style>
+
+<script>
+	const group = document.querySelector("[data-video-filters]");
+	if (group) {
+		const chips = [...group.querySelectorAll<HTMLButtonElement>("[data-filter]")];
+		const cards = [...document.querySelectorAll<HTMLElement>("article[data-category]")];
+		group.addEventListener("click", (e) => {
+			const chip = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-filter]");
+			if (!chip) return;
+			const f = chip.dataset.filter;
+			chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+			cards.forEach((card) => (card.hidden = f !== "all" && card.dataset.category !== f));
+		});
+	}
+</script>

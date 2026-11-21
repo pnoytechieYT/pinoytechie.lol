@@ -9,7 +9,7 @@ MariBank's referral program pays **up to ₱588** to both the referrer and the n
 
 ## The Three Requirements
 
-To qualify, the new user must do all of the following [citation:8]:
+To qualify, the new user must do all of the following:
 
 1. **Enter a valid referral code during registration**, before completing the mobile number verification step.
 2. **Make a first one-time deposit of exactly ₱1,000 or more** from any bank or e-wallet, including another MariBank account. Depositing ₱500 today and ₱500 tomorrow does not qualify.
@@ -17,7 +17,7 @@ To qualify, the new user must do all of the following [citation:8]:
 
 ## The Mistakes That Disqualify You
 
-MariBank's own FAQ lists examples of failed referrals [citation:8]:
+MariBank's own FAQ lists examples of failed referrals:
 
 - Depositing **₱500** as the first deposit and adding more later. The first deposit must meet the ₱1,000 threshold in one transaction.
 - Depositing **₱800** first and **₱200** the next day. The total reaches ₱1,000, but the first deposit was below the minimum.
@@ -27,11 +27,11 @@ The common thread: the first deposit must be **one transaction of at least ₱1,
 
 ## Payout Timing
 
-If all requirements are met, the reward is credited to both accounts **the following week**, typically within a few days after the holding period ends. MariBank's example states that a referral completed on January 3 would pay out on or before January 7 [citation:8].
+If all requirements are met, the reward is credited to both accounts **the following week**, typically within a few days after the holding period ends. MariBank's example states that a referral completed on January 3 would pay out on or before January 7.
 
 ## Referral Limits
 
-You can refer as many people as you want per month, but rewards are capped at the **first 100 successful referrals** per month. Unused referrals do not carry over [citation:8]. This matters for users who promote codes publicly; the 101st successful sign-up in a given month does not generate a reward.
+You can refer as many people as you want per month, but rewards are capped at the **first 100 successful referrals** per month. Unused referrals do not carry over. This matters for users who promote codes publicly; the 101st successful sign-up in a given month does not generate a reward.
 
 ## What Nobody Should Charge You For
 

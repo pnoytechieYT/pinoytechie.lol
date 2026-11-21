@@ -9,7 +9,7 @@ MariBank's public materials focus on savings and transfers, but the bank also of
 
 ## What the Product Is
 
-MariBank's Philippine loan product is a cash loan offered through the app to qualified users. It is distinct from the MariBank Singapore business loan products, which are marketed to SME customers in Singapore and have their own promotional terms [citation:7].
+MariBank's Philippine loan product is a cash loan offered through the app to qualified users. It is distinct from the MariBank Singapore business loan products, which are marketed to SME customers in Singapore and have their own promotional terms.
 
 For Philippine users, the loan appears as an option in the app for accounts that meet MariBank's internal criteria. If the option is not visible, the account has not been selected for the offer.
 

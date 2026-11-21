@@ -1,5 +1,5 @@
 ---
-import { siteData } from "@/data/site";
+import { homeVideo } from "@/data/videos";
 
 interface Props {
 	id?: string;
@@ -7,12 +7,12 @@ interface Props {
 	title?: string;
 	class?: string;
 }
-const { id = siteData.video.id, si, title = siteData.video.title, class: className } = Astro.props;
+const { id = homeVideo.id, si, title = homeVideo.title, class: className } = Astro.props;
 const query = si ? `?si=${encodeURIComponent(si)}` : "";
 ---
 
 <!-- youtube-nocookie.com: the same player, but YouTube sets no tracking cookies until the video is played -->
-<div class:list={["aspect-video w-full overflow-hidden rounded-xl bg-navy-950 shadow-lg ring-1 ring-slate-900/10", className]}>
+<div class:list={["aspect-video w-full overflow-hidden rounded-xl bg-navy-950 shadow-lg ring-1 ring-line", className]}>
 	<iframe
 		class="h-full w-full"
 		src={`https://www.youtube-nocookie.com/embed/${id}${query}`}

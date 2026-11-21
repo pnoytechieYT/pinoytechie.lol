@@ -6,11 +6,6 @@ export interface Faq {
 	question: string;
 	answer: string;
 }
-export interface Video {
-	id: string;
-	title: string;
-	description: string;
-}
 
 const code = "MBPINOY2027";
 const bonus = "₱588";
@@ -70,23 +65,12 @@ export const siteData = {
 		email: "", // e.g. "hello@pinoytechie.lol"
 	},
 
-	// Featured video on the home page (youtube.com/watch?v=<id>)
+	// Home page video block wording. The video itself is the first `featured: true`
+	// entry in src/data/videos.ts (that file also controls the /videos/ page).
 	video: {
-		id: "qHHuN3Y3FzA",
-		si: "m6GFuCP9fZHsGQrw",
-		title: "Pinoy Techie featured video",
 		heading: "Watch the walkthrough",
 		text: "Prefer to see it on screen? This video shows the sign-up flow so you know what to expect before you deposit.",
 	},
-
-	// Shown on /videos/. Add more entries to list more videos.
-	videos: [
-		{
-			id: "qHHuN3Y3FzA",
-			title: "Pinoy Techie featured video",
-			description: "The latest featured tutorial from the Pinoy Techie channel.",
-		},
-	] satisfies Video[],
 
 	legalUpdated: "2026-11-21", // update whenever Privacy Policy / Terms / Disclosure change
 
