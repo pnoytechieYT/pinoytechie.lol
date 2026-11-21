@@ -87,8 +87,8 @@ export const siteData = {
 		holdDays,
 		title: `MariBank Referral Code ${code}: Get ${bonus} (2026)`,
 		description: `Use MariBank referral code ${code} when you sign up. Deposit ${minDeposit}, keep it ${holdDays} days, and get ${bonus} rewards. Step-by-step guide, updated October 2026.`,
-		usersCount: 823,
-		usersCountAsOf: "2026-10-03", // update this date whenever you update the count
+		usersCount: 869,
+		usersCountAsOf: "2026-11-20", // update this date whenever you update the count
 		updated: "2026-11-21", // update whenever promo terms change
 	},
 
