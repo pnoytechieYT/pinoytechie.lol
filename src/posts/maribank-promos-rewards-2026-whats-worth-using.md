@@ -3,6 +3,7 @@ title: "MariBank Promos and Rewards in 2026: What's Actually Worth Using"
 description: "A running list of the load discounts, bill cashback, referral rewards, and the terms that determine whether they are worth the effort."
 pubDate: "2026-11-29T12:00:00+08:00"
 tags: ["MariBank", "Promos", "Rewards"]
+category: "maribank"
 ---
 
 MariBank's app advertises several recurring perks alongside its savings rate. Some are genuinely useful for everyday users; others require enough conditions that the effective value is lower than the headline.

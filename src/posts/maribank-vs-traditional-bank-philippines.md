@@ -3,6 +3,7 @@ title: "MariBank vs a Traditional Bank: Where the Digital Bank Actually Wins"
 description: "No maintaining balance, higher rates, and free transfers. But traditional banks still have branches and broader services. Here is the honest split."
 pubDate: "2026-08-14T09:00:00+08:00"
 tags: ["MariBank", "Comparison", "Banking"]
+category: "maribank"
 ---
 
 MariBank is often compared to GCash, but the more instructive comparison for savers is against a traditional brick-and-mortar bank.

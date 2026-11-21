@@ -3,6 +3,7 @@ title: "MariCard Debit Card Fees: ATM Withdrawals, FX Charges, and Limits"
 description: "Local ATM fees, the 0% vs 2% foreign transaction split, and how to check your daily withdrawal cap before you travel."
 pubDate: "2026-03-10T09:00:00+08:00"
 tags: ["MariBank", "MariCard", "Fees"]
+category: "maribank"
 ---
 
 MariBank's debit card, MariCard, is free to get (the physical card costs ₱49), but it comes with specific fee structures that are easy to miss until you are at an ATM or paying in a foreign currency.

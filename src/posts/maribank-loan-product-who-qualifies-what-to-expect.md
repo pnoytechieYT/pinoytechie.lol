@@ -3,6 +3,7 @@ title: "MariBank Loan Product: Who Qualifies and What to Expect"
 description: "MariBank offers a loan to select users. Here is what is known about eligibility, how it appears in the app, and what to check before applying."
 pubDate: "2026-11-30T12:00:00+08:00"
 tags: ["MariBank", "Loans", "Credit"]
+category: "maribank"
 ---
 
 MariBank's public materials focus on savings and transfers, but the bank also offers a **loan product available to select users**. The details are not prominently advertised, and eligibility is not automatic. Here is what the available information shows.

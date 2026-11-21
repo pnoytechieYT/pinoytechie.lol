@@ -1,0 +1,32 @@
+---
+import { siteData } from "@/data/site";
+
+const { referral } = siteData;
+const items = [
+	`${referral.bonus} sign-up reward`,
+	`Code ${referral.code}`,
+	"₱1,000,000 PDIC insurance per depositor",
+	`Deposit ${referral.minDeposit}`,
+	`Keep it ${referral.holdDays} days`,
+	"Independent guides",
+];
+---
+
+<div class="marquee" aria-label="Quick facts">
+	<div class="marquee-track">
+		<div class="marquee-group">
+			{items.map((item) => (
+				<span class="flex items-center whitespace-nowrap py-3 font-mono text-sm font-bold uppercase tracking-wider">
+					<span class="px-6">{item}</span><span class="text-amber" aria-hidden="true">✦</span>
+				</span>
+			))}
+		</div>
+		<div class="marquee-group" aria-hidden="true">
+			{items.map((item) => (
+				<span class="flex items-center whitespace-nowrap py-3 font-mono text-sm font-bold uppercase tracking-wider">
+					<span class="px-6">{item}</span><span class="text-amber" aria-hidden="true">✦</span>
+				</span>
+			))}
+		</div>
+	</div>
+</div>

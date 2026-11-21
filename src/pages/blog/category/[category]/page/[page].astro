@@ -1,0 +1,17 @@
+---
+import CategoryPage from "@/components/pages/CategoryPage.astro";
+import { siteData } from "@/data/site";
+import { categories } from "@/data/categories";
+import { getPostsByCategory } from "@/lib/posts";
+import { extraPageParams } from "@/lib/pagination";
+
+export function getStaticPaths() {
+	return categories.flatMap((c) =>
+		extraPageParams(getPostsByCategory(c.slug).length, siteData.paging.postsPerPage).map((p) => ({
+			params: { category: c.slug, ...p },
+		})),
+	);
+}
+---
+
+<CategoryPage slug={Astro.params.category!} page={Number(Astro.params.page)} />

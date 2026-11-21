@@ -3,6 +3,7 @@ title: "Is MariBank legit? What to check before you deposit"
 description: "MariBank is a licensed digital bank with PDIC-insured deposits. Here is who is behind it and how to avoid fake apps and fake referral pages."
 pubDate: "2026-10-28T09:00:00+08:00"
 tags: ["MariBank", "Safety"]
+category: "maribank"
 ---
 
 Yes, MariBank is a real bank. MariBank Philippines, formerly known as SeaBank, is a licensed digital bank in the Philippines. Here is what to check so you only deal with the real one.

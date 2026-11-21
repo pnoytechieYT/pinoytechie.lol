@@ -3,6 +3,7 @@ title: "MariBank Free Transfers: Unlimited InstaPay and PESONet, Explained"
 description: "MariBank brought back unlimited free transfers. Here is how it works, what changed, and why it matters for daily banking."
 pubDate: "2026-07-20T09:00:00+08:00"
 tags: ["MariBank", "Transfers", "InstaPay"]
+category: "maribank"
 ---
 
 One of MariBank's most practical features is **unlimited free transfers** via InstaPay and PESONet. This was not always the case—the bank previously experimented with limited free transfers before returning to the unlimited model.

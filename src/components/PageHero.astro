@@ -6,19 +6,28 @@ interface Props {
 	title: string;
 	lead?: string;
 	eyebrow?: string;
+	/** Logo shown above the title (category pages) */
+	icon?: string;
 	crumbs?: Crumb[];
 }
-const { title, lead, eyebrow, crumbs } = Astro.props;
+const { title, lead, eyebrow, icon, crumbs } = Astro.props;
 ---
 
-<section class="hero-bg text-white">
-	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
-		{crumbs && <Breadcrumbs items={crumbs} dark />}
-		{eyebrow && <p class="mt-5 text-sm font-semibold uppercase tracking-wider text-gold-400">{eyebrow}</p>}
-		<h1 class:list={["max-w-3xl text-3xl font-bold leading-tight tracking-tight md:text-5xl", !eyebrow && crumbs && "mt-5"]}>
+<section class="relative overflow-hidden border-b-[3px] border-ink bg-sun">
+	<svg aria-hidden="true" class="pointer-events-none absolute -right-4 -top-6 hidden h-64 w-auto rotate-12 text-amber md:block" viewBox="0 0 24 32">
+		<polygon points="14,0 2,18 11,18 8,32 22,12 13,12 18,0" fill="currentColor" stroke="#111" stroke-width="1.2" stroke-linejoin="round"></polygon>
+	</svg>
+	<svg aria-hidden="true" class="pointer-events-none absolute bottom-4 right-44 hidden h-24 w-auto -rotate-12 text-flame md:block" viewBox="0 0 24 32">
+		<polygon points="14,0 2,18 11,18 8,32 22,12 13,12 18,0" fill="currentColor" stroke="#111" stroke-width="1.5" stroke-linejoin="round"></polygon>
+	</svg>
+	<div class="relative mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+		{crumbs && <Breadcrumbs items={crumbs} />}
+		{icon && <img src={icon} alt="" width="88" height="88" class="mt-6 h-[5.5rem] w-[5.5rem] rounded-3xl border-[3px] border-ink bg-white shadow-hard" />}
+		{eyebrow && <p class="nb-eyebrow mt-5">{eyebrow}</p>}
+		<h1 class:list={[icon && "mt-5", "max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight text-ink md:text-6xl", !eyebrow && crumbs && !icon && "mt-5"]}>
 			{title}
 		</h1>
-		{lead && <p class="mt-4 max-w-2xl text-lg leading-relaxed text-slate-300">{lead}</p>}
+		{lead && <p class="mt-5 max-w-2xl text-lg font-medium leading-relaxed text-ink/85 md:text-xl">{lead}</p>}
 		<slot />
 	</div>
 </section>

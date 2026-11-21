@@ -15,6 +15,6 @@ const { href, src, alt, label, width, height } = Astro.props;
 	target="_blank"
 	rel="noopener noreferrer"
 	aria-label={label}
-	class="inline-flex transition-transform duration-200 hover:-translate-y-0.5">
+	class="inline-flex transition-transform duration-100 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5">
 	<img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" class="h-12 w-auto md:h-14" />
 </a>

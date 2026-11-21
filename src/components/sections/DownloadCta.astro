@@ -4,34 +4,44 @@ import CopyButton from "@/components/CopyButton.astro";
 import { siteData } from "@/data/site";
 ---
 
-<section id="download" class="hero-bg text-white" aria-labelledby="download-title">
-	<div class="mx-auto grid max-w-6xl gap-8 px-4 py-16 md:grid-cols-12 md:items-center md:px-6 md:py-20">
-		<div class="md:col-span-7">
-			<h2 id="download-title" class="text-3xl font-bold leading-tight tracking-tight md:text-4xl">
-				Open your MariBank account with <span class="text-gold-400">{siteData.referral.code}</span>
-			</h2>
-			<p class="mt-3 max-w-xl text-lg text-slate-300">
-				Use the official store links, then enter the code during sign-up.
-			</p>
-			<CopyButton code={siteData.referral.code} class="mt-6 !bg-gold-400 !text-navy-950 hover:!bg-gold-300" />
-		</div>
-		<div class="flex flex-wrap gap-4 md:col-span-5 md:justify-end">
-			<StoreButton
-				href="https://play.google.com/store/apps/details?id=ph.seabank.seabank&hl=en"
-				src="/images/playstore-btn.webp"
-				alt="Get it on Google Play"
-				label="Download MariBank from Google Play Store"
-				width={1280}
-				height={380}
-			/>
-			<StoreButton
-				href="https://apps.apple.com/ph/app/maribank-ph-seabank/id1592249158"
-				src="/images/appstore-btn.webp"
-				alt="Download on the App Store"
-				label="Download MariBank from Apple App Store"
-				width={800}
-				height={237}
-			/>
+<section id="download" class="relative overflow-hidden bg-flame" aria-labelledby="download-title">
+	<svg aria-hidden="true" class="pointer-events-none absolute -right-6 top-6 hidden h-56 w-auto rotate-12 text-sun md:block" viewBox="0 0 24 32">
+		<polygon points="14,0 2,18 11,18 8,32 22,12 13,12 18,0" fill="currentColor" stroke="#111" stroke-width="1.2" stroke-linejoin="round"></polygon>
+	</svg>
+	<div class="relative mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+		<div class="nb-card grid gap-10 p-6 shadow-[10px_10px_0_0_#111] md:grid-cols-12 md:items-center md:p-12">
+			<div class="md:col-span-7">
+				<div class="flex items-center gap-3">
+					<img src={siteData.maribankLogo} alt="MariBank app icon" width="48" height="48" class="h-12 w-12 rounded-xl border-[3px] border-ink shadow-hard-sm" />
+					<span class="nb-tag nb-tag-red">Last step</span>
+				</div>
+				<h2 id="download-title" class="mt-4 text-3xl font-bold leading-[1.1] tracking-tight text-ink md:text-5xl">
+					Open your MariBank account with
+					<span class="mt-2 inline-block -rotate-1 bg-ink px-2.5 py-0.5 font-mono text-[0.9em] text-sun">{siteData.referral.code}</span>
+				</h2>
+				<p class="mt-5 max-w-xl text-lg font-medium text-body">
+					Use the official store links, then enter the code during sign-up.
+				</p>
+				<CopyButton code={siteData.referral.code} variant="red" class="mt-7 px-6 py-3.5 text-lg" />
+			</div>
+			<div class="flex flex-wrap items-center gap-4 md:col-span-5 md:justify-end">
+				<StoreButton
+					href="https://play.google.com/store/apps/details?id=ph.seabank.seabank&hl=en"
+					src="/images/playstore-btn.webp"
+					alt="Get it on Google Play"
+					label="Download MariBank from Google Play Store"
+					width={1280}
+					height={380}
+				/>
+				<StoreButton
+					href="https://apps.apple.com/ph/app/maribank-ph-seabank/id1592249158"
+					src="/images/appstore-btn.webp"
+					alt="Download on the App Store"
+					label="Download MariBank from Apple App Store"
+					width={800}
+					height={237}
+				/>
+			</div>
 		</div>
 	</div>
 </section>

@@ -3,6 +3,7 @@ title: "How to Keep More Than ₱1,000,000 Safe Across Philippine Banks"
 description: "PDIC coverage is per depositor per bank. Here is how to split large savings across multiple institutions without losing insurance protection."
 pubDate: "2026-11-28T12:00:00+08:00"
 tags: ["MariBank", "PDIC", "Safety"]
+category: "maribank"
 ---
 
 Every MariBank guide correctly states that deposits are insured by the PDIC up to **₱1,000,000 per depositor**. What most guides do not explain is what to do when your savings exceed that amount.

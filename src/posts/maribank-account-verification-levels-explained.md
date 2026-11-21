@@ -3,6 +3,7 @@ title: "MariBank Verification Levels Explained: What Each Tier Lets You Do"
 description: "Your transaction limits and feature access depend on how verified your account is. Here is what changes at each level and how to upgrade."
 pubDate: "2026-11-22T12:00:00+08:00"
 tags: ["MariBank", "Account Opening", "Verification"]
+category: "maribank"
 ---
 
 MariBank's help pages and fee schedules repeatedly mention that limits "vary by account verification level," but the app does not always make the tiers obvious during onboarding. Understanding the difference matters if you plan to move significant amounts or use the card abroad.

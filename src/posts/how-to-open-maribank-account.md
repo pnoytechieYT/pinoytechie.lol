@@ -3,6 +3,7 @@ title: "How to Open a MariBank Account in 5 Minutes (and What to Prepare)"
 description: "The requirements, the steps, and the common snags when signing up for MariBank from your phone."
 pubDate: "2026-04-22T09:00:00+08:00"
 tags: ["MariBank", "Account Opening", "Guide"]
+category: "maribank"
 ---
 
 MariBank advertises a 5-minute account opening process. In practice, preparation determines whether it actually takes 5 minutes or 20.

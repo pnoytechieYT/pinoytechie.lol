@@ -3,6 +3,7 @@ title: "MariBank Savings Rate in 2026: How the 3.25% and 3.75% Tiers Actually Wo
 description: "A clear breakdown of MariBank's savings interest tiers, daily crediting, and the 20% withholding tax you need to factor in."
 pubDate: "2026-02-15T09:00:00+08:00"
 tags: ["MariBank", "Savings", "Interest Rates"]
+category: "maribank"
 ---
 
 MariBank's headline rate looks simple, but the tiered structure and tax treatment matter if you are deciding where to park your cash.

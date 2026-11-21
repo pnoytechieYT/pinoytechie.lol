@@ -3,6 +3,7 @@ title: "MariBank Interest Calculation: What You Actually Earn on ₱10K, ₱50K,
 description: "Gross rate vs net after 20% tax, with daily crediting factored in. Real peso figures for common balances."
 pubDate: "2026-11-25T12:00:00+08:00"
 tags: ["MariBank", "Savings", "Interest Rates"]
+category: "maribank"
 ---
 
 MariBank advertises **3.25% per annum** on balances up to ₱1,000,000, credited daily, subject to **20% withholding tax**. The advertised rate is gross. What lands in your account is lower. Here is what that looks like at three common balance levels.

@@ -1,9 +1,9 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
-import CopyButton from "@/components/CopyButton.astro";
+import Angpao from "@/components/Angpao.astro";
 import PostCard from "@/components/PostCard.astro";
-import { getPosts, getRelated, formatDateTime, slugify } from "@/lib/posts";
+import { getCategory, getPosts, getRelated, formatDateTime, slugify } from "@/lib/posts";
 import { siteData } from "@/data/site";
 import { abs, authorNode, breadcrumbNode, ids, webPageNode } from "@/lib/seo";
 
@@ -19,6 +19,7 @@ const path = `/blog/${post.slug}/`;
 const pageUrl = abs(path);
 const image = post.meta.image ?? siteData.ogImage;
 const related = getRelated(post, 3);
+const category = getCategory(post.category)!;
 const toc = post.headings.filter((h) => (h.depth === 2 || h.depth === 3) && h.slug !== "footnote-label");
 const tocH2Count = toc.filter((h) => h.depth === 2).length;
 const seoTitle = post.meta.seoTitle ?? post.meta.title;
@@ -29,6 +30,7 @@ const wasUpdated = post.updatedDate.getTime() - post.pubDate.getTime() > 60_000;
 const crumbs = [
 	{ name: "Home", href: "/" },
 	{ name: "Guides", href: "/blog/" },
+	{ name: category.name, href: category.path },
 	{ name: post.meta.title, href: path },
 ];
 
@@ -55,7 +57,8 @@ const schema = [
 		isPartOf: { "@id": ids.website },
 		wordCount: post.wordCount,
 		timeRequired: `PT${post.minutes}M`,
-		...(post.tags.length ? { keywords: post.tags.join(", "), articleSection: post.tags[0] } : {}),
+		articleSection: category.name,
+		...(post.tags.length ? { keywords: post.tags.join(", ") } : {}),
 	},
 	breadcrumbNode(crumbs),
 ];
@@ -70,27 +73,28 @@ const schema = [
 	publishedTime={post.pubDate.toISOString()}
 	modifiedTime={post.updatedDate.toISOString()}
 	tags={post.tags}
+	activeNav={category.inNav ? category.path : undefined}
 	schema={schema}>
-	<div id="read-progress" class="fixed inset-x-0 top-0 z-50 h-1 origin-left scale-x-0 bg-gold-400" aria-hidden="true"></div>
-	<div class="border-b border-line glass">
+	<div id="read-progress" class="fixed inset-x-0 top-0 z-50 h-2 origin-left scale-x-0 border-b-2 border-ink bg-flame" aria-hidden="true"></div>
+	<div class="border-b-[3px] border-ink bg-sun">
 		<div class="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
 			<Breadcrumbs items={crumbs} />
-			<div class="mt-5 flex flex-wrap items-center gap-2 text-xs font-medium">
+			<div class="mt-5 flex flex-wrap items-center gap-2">
 				{
 					post.tags.map((tag) => (
-						<a href={`/blog/tag/${slugify(tag)}/`} class="rounded-full bg-tint px-2.5 py-1 text-accent-strong hover:bg-tint-strong">
+						<a href={`/blog/tag/${slugify(tag)}/`} class="nb-tag nb-tag-white hover:bg-ink hover:text-sun">
 							{tag}
 						</a>
 					))
 				}
-				{post.isScheduled && <span class="rounded-full bg-gold-300 px-2.5 py-1 text-navy-950">Scheduled: not public yet (dev preview)</span>}
+				{post.isScheduled && <span class="nb-tag nb-tag-red">Scheduled: not public yet (dev preview)</span>}
 			</div>
-			<h1 class="mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-ink md:text-5xl">
+			<h1 class="mt-5 max-w-3xl text-3xl font-bold leading-[1.08] tracking-tight text-ink md:text-5xl">
 				{post.meta.title}
 			</h1>
-			<p class="mt-4 max-w-3xl text-lg leading-relaxed text-body">{post.meta.description}</p>
-			<p class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
-				<span>By <a href="/about/" class="font-medium text-body hover:underline">{siteData.author.name}</a></span>
+			<p class="mt-5 max-w-3xl text-lg font-medium leading-relaxed text-ink/85">{post.meta.description}</p>
+			<p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs font-bold uppercase text-ink">
+				<span>By <a href="/about/" class="underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">{siteData.author.name}</a></span>
 				<span aria-hidden="true">·</span>
 				<span>Published <time datetime={post.pubDate.toISOString()}>{formatDateTime(post.pubDate)}</time></span>
 				{
@@ -112,22 +116,22 @@ const schema = [
 			<div class="prose-article">
 				<Content />
 			</div>
-			<p class="mt-12 max-w-2xl rounded-lg border border-line glass p-4 text-sm leading-relaxed text-muted">
-				<strong class="text-body">Not financial advice.</strong>
+			<p class="nb-card mt-12 max-w-2xl bg-sun-soft p-4 text-sm leading-relaxed text-body">
+				<strong class="font-mono uppercase text-ink">Not financial advice.</strong>
 				{name} is independent and not affiliated with MariBank or Sea Group. Rates, fees and rewards change, so confirm current
-				terms in the app. See our <a href="/disclosure/" class="text-accent underline">referral disclosure</a>.
+				terms in the app. See our <a href="/disclosure/" class="font-bold text-flame-dark underline hover:bg-sun hover:text-ink">referral disclosure</a>.
 			</p>
 		</article>
 
 		<aside class="space-y-6 lg:sticky lg:top-24 lg:self-start" aria-label="Sidebar">
 			{
 				tocH2Count >= 3 && (
-					<nav aria-labelledby="toc-title" class="rounded-xl border border-line glass p-5">
-						<h2 id="toc-title" class="text-sm font-semibold uppercase tracking-wider text-muted">On this page</h2>
-						<ul class="mt-3 space-y-2 text-sm">
+					<nav aria-labelledby="toc-title" class="nb-card p-5">
+						<h2 id="toc-title" class="nb-eyebrow">On this page</h2>
+						<ul class="mt-4 space-y-2.5 border-t-[3px] border-dashed border-ink pt-4 text-sm font-medium">
 							{toc.map((h) => (
-								<li class={h.depth === 3 ? "ml-3 border-l border-line pl-3 text-[0.8125rem]" : ""}>
-									<a href={`#${h.slug}`} data-toc-link class="block text-body transition-colors hover:text-accent-strong [&.is-active]:font-semibold [&.is-active]:text-accent-strong">
+								<li class={h.depth === 3 ? "ml-3 border-l-[3px] border-ink pl-3 text-[0.8125rem]" : ""}>
+									<a href={`#${h.slug}`} data-toc-link class="block px-1 text-ink transition-colors hover:bg-sun-soft [&.is-active]:bg-sun [&.is-active]:font-bold">
 										{h.text}
 									</a>
 								</li>
@@ -136,26 +140,21 @@ const schema = [
 					</nav>
 				)
 			}
-			<div class="glass-dark rounded-xl p-6 text-white" aria-labelledby="cta-title">
-				<h2 id="cta-title" class="text-lg font-semibold">Trying MariBank?</h2>
-				<p class="mt-2 text-sm leading-relaxed text-slate-300">
-					Enter <strong class="text-gold-400">{referral.code}</strong> during sign-up. Deposit {referral.minDeposit}, keep it for
-					{referral.holdDays} days, and you receive {referral.bonus}. Terms are set by MariBank and can change.
-				</p>
-				<CopyButton code={referral.code} class="mt-4 w-full !bg-gold-400 !text-navy-950 hover:!bg-gold-300" />
-				<a href="/#download" class="mt-3 block text-center text-sm font-medium text-slate-300 underline underline-offset-4 hover:text-white">
-					Get the app
-				</a>
+			<div>
+				<h2 id="cta-title" class="mb-4 text-xl font-bold tracking-tight text-ink">Trying MariBank?</h2>
+				<Angpao code={referral.code} bonus={referral.bonus} minDeposit={referral.minDeposit} holdDays={referral.holdDays} compact />
+				<p class="mt-4 text-sm font-medium leading-relaxed text-body">Enter the code during sign-up. Terms are set by MariBank and can change.</p>
+				<a href="/#download" class="mt-2 inline-block text-sm font-bold text-ink underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">Get the app →</a>
 			</div>
 		</aside>
 	</div>
 
 	{
 		related.length > 0 && (
-			<section class="border-t border-line glass" aria-labelledby="more-title">
-				<div class="mx-auto max-w-6xl px-4 py-14 md:px-6">
-					<h2 id="more-title" class="text-2xl font-bold tracking-tight text-ink">Keep reading</h2>
-					<div class="mt-8 grid gap-6 md:grid-cols-3">
+			<section class="border-t-[3px] border-ink bg-white" aria-labelledby="more-title">
+				<div class="mx-auto max-w-6xl px-4 py-16 md:px-6">
+					<h2 id="more-title" class="text-3xl font-bold tracking-tight text-ink md:text-4xl">Keep <span class="hl">reading</span></h2>
+					<div class="mt-10 grid gap-8 md:grid-cols-3">
 						{related.map((p) => <PostCard post={p} />)}
 					</div>
 				</div>

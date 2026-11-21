@@ -3,6 +3,7 @@ title: "Is Your Money Safe in MariBank? BSP License and PDIC Coverage Explained"
 description: "MariBank is regulated by the Bangko Sentral ng Pilipinas and deposits are insured by PDIC up to ₱1,000,000. Here is what that actually means."
 pubDate: "2026-01-20T09:00:00+08:00"
 tags: ["MariBank", "Safety", "PDIC"]
+category: "maribank"
 ---
 
 If you are considering a digital bank, the first question is usually about safety. MariBank operates under the same regulatory framework as traditional banks in the Philippines.

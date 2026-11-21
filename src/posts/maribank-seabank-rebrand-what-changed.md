@@ -3,6 +3,7 @@ title: "MariBank vs SeaBank: What Actually Changed After the Rebrand?"
 description: "The name changed, but what about account numbers, rates, the card, and the app? Here is what stayed the same and what did not."
 pubDate: "2026-11-26T12:00:00+08:00"
 tags: ["MariBank", "SeaBank", "Rebrand"]
+category: "maribank"
 ---
 
 SeaBank Philippines completed its rebrand to **MariBank Philippines Inc.** effective July 31, 2025, following approval from the Bangko Sentral ng Pilipinas and the Securities and Exchange Commission. For existing users, the transition raised a practical question: what actually changed?

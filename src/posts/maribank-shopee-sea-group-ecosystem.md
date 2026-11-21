@@ -3,6 +3,7 @@ title: "MariBank and Shopee: How the Sea Group Ecosystem Changes the Math"
 description: "Free transfers from ShopeePay, cashback on bills, and why being part of Sea Group makes MariBank stickier than a standalone bank."
 pubDate: "2026-06-12T09:00:00+08:00"
 tags: ["MariBank", "Shopee", "Ecosystem"]
+category: "maribank"
 ---
 
 MariBank is not a standalone startup bank. It is part of **Sea Group**, the company that also owns Shopee and Garena. That ownership shapes the product in ways that matter for everyday users.

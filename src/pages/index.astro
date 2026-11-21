@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Hero from "@/components/sections/Hero.astro";
+import Marquee from "@/components/sections/Marquee.astro";
 import TrustBar from "@/components/sections/TrustBar.astro";
 import Steps from "@/components/sections/Steps.astro";
 import VideoSection from "@/components/sections/VideoSection.astro";
@@ -30,6 +31,7 @@ const schema = [
 	modifiedTime={referral.updated}
 	schema={schema}>
 	<Hero />
+	<Marquee />
 	<TrustBar />
 	<Steps />
 	<VideoSection />

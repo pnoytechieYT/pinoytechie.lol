@@ -3,6 +3,7 @@ title: "MariBank Referral Code Guide: How the ₱588 Promo Actually Works"
 description: "The eligibility rules, common disqualification mistakes, and payout timing for MariBank's referral reward."
 pubDate: "2026-11-23T12:00:00+08:00"
 tags: ["MariBank", "Referral", "Promo"]
+category: "maribank"
 ---
 
 MariBank's referral program pays **up to ₱588** to both the referrer and the new user, but the qualification rules are specific enough that many users complete the sign-up and still fail to receive the reward.

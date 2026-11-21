@@ -3,6 +3,7 @@ title: "MariBank Time Deposit: 3.75% for 1 or 3 Months with a ₱100 Minimum"
 description: "A quick guide to MariBank's time deposit product, how interest is paid upfront, and when auto-renewal makes sense."
 pubDate: "2026-05-05T09:00:00+08:00"
 tags: ["MariBank", "Time Deposit", "Savings"]
+category: "maribank"
 ---
 
 MariBank's savings account is the headline product, but it also offers a time deposit for users who want to lock in a rate for a short period.

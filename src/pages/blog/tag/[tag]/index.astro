@@ -1,0 +1,10 @@
+---
+import TagPage from "@/components/pages/TagPage.astro";
+import { getTags } from "@/lib/posts";
+
+export function getStaticPaths() {
+	return getTags().map((t) => ({ params: { tag: t.slug } }));
+}
+---
+
+<TagPage slug={Astro.params.tag!} page={1} />

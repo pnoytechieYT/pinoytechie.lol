@@ -3,6 +3,7 @@ title: "MariBank Time Deposit vs Savings: A Worked Example for ₱50,000"
 description: "The rate difference is 0.50%, but the liquidity trade-off and upfront interest crediting change the math. Here are the actual numbers."
 pubDate: "2026-11-24T12:00:00+08:00"
 tags: ["MariBank", "Time Deposit", "Savings"]
+category: "maribank"
 ---
 
 MariBank's time deposit pays **3.75% per annum**, while the savings account pays **3.25%** on balances up to ₱1,000,000. The 0.50 percentage point difference looks small, but the way interest is paid makes the comparison less obvious than it appears.

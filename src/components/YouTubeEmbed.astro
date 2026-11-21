@@ -12,7 +12,7 @@ const query = si ? `?si=${encodeURIComponent(si)}` : "";
 ---
 
 <!-- youtube-nocookie.com: the same player, but YouTube sets no tracking cookies until the video is played -->
-<div class:list={["aspect-video w-full overflow-hidden rounded-xl bg-navy-950 shadow-lg ring-1 ring-line", className]}>
+<div class:list={["aspect-video w-full overflow-hidden rounded-lg border-[3px] border-ink bg-ink shadow-hard-lg", className]}>
 	<iframe
 		class="h-full w-full"
 		src={`https://www.youtube-nocookie.com/embed/${id}${query}`}

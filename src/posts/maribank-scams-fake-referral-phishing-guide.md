@@ -3,6 +3,7 @@ title: "MariBank Scams to Watch For: Fake Codes, Phishing Links, and Impersonato
 description: "The specific red flags that separate the real MariBank from pages and people pretending to be it."
 pubDate: "2026-11-27T12:00:00+08:00"
 tags: ["MariBank", "Safety", "Scams"]
+category: "maribank"
 ---
 
 MariBank's safety page covers the basics—don't share your OTP, install only from official stores—but the specific scam patterns targeting digital bank users in the Philippines are more varied than that. Here are the ones that actually appear in the wild.

@@ -24,6 +24,8 @@ export const siteData = {
 		"Pinoy Techie publishes independent, plain-language guides, comparisons and video tutorials on MariBank, GCash and digital banking in the Philippines.",
 
 	logo: { src: "/logo.png", small: "/logo-128.png", width: 512, height: 512 },
+	// MariBank's own app icon, shown so visitors can recognise it
+	maribankLogo: "/maribank-logo.png",
 	ogImage: "/og-default.png",
 	ogImageAlt: "Pinoy Techie logo: an eagle with lightning bolts on a yellow circle",
 
@@ -35,11 +37,15 @@ export const siteData = {
 
 	nav: [
 		{ label: "Home", href: "/" },
-		{ label: "Guides", href: "/blog/" },
+		// "expand" = replaced by one button per category that has inNav: true (src/data/categories.ts)
+		{ label: "Guides", href: "/blog/", expand: "categories" },
 		{ label: "Videos", href: "/videos/" },
 		{ label: "About", href: "/about/" },
 		{ label: "Contact", href: "/contact/" },
 	],
+
+	/** How many items per page, and how many topic tags to show under the list */
+	paging: { postsPerPage: 9, videosPerPage: 12, maxTags: 10 },
 
 	footer: {
 		explore: [

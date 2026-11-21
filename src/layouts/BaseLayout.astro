@@ -1,5 +1,7 @@
 ---
-import "@fontsource-variable/inter";
+import "@fontsource-variable/space-grotesk";
+import "@fontsource/space-mono/400.css";
+import "@fontsource/space-mono/700.css";
 import "@/styles/global.css";
 import Seo from "@/components/Seo.astro";
 import Header from "@/components/Header.astro";
@@ -18,10 +20,12 @@ interface Props {
 	modifiedTime?: string;
 	tags?: string[];
 	noindex?: boolean;
+	/** href of the nav button to highlight (defaults to the one matching the URL) */
+	activeNav?: string;
 	schema?: Record<string, unknown>[];
 }
 
-const { title, suffix = true, ...rest } = Astro.props;
+const { title, suffix = true, activeNav, ...rest } = Astro.props;
 const fullTitle = suffix && !title.includes(siteData.name) ? `${title} | ${siteData.name}` : title;
 ---
 
@@ -30,10 +34,10 @@ const fullTitle = suffix && !title.includes(siteData.name) ? `${title} | ${siteD
 	<body class="flex min-h-screen flex-col">
 		<a
 			href="#main"
-			class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-gold-400 focus:px-3 focus:py-2 focus:font-semibold focus:text-navy-950">
+			class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 nb-btn nb-btn-sm">
 			Skip to content
 		</a>
-		<Header />
+		<Header activeNav={activeNav} />
 		<main id="main" class="flex-1">
 			<slot />
 		</main>

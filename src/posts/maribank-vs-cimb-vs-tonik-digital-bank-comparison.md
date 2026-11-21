@@ -3,6 +3,7 @@ title: "MariBank vs CIMB vs Tonik: Which Digital Bank Pays More in 2026?"
 description: "A three-way comparison of savings rates, time deposit terms, PDIC coverage, and the catches behind each bank's headline number."
 pubDate: "2026-11-21T12:00:00+08:00"
 tags: ["MariBank", "CIMB", "Tonik", "Comparison"]
+category: "maribank"
 ---
 
 MariBank, CIMB, and Tonik are the three names that come up most often when Filipinos compare digital savings options. Each advertises a rate that looks competitive, but the structures differ enough that the headline number rarely tells the full story.

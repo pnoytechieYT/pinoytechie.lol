@@ -1,0 +1,64 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import PostListing from "@/components/PostListing.astro";
+import { siteData } from "@/data/site";
+import { getCategory, getPostsByCategory, getTags } from "@/lib/posts";
+import { paginate, pageUrl } from "@/lib/pagination";
+import { abs, breadcrumbNode, webPageNode } from "@/lib/seo";
+
+/** One category (e.g. "MariBank Guide"): its posts, paginated, then its topic tags. */
+interface Props {
+	slug: string;
+	page: number;
+}
+const { slug, page } = Astro.props;
+
+const category = getCategory(slug)!;
+const posts = getPostsByCategory(slug);
+const result = paginate(posts, page, siteData.paging.postsPerPage);
+const tags = getTags(posts);
+
+const base = category.path;
+const path = pageUrl(base, result.page);
+const suffix = result.page > 1 ? ` (page ${result.page})` : "";
+const title = `${category.seoTitle ?? category.name}${suffix}`;
+const description = category.seoDescription ?? category.description;
+const crumbs = [
+	{ name: "Home", href: "/" },
+	{ name: "Guides", href: "/blog/" },
+	{ name: category.name, href: base },
+];
+
+const schema = [
+	{
+		...webPageNode({ type: "CollectionPage", path, title, description }),
+		mainEntity: {
+			"@type": "ItemList",
+			itemListElement: result.items.map((p, i) => ({
+				"@type": "ListItem",
+				position: result.from + i,
+				url: abs(`/blog/${p.slug}/`),
+				name: p.meta.title,
+			})),
+		},
+	},
+	breadcrumbNode(crumbs),
+];
+---
+
+<BaseLayout title={title} description={description} schema={schema} noindex={posts.length === 0}>
+	<PageHero
+		title={category.name}
+		icon={category.logo}
+		eyebrow={category.pinned ? "★ Pinned guides" : undefined}
+		lead={category.description}
+		crumbs={crumbs} />
+
+	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+		<PostListing result={result} basePath={base} tags={tags} emptyText="No guides in this category yet." />
+		<p class="mt-12">
+			<a href="/blog/" class="nb-btn nb-btn-white">← All guide topics</a>
+		</p>
+	</div>
+</BaseLayout>

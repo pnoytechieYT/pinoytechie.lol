@@ -3,6 +3,7 @@ title: "MariBank vs GCash: which should you use in 2026?"
 description: "They do different jobs. Here is how MariBank and GCash compare on savings rates, PDIC coverage, and everyday use, and how to use both."
 pubDate: "2026-10-28T12:00:00+08:00"
 tags: ["MariBank", "GCash", "Comparison"]
+category: "maribank"
 ---
 
 MariBank and GCash get compared a lot, but they are not the same kind of app. GCash is an e-wallet built for paying and sending money. MariBank is a digital bank built for keeping money. Most people end up using both.
