@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Rebuild every 30 minutes so scheduled posts (pubDate in the future)
+  # go live automatically once their publish time has passed.
+  schedule:
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 permissions:

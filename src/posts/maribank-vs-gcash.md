@@ -1,7 +1,7 @@
 ---
 title: "MariBank vs GCash: which should you use in 2026?"
 description: "They do different jobs. Here is how MariBank and GCash compare on savings rates, PDIC coverage, and everyday use, and how to use both."
-pubDate: "2026-10-28"
+pubDate: "2026-10-28T12:00:00+08:00"
 tags: ["MariBank", "GCash", "Comparison"]
 ---
 

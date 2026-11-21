@@ -1,0 +1,42 @@
+---
+import "@fontsource-variable/inter";
+import "@/styles/global.css";
+import Seo from "@/components/Seo.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { siteData } from "@/data/site";
+
+interface Props {
+	title: string;
+	description: string;
+	/** Add " | Pinoy Techie" to the title (default true) */
+	suffix?: boolean;
+	image?: string;
+	imageAlt?: string;
+	type?: "website" | "article";
+	publishedTime?: string;
+	modifiedTime?: string;
+	tags?: string[];
+	noindex?: boolean;
+	schema?: Record<string, unknown>[];
+}
+
+const { title, suffix = true, ...rest } = Astro.props;
+const fullTitle = suffix && !title.includes(siteData.name) ? `${title} | ${siteData.name}` : title;
+---
+
+<html lang={siteData.locale}>
+	<Seo title={fullTitle} {...rest} />
+	<body class="flex min-h-screen flex-col">
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-gold-400 focus:px-3 focus:py-2 focus:font-semibold focus:text-navy-950">
+			Skip to content
+		</a>
+		<Header />
+		<main id="main" class="flex-1">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>

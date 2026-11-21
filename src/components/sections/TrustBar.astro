@@ -1,0 +1,32 @@
+---
+import { siteData } from "@/data/site";
+
+const { referral } = siteData;
+const asOf = new Date(referral.usersCountAsOf).toLocaleDateString(siteData.locale, {
+	month: "long",
+	day: "numeric",
+	year: "numeric",
+	timeZone: "UTC",
+});
+
+const items = [
+	{ value: "₱1,000,000", label: "PDIC deposit insurance per depositor" },
+	{ value: "Licensed", label: "Digital bank in the Philippines" },
+	{ value: referral.usersCount.toLocaleString(siteData.locale), label: `People used this code (as of ${asOf})` },
+	{ value: "Independent", label: "Not affiliated with MariBank" },
+];
+---
+
+<section class="border-b border-slate-200 bg-white" aria-label="Key facts">
+	<dl class="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-slate-200 md:grid-cols-4">
+		{
+			items.map((item) => (
+				<div class="bg-white px-4 py-6 text-center md:px-6">
+					<dt class="sr-only">{item.label}</dt>
+					<dd class="text-2xl font-bold tracking-tight text-navy-900 md:text-3xl">{item.value}</dd>
+					<p class="mt-1 text-xs text-slate-500 md:text-sm" aria-hidden="true">{item.label}</p>
+				</div>
+			))
+		}
+	</dl>
+</section>

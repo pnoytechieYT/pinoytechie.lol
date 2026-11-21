@@ -1,72 +1,39 @@
 ---
-import App from "@/components/app.astro";
-import ReferralHero from "@/components/sections/ReferralHero.astro";
-import StepSection from "@/components/sections/StepSection.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Hero from "@/components/sections/Hero.astro";
+import TrustBar from "@/components/sections/TrustBar.astro";
+import Steps from "@/components/sections/Steps.astro";
+import VideoSection from "@/components/sections/VideoSection.astro";
 import LatestPosts from "@/components/sections/LatestPosts.astro";
-import FaqSection from "@/components/sections/FaqSection.astro";
-import DownloadSection from "@/components/sections/DownloadSection.astro";
+import Faq from "@/components/sections/Faq.astro";
+import DownloadCta from "@/components/sections/DownloadCta.astro";
 import { siteData } from "@/data/site";
+import { webPageNode, faqNode } from "@/lib/seo";
 
-const { referral, faqs, url, name, social } = siteData;
+const { referral, faqs } = siteData;
 
-const jsonLd = {
-	"@context": "https://schema.org",
-	"@graph": [
-		{
-			"@type": "WebSite",
-			"@id": `${url}/#website`,
-			url: `${url}/`,
-			name,
-			inLanguage: "en-PH",
-		},
-		{
-			"@type": "Organization",
-			"@id": `${url}/#org`,
-			name,
-			url: `${url}/`,
-			...(social.youtube ? { sameAs: [social.youtube] } : {}),
-		},
-		{
-			"@type": "WebPage",
-			"@id": `${url}/#webpage`,
-			url: `${url}/`,
-			name: referral.title,
-			isPartOf: { "@id": `${url}/#website` },
-			dateModified: referral.updated,
-			inLanguage: "en-PH",
-		},
-		{
-			"@type": "FAQPage",
-			mainEntity: faqs.map((faq) => ({
-				"@type": "Question",
-				name: faq.question,
-				acceptedAnswer: { "@type": "Answer", text: faq.answer },
-			})),
-		},
-	],
-};
+const schema = [
+	webPageNode({
+		path: "/",
+		title: referral.title,
+		description: referral.description,
+		dateModified: referral.updated,
+	}),
+	faqNode(faqs),
+];
 ---
 
-<App
+<BaseLayout
 	title={referral.title}
 	description={referral.description}
-	jsonLd={jsonLd}
-	modifiedTime={referral.updated}>
-	<div class="bg-white">
-		<img
-			src="/images/banner-3.webp"
-			alt="MariBank Pamasko promo: claim up to ₱588"
-			width="2106"
-			height="720"
-			loading="eager"
-			fetchpriority="high"
-			decoding="async"
-			class="mx-auto h-auto w-full max-w-6xl"
-		/>
-	</div>
-	<ReferralHero />
-	<StepSection />
+	suffix={false}
+	modifiedTime={referral.updated}
+	schema={schema}>
+	<Hero />
+	<TrustBar />
+	<Steps />
+	<VideoSection />
 	<LatestPosts />
-	<FaqSection />
-	<DownloadSection />
-</App>
+	<Faq />
+	<DownloadCta />
+</BaseLayout>

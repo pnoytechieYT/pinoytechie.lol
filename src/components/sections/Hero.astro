@@ -1,0 +1,69 @@
+---
+import CopyButton from "@/components/CopyButton.astro";
+import { siteData } from "@/data/site";
+
+const { referral } = siteData;
+const updated = new Date(referral.updated).toLocaleDateString(siteData.locale, {
+	month: "long",
+	day: "numeric",
+	year: "numeric",
+	timeZone: "UTC",
+});
+---
+
+<section class="hero-bg text-white" aria-labelledby="hero-title">
+	<div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-12 md:items-center md:gap-12 md:px-6 md:py-20">
+		<div class="md:col-span-7">
+			<p class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200">
+				<span class="h-2 w-2 rounded-full bg-gold-400" aria-hidden="true"></span>
+				Updated {updated}
+			</p>
+			<h1 id="hero-title" class="mt-5 text-4xl font-bold leading-[1.1] tracking-tight md:text-5xl lg:text-[3.25rem]">
+				MariBank referral code <span class="text-gold-400">{referral.code}</span>: get {referral.bonus} when you sign up
+			</h1>
+			<p class="mt-5 max-w-xl text-lg leading-relaxed text-slate-300">
+				Enter this code when you open a new MariBank account. Deposit {referral.minDeposit}, keep it in for {referral.holdDays}
+				days, and you receive the {referral.bonus} reward.
+			</p>
+			<div class="mt-8 flex flex-wrap items-center gap-3">
+				<a
+					href="#download"
+					class="inline-flex items-center rounded-md bg-gold-400 px-6 py-3 font-semibold text-navy-950 shadow-sm transition-colors hover:bg-gold-300">
+					Download MariBank
+				</a>
+				<a
+					href="#how-it-works"
+					class="inline-flex items-center rounded-md border border-white/25 px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10">
+					See how it works
+				</a>
+			</div>
+			<p class="mt-6 max-w-xl text-sm text-slate-400">
+				Reward terms are set by MariBank and can change at any time. Pinoy Techie is independent and not affiliated with MariBank.
+			</p>
+		</div>
+
+		<div class="md:col-span-5" id="referral">
+			<div class="mx-auto w-full max-w-md rounded-2xl bg-white p-6 text-slate-800 shadow-2xl ring-1 ring-white/10 md:p-8" role="group" aria-label="Referral code">
+				<p class="text-sm font-semibold uppercase tracking-wider text-slate-500">Your MariBank referral code</p>
+				<p class="mt-3 break-all rounded-lg border border-dashed border-brand-500/40 bg-brand-50 px-4 py-4 text-center text-3xl font-extrabold tracking-[0.12em] text-navy-900 md:text-4xl">
+					{referral.code}
+				</p>
+				<CopyButton code={referral.code} class="mt-4 w-full" />
+				<dl class="mt-6 divide-y divide-slate-100 text-sm">
+					<div class="flex items-center justify-between py-3">
+						<dt class="text-slate-500">First deposit</dt>
+						<dd class="font-semibold text-navy-900">{referral.minDeposit}</dd>
+					</div>
+					<div class="flex items-center justify-between py-3">
+						<dt class="text-slate-500">Keep it for</dt>
+						<dd class="font-semibold text-navy-900">{referral.holdDays} days</dd>
+					</div>
+					<div class="flex items-center justify-between py-3">
+						<dt class="text-slate-500">Reward</dt>
+						<dd class="text-lg font-bold text-brand-600">{referral.bonus}</dd>
+					</div>
+				</dl>
+			</div>
+		</div>
+	</div>
+</section>

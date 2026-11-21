@@ -1,3 +1,4 @@
+# Pinoy Techie: everything public is crawlable, including AI search crawlers.
 User-agent: *
 Allow: /
 

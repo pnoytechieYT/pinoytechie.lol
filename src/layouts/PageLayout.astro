@@ -1,0 +1,38 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import { breadcrumbNode, webPageNode } from "@/lib/seo";
+
+interface Props {
+	title: string; // <title> and og:title (without site suffix)
+	heading?: string; // visible H1 (defaults to title)
+	description: string;
+	lead?: string;
+	path: string;
+	type?: "WebPage" | "AboutPage" | "ContactPage";
+	dateModified?: string;
+	noindex?: boolean;
+	/** false = no prose wrapper, page supplies its own markup */
+	prose?: boolean;
+	schema?: Record<string, unknown>[];
+}
+
+const { title, heading, description, lead, path, type = "WebPage", dateModified, noindex, prose = true, schema = [] } = Astro.props;
+
+const crumbs = [
+	{ name: "Home", href: "/" },
+	{ name: heading ?? title, href: path },
+];
+---
+
+<BaseLayout
+	title={title}
+	description={description}
+	noindex={noindex}
+	modifiedTime={dateModified}
+	schema={[webPageNode({ type, path, title, description, dateModified }), breadcrumbNode(crumbs), ...schema]}>
+	<PageHero title={heading ?? title} lead={lead} crumbs={crumbs} />
+	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+		{prose ? <div class="prose-article"><slot /></div> : <slot />}
+	</div>
+</BaseLayout>

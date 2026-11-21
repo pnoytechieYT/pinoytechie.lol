@@ -1,31 +1,70 @@
 ---
-import App from "@/components/app.astro";
-import PostRow from "@/components/ui/PostRow.astro";
-import { getPosts } from "@/lib/posts";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import PostCard from "@/components/PostCard.astro";
+import { getPosts, getTags } from "@/lib/posts";
+import { abs, breadcrumbNode, webPageNode } from "@/lib/seo";
 
 const posts = getPosts();
+const tags = getTags(posts);
+
+const title = "MariBank Guides and Comparisons";
+const description =
+	"Plain-language guides on MariBank: is it legit, how it compares with GCash, savings rates, fees, and how to get the most from the sign-up reward.";
+const crumbs = [
+	{ name: "Home", href: "/" },
+	{ name: "Guides", href: "/blog/" },
+];
+
+const schema = [
+	{
+		...webPageNode({ type: "CollectionPage", path: "/blog/", title, description }),
+		mainEntity: {
+			"@type": "ItemList",
+			itemListElement: posts.map((p, i) => ({
+				"@type": "ListItem",
+				position: i + 1,
+				url: abs(`/blog/${p.slug}/`),
+				name: p.meta.title,
+			})),
+		},
+	},
+	breadcrumbNode(crumbs),
+];
 ---
 
-<App
-	title="MariBank Guides and Comparisons | Pinoy Techie"
-	description="Plain-language guides on MariBank: is it legit, how it compares with GCash, rates, and how to get the most from the sign-up reward.">
-	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-20">
-		<h1 class="font-display text-4xl font-extrabold tracking-tight md:text-6xl">
-			MariBank guides
-		</h1>
-		<p class="mt-4 max-w-xl font-text text-lg text-slate">
-			Comparisons and how-tos for digital banking in the Philippines, written so you can
-			decide before you deposit.
-		</p>
-		<div class="mt-10 border-b border-line">
-			{posts.map((post) => <PostRow post={post} />)}
+<BaseLayout title={title} description={description} schema={schema}>
+	<PageHero
+		title="MariBank guides"
+		lead="Comparisons and how-tos for digital banking in the Philippines, written so you can decide before you deposit."
+		crumbs={crumbs}
+	/>
+
+	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+		{
+			tags.length > 0 && (
+				<nav aria-label="Filter by topic" class="mb-10 flex flex-wrap gap-2">
+					{tags.map((tag) => (
+						<a
+							href={`/blog/tag/${tag.slug}/`}
+							class="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:border-brand-500 hover:text-brand-700">
+							{tag.name} <span class="text-slate-400">{tag.count}</span>
+						</a>
+					))}
+				</nav>
+			)
+		}
+
+		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+			{posts.map((post) => <PostCard post={post} />)}
 		</div>
+
 		{
 			posts.length === 0 && (
-				<p class="mt-10 font-text text-slate">
+				<p class="text-slate-600">
 					No posts yet. Add a Markdown file to <code>src/posts</code> and it shows up here.
 				</p>
 			)
 		}
 	</div>
-</App>
+</BaseLayout>

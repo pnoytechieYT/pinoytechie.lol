@@ -1,0 +1,76 @@
+---
+import { siteData } from "@/data/site";
+
+const { social, footer } = siteData;
+const year = new Date().getFullYear();
+const groups = [
+	{ title: "Explore", links: footer.explore },
+	{ title: "Company", links: footer.company },
+	{ title: "Legal", links: footer.legal },
+];
+---
+
+<footer class="bg-navy-950 text-slate-300">
+	<div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-12 md:px-6">
+		<div class="md:col-span-4">
+			<a href="/" class="flex items-center gap-3">
+				<img src={siteData.logo.small} alt="" width="44" height="44" class="h-11 w-11 rounded-full" loading="lazy" />
+				<span class="text-xl font-bold tracking-tight text-white">{siteData.name}</span>
+			</a>
+			<p class="mt-4 max-w-sm text-sm leading-relaxed text-slate-400">{siteData.tagline}</p>
+			<div class="mt-5 flex flex-wrap gap-3 text-sm">
+				{
+					social.youtube && (
+						<a
+							href={social.youtube}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="rounded-md border border-white/15 px-3 py-2 font-medium text-white transition-colors hover:bg-white/10">
+							YouTube
+						</a>
+					)
+				}
+				{
+					social.email && (
+						<a
+							href={`mailto:${social.email}`}
+							class="rounded-md border border-white/15 px-3 py-2 font-medium text-white transition-colors hover:bg-white/10">
+							Email
+						</a>
+					)
+				}
+			</div>
+		</div>
+
+		<div class="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-8">
+			{
+				groups.map((group) => (
+					<nav aria-label={group.title}>
+						<h2 class="text-sm font-semibold uppercase tracking-wider text-white">{group.title}</h2>
+						<ul class="mt-4 space-y-2.5 text-sm">
+							{group.links.map((link) => (
+								<li>
+									<a href={link.href} class="text-slate-400 transition-colors hover:text-white">
+										{link.label}
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				))
+			}
+		</div>
+	</div>
+
+	<div class="border-t border-white/10">
+		<div class="mx-auto max-w-6xl space-y-3 px-4 py-6 text-xs leading-relaxed text-slate-400 md:px-6">
+			<p>
+				<strong class="text-slate-200">Disclaimer:</strong>
+				{siteData.name} is an independent website. MariBank and its logo are trademarks of MariBank Philippines. This site is not
+				affiliated with or endorsed by MariBank or Sea Group. Rates, rewards and terms can change, so confirm them in the app.
+				Nothing here is financial advice. See our <a href="/disclosure/" class="underline hover:text-white">referral disclosure</a>.
+			</p>
+			<p>© {year} {siteData.name}. All rights reserved.</p>
+		</div>
+	</div>
+</footer>

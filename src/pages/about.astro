@@ -1,52 +1,59 @@
 ---
-import App from "@/components/app.astro";
+import PageLayout from "@/layouts/PageLayout.astro";
 import { siteData } from "@/data/site";
 
-const { social, referral } = siteData;
+const { social, referral, name } = siteData;
 ---
 
-<App
-	title="About Pinoy Techie and Referral Disclosure"
-	description="Pinoy Techie makes short tech tips and tutorials for Filipinos. Here's who runs this site, how referral rewards work, and how to reach out.">
-	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-20">
-		<h1 class="font-display text-4xl font-extrabold tracking-tight md:text-6xl">About Pinoy Techie</h1>
+<PageLayout
+	title="About Pinoy Techie"
+	description="Pinoy Techie makes plain-language tech and money-app guides for Filipinos. Learn who runs this site, how guides are written and updated, and how referral rewards work."
+	lead="Short, honest tech tips and tutorials for Filipinos, starting with MariBank and everyday money apps."
+	path="/about/"
+	type="AboutPage">
+	<h2>Who we are</h2>
+	<p>
+		{name} makes short tech tips and tutorials for Filipinos. This website is where the longer, searchable version of the
+		money-app topics people keep asking about lives, starting with MariBank.
+	</p>
 
-		<div class="article mt-8">
-			<p>
-				Pinoy Techie makes short tech tips and tutorials for Filipinos. This website is where I
-				put the longer, searchable version of the money-app topics people keep asking about,
-				starting with MariBank.
-			</p>
-			<p>
-				Each guide says what is verified, what changes often (like savings rates), and where to
-				confirm the latest numbers in the app.
-			</p>
+	<h2>What you will find here</h2>
+	<ul>
+		<li><strong>Guides</strong>: step-by-step how-tos, such as <a href="/blog/how-to-open-maribank-account/">opening a MariBank account</a>.</li>
+		<li><strong>Comparisons</strong>: side-by-side looks, such as <a href="/blog/maribank-vs-gcash/">MariBank vs GCash</a>.</li>
+		<li><strong>Safety checks</strong>: what to verify before you deposit, such as <a href="/blog/is-maribank-legit/">is MariBank legit</a>.</li>
+		<li><strong>Videos</strong>: the same topics on screen, on our <a href="/videos/">videos page</a>.</li>
+	</ul>
 
-			<h2 id="disclosure">Referral disclosure</h2>
-			<p>
-				This site shares the MariBank referral code <strong>{referral.code}</strong>. New users who
-				sign up with it can receive {referral.bonus} after meeting MariBank's deposit conditions.
-				Referral programs usually reward the person who shared the code too, so I may earn a
-				reward when you sign up with it.
-			</p>
-			<p>
-				Pinoy Techie is independent and is not affiliated with or endorsed by MariBank or Sea
-				Group. MariBank sets and can change the reward terms. Nothing on this site is financial
-				advice.
-			</p>
+	<h2>How we write and update guides</h2>
+	<ul>
+		<li>Each guide separates what is verified from what changes often, such as savings rates and promo terms.</li>
+		<li>Every article shows when it was published and, if it changed, when it was last updated.</li>
+		<li>We point you to the official app or regulator for the latest numbers instead of guessing.</li>
+		<li>Found a mistake? <a href="/contact/">Tell us</a> and we will correct it and note the update date.</li>
+	</ul>
 
-			<h2>Contact</h2>
-			<p>
-				{
-					social.email ? (
-						<>Email <a href={`mailto:${social.email}`}>{social.email}</a>.</>
-					) : social.youtube ? (
-						<>Message me on <a href={social.youtube}>YouTube</a>.</>
-					) : (
-						<>Contact details are coming soon.</>
-					)
-				}
-			</p>
-		</div>
-	</div>
-</App>
+	<h2 id="disclosure">Referral disclosure</h2>
+	<p>
+		This site shares the MariBank referral code <strong>{referral.code}</strong>. New users who sign up with it can receive
+		{referral.bonus} after meeting MariBank's deposit conditions. Referral programs usually reward the person who shared the code
+		too, so we may earn a reward when you sign up with it.
+	</p>
+	<p>
+		{name} is independent and is not affiliated with or endorsed by MariBank or Sea Group. MariBank sets and can change the reward
+		terms. Nothing on this site is financial advice. Read the full <a href="/disclosure/">referral disclosure</a>.
+	</p>
+
+	<h2>Contact</h2>
+	<p>
+		{
+			social.email ? (
+				<>Email <a href={`mailto:${social.email}`}>{social.email}</a>, or visit the <a href="/contact/">contact page</a>.</>
+			) : social.youtube ? (
+				<>Message us on <a href={social.youtube} rel="noopener noreferrer" target="_blank">YouTube</a>, or visit the <a href="/contact/">contact page</a>.</>
+			) : (
+				<>Visit the <a href="/contact/">contact page</a>.</>
+			)
+		}
+	</p>
+</PageLayout>

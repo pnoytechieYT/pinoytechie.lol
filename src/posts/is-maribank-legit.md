@@ -1,7 +1,7 @@
 ---
 title: "Is MariBank legit? What to check before you deposit"
 description: "MariBank is a licensed digital bank with PDIC-insured deposits. Here is who is behind it and how to avoid fake apps and fake referral pages."
-pubDate: "2026-10-28"
+pubDate: "2026-10-28T09:00:00+08:00"
 tags: ["MariBank", "Safety"]
 ---
 

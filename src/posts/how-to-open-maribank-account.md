@@ -1,11 +1,11 @@
 ---
 title: "How to Open a MariBank Account in 5 Minutes (and What to Prepare)"
 description: "The requirements, the steps, and the common snags when signing up for MariBank from your phone."
-pubDate: "2026-04-22"
+pubDate: "2026-04-22T09:00:00+08:00"
 tags: ["MariBank", "Account Opening", "Guide"]
 ---
 
-MariBank advertises a 5-minute account opening process [citation:2]. In practice, preparation determines whether it actually takes 5 minutes or 20.
+MariBank advertises a 5-minute account opening process. In practice, preparation determines whether it actually takes 5 minutes or 20.
 
 ## What You Need
 
@@ -31,4 +31,4 @@ MariBank advertises a 5-minute account opening process [citation:2]. In practice
 
 ## After Opening
 
-Your account number is generated immediately. You can start transferring money in and earning interest the same day. If you want the physical MariCard, order it in the app (₱49 fee) [citation:12].
+Your account number is generated immediately. You can start transferring money in and earning interest the same day. If you want the physical MariCard, order it in the app (₱49 fee).

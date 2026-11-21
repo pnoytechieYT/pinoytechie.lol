@@ -1,9 +1,11 @@
 ---
-import App from "@/components/app.astro";
-import CopyButton from "@/components/ui/CopyButton.astro";
-import PostRow from "@/components/ui/PostRow.astro";
-import { getPosts, formatDate } from "@/lib/posts";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import CopyButton from "@/components/CopyButton.astro";
+import PostCard from "@/components/PostCard.astro";
+import { getPosts, getRelated, formatDateTime, slugify } from "@/lib/posts";
 import { siteData } from "@/data/site";
+import { abs, authorNode, breadcrumbNode, ids, webPageNode } from "@/lib/seo";
 
 export function getStaticPaths() {
 	return getPosts().map((post) => ({ params: { slug: post.slug }, props: { post } }));
@@ -11,90 +13,151 @@ export function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = post;
-const { url, name, referral } = siteData;
-const pageUrl = `${url}/blog/${post.slug}/`;
-const more = getPosts().filter((p) => p.slug !== post.slug).slice(0, 2);
+const { name, referral } = siteData;
 
-const jsonLd = {
-	"@context": "https://schema.org",
-	"@graph": [
-		{
-			"@type": "BlogPosting",
-			headline: post.meta.title,
-			description: post.meta.description,
-			datePublished: post.pubDate.toISOString(),
-			dateModified: post.updatedDate.toISOString(),
-			inLanguage: "en-PH",
-			mainEntityOfPage: pageUrl,
-			image: `${url}/images/og-maribank.jpg`,
-			author: { "@type": "Organization", name, url: `${url}/` },
-			publisher: { "@type": "Organization", name, url: `${url}/` },
-		},
-		{
-			"@type": "BreadcrumbList",
-			itemListElement: [
-				{ "@type": "ListItem", position: 1, name: "Home", item: `${url}/` },
-				{ "@type": "ListItem", position: 2, name: "Blog", item: `${url}/blog/` },
-				{ "@type": "ListItem", position: 3, name: post.meta.title, item: pageUrl },
-			],
-		},
-	],
-};
+const path = `/blog/${post.slug}/`;
+const pageUrl = abs(path);
+const image = post.meta.image ?? siteData.ogImage;
+const related = getRelated(post, 3);
+const toc = post.headings.filter((h) => h.depth === 2);
+const seoTitle = post.meta.seoTitle ?? post.meta.title;
+// Only append the brand when the result still fits in a typical Google title (~60 chars).
+const withBrand = `${seoTitle} | ${name}`.length <= 62;
+const wasUpdated = post.updatedDate.getTime() - post.pubDate.getTime() > 60_000;
+
+const crumbs = [
+	{ name: "Home", href: "/" },
+	{ name: "Guides", href: "/blog/" },
+	{ name: post.meta.title, href: path },
+];
+
+const schema = [
+	webPageNode({
+		path,
+		title: post.meta.title,
+		description: post.meta.description,
+		dateModified: post.updatedDate.toISOString(),
+	}),
+	{
+		"@type": "BlogPosting",
+		"@id": `${pageUrl}#article`,
+		headline: post.meta.title,
+		description: post.meta.description,
+		url: pageUrl,
+		mainEntityOfPage: { "@id": `${pageUrl}#webpage` },
+		datePublished: post.pubDate.toISOString(),
+		dateModified: post.updatedDate.toISOString(),
+		inLanguage: siteData.locale,
+		image: [abs(image)],
+		author: authorNode(),
+		publisher: { "@id": ids.org },
+		isPartOf: { "@id": ids.website },
+		wordCount: post.wordCount,
+		timeRequired: `PT${post.minutes}M`,
+		...(post.tags.length ? { keywords: post.tags.join(", "), articleSection: post.tags[0] } : {}),
+	},
+	breadcrumbNode(crumbs),
+];
 ---
 
-<App
-	title={`${post.meta.title} | Pinoy Techie`}
+<BaseLayout
+	title={seoTitle}
+	suffix={withBrand}
 	description={post.meta.description}
+	image={image}
 	type="article"
 	publishedTime={post.pubDate.toISOString()}
 	modifiedTime={post.updatedDate.toISOString()}
-	jsonLd={jsonLd}>
-	<article class="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-16">
-		<nav aria-label="Breadcrumb" class="text-sm font-medium text-slate">
-			<a href="/" class="hover:underline">Home</a>
-			<span aria-hidden="true"> / </span>
-			<a href="/blog/" class="hover:underline">Blog</a>
-		</nav>
-
-		<header class="mt-6 max-w-3xl">
-			<h1 class="font-display text-4xl font-extrabold leading-[1.08] tracking-tight md:text-5xl">
+	tags={post.tags}
+	schema={schema}>
+	<div class="border-b border-slate-200 bg-white">
+		<div class="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
+			<Breadcrumbs items={crumbs} />
+			<div class="mt-5 flex flex-wrap items-center gap-2 text-xs font-medium">
+				{
+					post.tags.map((tag) => (
+						<a href={`/blog/tag/${slugify(tag)}/`} class="rounded-full bg-brand-50 px-2.5 py-1 text-brand-700 hover:bg-brand-100">
+							{tag}
+						</a>
+					))
+				}
+				{post.isScheduled && <span class="rounded-full bg-gold-300 px-2.5 py-1 text-navy-950">Scheduled: not public yet (dev preview)</span>}
+			</div>
+			<h1 class="mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-navy-900 md:text-5xl">
 				{post.meta.title}
 			</h1>
-			<p class="mt-4 font-text text-xl text-slate">{post.meta.description}</p>
-			<p class="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-slate">
-				<span>Updated <time datetime={post.updatedDate.toISOString()}>{formatDate(post.updatedDate)}</time></span>
+			<p class="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600">{post.meta.description}</p>
+			<p class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+				<span>By <a href="/about/" class="font-medium text-slate-700 hover:underline">{siteData.author.name}</a></span>
+				<span aria-hidden="true">·</span>
+				<span>Published <time datetime={post.pubDate.toISOString()}>{formatDateTime(post.pubDate)}</time></span>
+				{
+					wasUpdated && (
+						<>
+							<span aria-hidden="true">·</span>
+							<span>Updated <time datetime={post.updatedDate.toISOString()}>{formatDateTime(post.updatedDate)}</time></span>
+						</>
+					)
+				}
+				<span aria-hidden="true">·</span>
 				<span>{post.minutes} min read</span>
 			</p>
-		</header>
-
-		<div class="article mt-10">
-			<Content />
 		</div>
+	</div>
 
-		<aside class="mt-14 max-w-2xl rounded-2xl border-2 border-ink bg-sun p-6 md:p-8" aria-labelledby="cta-title">
-			<h2 id="cta-title" class="font-display text-2xl font-extrabold">Trying MariBank?</h2>
-			<p class="mt-2 font-text">
-				Enter <strong>{referral.code}</strong> during sign-up. Deposit {referral.minDeposit}, keep it
-				for {referral.holdDays} days, and you receive {referral.bonus}. Terms are set by MariBank and
-				can change.
+	<div class="mx-auto grid max-w-6xl gap-12 px-4 py-10 md:px-6 md:py-14 lg:grid-cols-[minmax(0,1fr)_20rem]">
+		<article>
+			<div class="prose-article">
+				<Content />
+			</div>
+			<p class="mt-12 max-w-2xl rounded-lg border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-500">
+				<strong class="text-slate-700">Not financial advice.</strong>
+				{name} is independent and not affiliated with MariBank or Sea Group. Rates, fees and rewards change, so confirm current
+				terms in the app. See our <a href="/disclosure/" class="text-brand-600 underline">referral disclosure</a>.
 			</p>
-			<div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
-				<CopyButton code={referral.code} />
-				<a href="/#download" class="font-semibold underline decoration-ink decoration-4 underline-offset-4">
+		</article>
+
+		<aside class="space-y-6 lg:sticky lg:top-24 lg:self-start" aria-label="Sidebar">
+			{
+				toc.length >= 3 && (
+					<nav aria-labelledby="toc-title" class="rounded-xl border border-slate-200 bg-white p-5">
+						<h2 id="toc-title" class="text-sm font-semibold uppercase tracking-wider text-slate-500">On this page</h2>
+						<ul class="mt-3 space-y-2 text-sm">
+							{toc.map((h) => (
+								<li>
+									<a href={`#${h.slug}`} class="text-slate-600 hover:text-brand-700">
+										{h.text}
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)
+			}
+			<div class="rounded-xl bg-navy-900 p-6 text-white" aria-labelledby="cta-title">
+				<h2 id="cta-title" class="text-lg font-semibold">Trying MariBank?</h2>
+				<p class="mt-2 text-sm leading-relaxed text-slate-300">
+					Enter <strong class="text-gold-400">{referral.code}</strong> during sign-up. Deposit {referral.minDeposit}, keep it for
+					{referral.holdDays} days, and you receive {referral.bonus}. Terms are set by MariBank and can change.
+				</p>
+				<CopyButton code={referral.code} class="mt-4 w-full !bg-gold-400 !text-navy-950 hover:!bg-gold-300" />
+				<a href="/#download" class="mt-3 block text-center text-sm font-medium text-slate-300 underline underline-offset-4 hover:text-white">
 					Get the app
 				</a>
 			</div>
 		</aside>
-	</article>
+	</div>
 
 	{
-		more.length > 0 && (
-			<section class="mx-auto max-w-6xl px-4 pb-16 md:px-6" aria-labelledby="more-title">
-				<h2 id="more-title" class="mb-4 font-display text-2xl font-extrabold">Keep reading</h2>
-				<div class="border-b border-line">
-					{more.map((p) => <PostRow post={p} />)}
+		related.length > 0 && (
+			<section class="border-t border-slate-200 bg-white" aria-labelledby="more-title">
+				<div class="mx-auto max-w-6xl px-4 py-14 md:px-6">
+					<h2 id="more-title" class="text-2xl font-bold tracking-tight text-navy-900">Keep reading</h2>
+					<div class="mt-8 grid gap-6 md:grid-cols-3">
+						{related.map((p) => <PostCard post={p} />)}
+					</div>
 				</div>
 			</section>
 		)
 	}
-</App>
+</BaseLayout>
