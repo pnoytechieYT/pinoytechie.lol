@@ -41,8 +41,8 @@ export const siteData = {
 		{ label: "Guides", href: "/blog/", expand: "categories" },
 		{ label: "Videos", href: "/videos/" },
 		{ label: "Shorts", href: "/shorts/" },
-		{ label: "About", href: "/about/" },
-		{ label: "Contact", href: "/contact/" },
+		// { label: "About", href: "/about/" },
+		// { label: "Contact", href: "/contact/" },
 	],
 
 	/** How many items per page, and how many topic tags to show under the list */
@@ -56,7 +56,7 @@ export const siteData = {
 			{ label: "Shorts", href: "/shorts/" },
 			{ label: "RSS feed", href: "/rss.xml" },
 		],
-		company: [
+		discover: [
 			{ label: "About", href: "/about/" },
 			{ label: "Contact", href: "/contact/" },
 			{ label: "Referral disclosure", href: "/disclosure/" },
@@ -70,7 +70,7 @@ export const siteData = {
 	// Empty values are hidden automatically.
 	social: {
 		youtube: "https://www.youtube.com/@pinoy.techie",
-		email: "", // e.g. "hello@pinoytechie.lol"
+		email: "contact@pinoytechie.lol", // e.g. "hello@pinoytechie.lol"
 	},
 
 	// Home page video block wording. The video itself is the first `featured: true`

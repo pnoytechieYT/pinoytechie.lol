@@ -6,7 +6,7 @@ const { social, footer } = siteData;
 const year = new Date().getFullYear();
 const groups = [
 	{ title: "Explore", links: [...footer.explore.slice(0, 1), ...getCategories().map((c) => ({ label: c.name, href: c.path })), ...footer.explore.slice(1)] },
-	{ title: "Company", links: footer.company },
+	{ title: "Discover", links: footer.discover },
 	{ title: "Legal", links: footer.legal },
 ];
 ---
