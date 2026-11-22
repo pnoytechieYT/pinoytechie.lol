@@ -1,0 +1,37 @@
+---
+import { shortThumbs, type Short } from "@/data/shorts";
+
+/**
+ * Vertical (9:16) thumbnail of a Short. The title is NOT shown; it is only the image
+ * description and the link's accessible name.
+ * Sizes: "card" = small grid card, "feature" = big pinned card with a larger play button.
+ */
+interface Props {
+	short: Short;
+	size?: "card" | "feature";
+	class?: string;
+	eager?: boolean;
+}
+const { short, size = "card", class: className, eager = false } = Astro.props;
+const [src, ...fallbacks] = shortThumbs(short.id);
+const feature = size === "feature";
+---
+
+<img
+	src={src}
+	alt={short.title}
+	width="405"
+	height="720"
+	loading={eager ? "eager" : "lazy"}
+	decoding="async"
+	data-yt-thumb
+	data-fallbacks={fallbacks.join(" ")}
+	class:list={["h-full w-full object-cover", className]} />
+<span
+	aria-hidden="true"
+	class:list={[
+		"pointer-events-none absolute bottom-3 right-3 flex items-center justify-center rounded-full border-[3px] border-ink bg-sun shadow-hard-sm transition-transform group-hover:scale-110",
+		feature ? "h-14 w-14" : "h-10 w-10",
+	]}>
+	<svg viewBox="0 0 24 24" class:list={[feature ? "h-6 w-6" : "h-4 w-4"]} fill="#111"><path d="M8 5v14l11-7z"></path></svg>
+</span>

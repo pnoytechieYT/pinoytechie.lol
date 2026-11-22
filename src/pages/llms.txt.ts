@@ -20,6 +20,7 @@ export function GET(context: APIContext) {
 		`- [MariBank referral code ${referral.code}](${site}/): code, reward (${referral.bonus} after a ${referral.minDeposit} deposit kept ${referral.holdDays} days), steps and FAQ. Updated ${referral.updated}.`,
 		`- [All guides](${site}/blog/): every article`,
 		`- [Videos](${site}/videos/): video tutorials`,
+		`- [Shorts](${site}/shorts/): YouTube Shorts from the channel`,
 		`- [About](${site}/about/): who runs the site and how guides are written`,
 		`- [Referral disclosure](${site}/disclosure/): how the site earns`,
 		`- [Contact](${site}/contact/)`,

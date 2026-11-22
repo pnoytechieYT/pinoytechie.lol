@@ -40,18 +40,20 @@ export const siteData = {
 		// "expand" = replaced by one button per category that has inNav: true (src/data/categories.ts)
 		{ label: "Guides", href: "/blog/", expand: "categories" },
 		{ label: "Videos", href: "/videos/" },
+		{ label: "Shorts", href: "/shorts/" },
 		{ label: "About", href: "/about/" },
 		{ label: "Contact", href: "/contact/" },
 	],
 
 	/** How many items per page, and how many topic tags to show under the list */
-	paging: { postsPerPage: 9, videosPerPage: 12, maxTags: 10 },
+	paging: { postsPerPage: 9, videosPerPage: 12, shortsPerPage: 20, maxTags: 10 },
 
 	footer: {
 		explore: [
 			{ label: "MariBank referral code", href: "/" },
 			{ label: "All guides", href: "/blog/" },
 			{ label: "Videos", href: "/videos/" },
+			{ label: "Shorts", href: "/shorts/" },
 			{ label: "RSS feed", href: "/rss.xml" },
 		],
 		company: [
