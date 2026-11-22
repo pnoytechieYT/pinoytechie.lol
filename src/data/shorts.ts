@@ -1,27 +1,47 @@
+import { loadYoutube, looksComplete } from "@/lib/youtube";
+
 /**
  * YouTube Shorts shown on /shorts/.
  *
- * HOW TO ADD A SHORT
- *   1. Paste a new line at the TOP of the list (newest first):
- *        { id: "AbCdEfGhIjK", title: "What the short is about" },
- *      id = the 11 characters after  youtube.com/shorts/
- *      title = never shown on the page. It is only used as the image description
- *              for screen readers and search engines, so write it normally.
- *   2. featured: true  = pinned at the top as a playable card.
- *      Only the FIRST 4 featured shorts are shown, so to swap one, remove
- *      `featured: true` from the old one and add it to the new one.
+ * AUTOMATIC: before every build, scripts/sync-youtube.mjs reads your channel from the YouTube API
+ * (title, newest first, view count). The workflow builds every 30 minutes, so a new Short appears
+ * on its own. You do not have to edit anything here when you upload.
+ *
+ * The list further down (fallbackShorts) is only a safety net. It is used when the sync has not run
+ * yet (no API key, YouTube down), so the page is never empty. You can leave it as it is.
+ *
+ * WHICH 4 ARE FEATURED: change `featuredConfig` below.
+ *   mode: "latest"  your 4 newest Shorts (changes by itself when you upload)
+ *         "views"   your 4 most viewed Shorts
+ *         "pinned"  the ids you list in `pinned` below (the id is the part after youtube.com/shorts/).
+ *                   This is what you had before, so your hand-picked 4 are kept.
  */
 export interface Short {
 	id: string;
+	/** never shown on the page, only used as the image description for screen readers and search engines */
 	title: string;
-	featured?: boolean;
+	/** exact view count, shown as a short label like "1.6M" on featured cards (automatic) */
+	views?: number;
 }
 
-export const shorts: Short[] = [
-	{ id: "MVHWTo-JA-0", title: "Billionaire Daughter Spotted Buying Ukay Ukay", featured: true },
-	{ id: "RPpc071y9Kg", title: "He Spent All Night Trying to Save His Dying Dog", featured: true },
-	{ id: "INQmx6NJWQQ", title: "The Philippine Cockroach Named After Pokémon", featured: true },
-	{ id: "ODBncMfDpQ0", title: "Philippines Is No. 1 In The World For THESE 3 Things", featured: true },
+export const featuredConfig = {
+	mode: "pinned" as "latest" | "views" | "pinned",
+	count: 4,
+	/** only used when mode is "pinned" */
+	pinned: [
+		"MVHWTo-JA-0",
+		"RPpc071y9Kg",
+		"INQmx6NJWQQ",
+		"ODBncMfDpQ0",
+	] as string[],
+};
+
+/** Safety net: used only when no synced YouTube data is available. */
+const fallbackShorts: Short[] = [
+	{ id: "MVHWTo-JA-0", title: "Billionaire Daughter Spotted Buying Ukay Ukay" },
+	{ id: "RPpc071y9Kg", title: "He Spent All Night Trying to Save His Dying Dog" },
+	{ id: "INQmx6NJWQQ", title: "The Philippine Cockroach Named After Pokémon" },
+	{ id: "ODBncMfDpQ0", title: "Philippines Is No. 1 In The World For THESE 3 Things" },
 	{ id: "iYYxRmfQ14w", title: "20 Places In The Philippines That Don't Feel Real!" },
 	{ id: "1I6AEnG4wuQ", title: "Philippines Has a ₱5,000 and ₱3,000 Bill?" },
 	{ id: "MUK81r6VijM", title: "Top 4 Largest Airports in the Philippines" },
@@ -156,10 +176,33 @@ export const shorts: Short[] = [
 	{ id: "qVPII2hemis", title: "Would You Save a Snake in Your Yard?" },
 ];
 
-/** Up to 4 pinned shorts */
-export const featuredShorts = shorts.filter((s) => s.featured).slice(0, 4);
+/** Synced list when available and plausible, otherwise the hand-written safety net. */
+function buildShorts(): Short[] {
+	const yt = loadYoutube();
+	if (yt && looksComplete(yt.shorts.length, fallbackShorts.length, "shorts list")) {
+		return yt.shorts.map((s) => ({ id: s.id, title: s.title, views: s.views }));
+	}
+	return fallbackShorts;
+}
 
-/** Everything else, in the order written above */
+export const shorts: Short[] = buildShorts();
+
+function pickFeatured(): Short[] {
+	const { mode, count, pinned } = featuredConfig;
+	if (mode === "pinned") {
+		const picked = pinned.map((id) => shorts.find((s) => s.id === id)).filter((s): s is Short => !!s);
+		if (picked.length) return picked.slice(0, count);
+	}
+	if (mode === "views" && shorts.some((s) => s.views !== undefined)) {
+		return [...shorts].sort((a, b) => (b.views ?? 0) - (a.views ?? 0)).slice(0, count);
+	}
+	return shorts.slice(0, count); // "latest" (the list is newest first)
+}
+
+/** Up to `featuredConfig.count` pinned shorts */
+export const featuredShorts = pickFeatured();
+
+/** Everything else, newest first */
 export const otherShorts = shorts.filter((s) => !featuredShorts.includes(s));
 
 /**

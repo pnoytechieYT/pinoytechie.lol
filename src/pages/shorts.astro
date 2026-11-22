@@ -3,6 +3,7 @@ import PageLayout from "@/layouts/PageLayout.astro";
 import ShortThumb from "@/components/ShortThumb.astro";
 import { siteData } from "@/data/site";
 import { featuredShorts, otherShorts, shortUrl } from "@/data/shorts";
+import { formatCount, parseCount } from "@/lib/format";
 
 const { social } = siteData;
 const perPage = siteData.paging.shortsPerPage;
@@ -22,7 +23,9 @@ const perPage = siteData.paging.shortsPerPage;
 					<span class="nb-tag nb-tag-red">Pinned</span>
 				</div>
 				<ul class="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-7">
-					{featuredShorts.map((short, i) => (
+					{featuredShorts.map((short, i) => {
+						const views = parseCount(short.views);
+						return (
 						<li>
 							<!-- A normal link (works without JavaScript). The script below turns the click into an inline player. -->
 							<a
@@ -30,12 +33,14 @@ const perPage = siteData.paging.shortsPerPage;
 								target="_blank"
 								rel="noopener noreferrer"
 								data-short-play={short.id}
-								aria-label={`Play: ${short.title}`}
+								data-short-title={short.title}
+								aria-label={`Play: ${short.title}${views !== undefined ? ` (${views.toLocaleString("en-US")} views)` : ""}`}
 								class="group nb-card nb-card-lift relative block aspect-[9/16] overflow-hidden bg-ink shadow-hard-lg">
-								<ShortThumb short={short} size="feature" eager={i < 2} />
+								<ShortThumb short={short} size="feature" eager={i < 2} views={views !== undefined ? formatCount(views) : undefined} />
 							</a>
 						</li>
-					))}
+						);
+					})}
 				</ul>
 			</section>
 		)
@@ -102,14 +107,15 @@ const perPage = siteData.paging.shortsPerPage;
 		if (img.complete) (img.naturalWidth === 0 || img.naturalWidth < 200) && swap(img);
 	});
 
-	// 2) Featured shorts: click plays the Short right there (no tracking cookies until played).
+	// 2) Featured shorts: click opens the player right there. No autoplay on purpose: YouTube does not
+	//    count autoplayed embeds as views, so the visitor presses YouTube's own play button.
 	document.addEventListener("click", (e) => {
 		const a = (e.target as HTMLElement).closest<HTMLAnchorElement>("a[data-short-play]");
 		if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
 		e.preventDefault();
 		const iframe = document.createElement("iframe");
-		iframe.src = `https://www.youtube-nocookie.com/embed/${a.dataset.shortPlay}?autoplay=1&rel=0&playsinline=1`;
-		iframe.title = (a.getAttribute("aria-label") ?? "YouTube Short").replace(/^Play: /, "");
+		iframe.src = `https://www.youtube-nocookie.com/embed/${a.dataset.shortPlay}?rel=0&playsinline=1`;
+		iframe.title = a.dataset.shortTitle ?? "YouTube Short";
 		iframe.allow = "autoplay; encrypted-media; picture-in-picture; web-share";
 		iframe.allowFullscreen = true;
 		iframe.referrerPolicy = "strict-origin-when-cross-origin";

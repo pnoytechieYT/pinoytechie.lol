@@ -1,15 +1,25 @@
+import { loadYoutube, looksComplete } from "@/lib/youtube";
+
 /**
  * Videos shown on /videos/ and the home page.
  *
- * HOW TO ADD A VIDEO
- *   1. Copy a block below and paste it at the top of the list (newest first).
- *   2. id: the part after  youtube.com/watch?v=  (or after /shorts/).
- *   3. featured: true  = pinned at the top of /videos/ with the big player.
- *                         The FIRST featured video is also the one on the home page.
- *      featured: false (or leave it out) = normal video in the grid.
- *   4. category: any label ("MariBank", "Tech Tips", ...). Filter buttons appear
- *      automatically on /videos/ once you have two or more categories.
- *   5. si: optional, the ?si= share token from a YouTube share link.
+ * AUTOMATIC: before every build, scripts/sync-youtube.mjs reads your channel from the YouTube API
+ * (every public video, newest first, current title). The workflow builds every 30 minutes, so a new
+ * upload shows up by itself. You do not have to add it here.
+ *
+ * This list (manualVideos) is still useful for things YouTube does not know about. For any video
+ * id listed here, these values are used:
+ *   - category:     the filter button on /videos/ ("MariBank", "WiFi & SIM", ...)
+ *   - description:  the optional line under the title
+ *   - featured:     true = pinned at the top of /videos/ with the big player.
+ *                   The FIRST featured video is also the one on the home page.
+ *   - si:           optional ?si= token from a YouTube share link
+ * It is also the safety net used if the sync has not run (no API key, YouTube down).
+ *
+ * CATEGORIES WITHOUT EDITING CODE: for a NEW video with no entry below, the category comes from your
+ * YouTube playlists. Put it in a playlist that is named exactly like an existing category
+ * (for example "Gadgets"), or name a playlist "Site: Smart Home" to create a new category
+ * "Smart Home". Videos in no such playlist show without a category (they still appear under "All").
  */
 export interface Video {
 	id: string;
@@ -19,9 +29,11 @@ export interface Video {
 	featured?: boolean;
 	category?: string;
 	si?: string;
+	/** exact view count from YouTube (automatic) */
+	views?: number;
 }
 
-export const videos: Video[] = [
+const manualVideos: Video[] = [
 	{
 		id: "qHHuN3Y3FzA",
 		si: "m6GFuCP9fZHsGQrw",
@@ -112,6 +124,44 @@ export const videos: Video[] = [
 ];
 
 /** Featured videos first-class, in list order. */
+const normalize = (name: string) => name.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Synced list when available and plausible, otherwise the hand-written list. */
+function buildVideos(): Video[] {
+	const yt = loadYoutube();
+	if (!yt || !looksComplete(yt.videos.length, manualVideos.length, "videos list")) return manualVideos;
+
+	const manual = new Map(manualVideos.map((v) => [v.id, v]));
+	const known = new Map(manualVideos.filter((v) => v.category).map((v) => [normalize(v.category!), v.category!]));
+
+	/** category from a playlist: its name matches a known category, or it starts with "Site:" */
+	const fromPlaylists = (id: string): string | undefined => {
+		for (const pl of yt.playlists) {
+			if (!pl.ids.includes(id)) continue;
+			const match = known.get(normalize(pl.name));
+			if (match) return match;
+			const m = pl.name.match(/^site:\s*(.+)$/i);
+			if (m) return m[1].trim();
+		}
+		return undefined;
+	};
+
+	return yt.videos.map((a) => {
+		const m = manual.get(a.id);
+		return {
+			id: a.id,
+			title: a.title,
+			description: m?.description,
+			featured: m?.featured,
+			category: m?.category ?? fromPlaylists(a.id),
+			si: m?.si,
+			views: a.views,
+		};
+	});
+}
+
+export const videos: Video[] = buildVideos();
+
 export const featuredVideos = videos.filter((v) => v.featured);
 /** Everything that is not featured, in list order. */
 export const otherVideos = videos.filter((v) => !v.featured);

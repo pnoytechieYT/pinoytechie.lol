@@ -37,8 +37,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Keeps the last successful YouTube sync between runs, so a short YouTube outage
+      # never removes your newest videos from the site. (Expires on its own, as YouTube requires.)
+      - name: Restore last YouTube data
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: youtube-${{ github.run_id }}
+          restore-keys: |
+            youtube-
+
       - name: Build with Astro
         run: npm run build
+        env:
+          # Secret you saved in Settings > Secrets and variables > Actions
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
