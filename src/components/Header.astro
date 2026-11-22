@@ -27,7 +27,7 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 
 <header class="sticky top-0 z-40 border-b-[3px] border-ink bg-paper">
 	<div class="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
-		<a href="/" class="group flex items-center gap-3" aria-label={`${siteData.name} home`}>
+		<a href="/" class="group flex shrink-0 items-center gap-3" aria-label={`${siteData.name} home`}>
 			<img
 				src={siteData.logo.small}
 				alt=""
@@ -39,7 +39,7 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 			</span>
 		</a>
 
-		<nav aria-label="Main" class="hidden md:block">
+		<nav aria-label="Main" class="hidden lg:block">
 			<ul class="flex items-center gap-1.5 text-sm font-bold">
 				{
 					nav.map((item) => (
@@ -48,7 +48,7 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 								href={item.href}
 								aria-current={isActive(item.href) ? "page" : undefined}
 								class:list={[
-									"flex items-center gap-2 rounded-md border-2 px-3 py-1.5 transition-colors",
+									"flex items-center gap-2 whitespace-nowrap rounded-md border-2 px-3 py-1.5 transition-colors",
 									isActive(item.href)
 										? "border-ink bg-sun shadow-hard-sm"
 										: "border-transparent hover:border-ink hover:bg-sun-soft",
@@ -63,11 +63,11 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 		</nav>
 
 		<div class="flex items-center gap-3">
-			<a href="/#referral" class="nb-btn nb-btn-red nb-btn-sm hidden sm:inline-flex">Get the code</a>
+			<a href="/#referral" class="nb-btn nb-btn-red nb-btn-sm hidden shrink-0 whitespace-nowrap sm:inline-flex">Get the code</a>
 			<button
 				type="button"
 				id="menu-button"
-				class="nb-btn nb-btn-white !p-0 h-11 w-11 md:hidden"
+				class="nb-btn nb-btn-white !p-0 h-11 w-11 lg:hidden"
 				aria-expanded="false"
 				aria-controls="mobile-menu"
 				aria-label="Open menu">
@@ -77,7 +77,7 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 		</div>
 	</div>
 
-	<div id="mobile-menu" class="hidden border-t-[3px] border-ink bg-sun md:hidden">
+	<div id="mobile-menu" class="hidden border-t-[3px] border-ink bg-sun lg:hidden">
 		<nav aria-label="Mobile" class="mx-auto max-w-6xl px-4 py-4">
 			<ul class="space-y-2 font-bold">
 				{
