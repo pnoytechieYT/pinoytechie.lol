@@ -7,7 +7,7 @@ export async function GET(context: APIContext) {
 	const posts = getPosts();
 	return rss({
 		title: `${siteData.name} | Guides`,
-		description: siteData.description,
+		description: "Plain-language guides to MariBank and digital banking in the Philippines from Pinoy Techie.",
 		site: context.site!,
 		customData: `<language>en-ph</language>`,
 		items: posts.map((post) => ({

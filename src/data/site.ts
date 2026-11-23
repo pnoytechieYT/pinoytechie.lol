@@ -19,9 +19,9 @@ export const siteData = {
 	timezone: "Asia/Manila",
 	timezoneOffset: "+08:00", // Philippine time. Dates without an offset are read as this.
 	tagline:
-		"Plain-language guides to MariBank and everyday money apps in the Philippines.",
+		"Philippine facts and stories in videos and Shorts, plus plain-language MariBank guides.",
 	description:
-		"Pinoy Techie publishes independent, plain-language guides, comparisons and video tutorials on MariBank, GCash and digital banking in the Philippines.",
+		"Philippine facts and stories in videos and Shorts from the Pinoy Techie YouTube channel, plus independent, plain-language MariBank guides.",
 
 	logo: { src: "/logo.png", small: "/logo-128.png", width: 512, height: 512 },
 	// MariBank's own app icon, shown so visitors can recognise it
