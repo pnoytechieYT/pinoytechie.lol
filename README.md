@@ -26,6 +26,7 @@ pubDate: "2026-11-25T09:00:00+08:00"            # date AND time, always in quote
 updatedDate: "2026-12-02T14:30:00+08:00"        # optional, set when you change the article
 tags: ["MariBank", "Comparison"]
 draft: false                                    # true = never published
+aiGenerated: true                               # optional, shows an "AI-generated guide" label on the post
 ---
 
 Your article in Markdown. Use ## headings, they become the table of contents.

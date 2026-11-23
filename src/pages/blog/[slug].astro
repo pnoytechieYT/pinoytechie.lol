@@ -108,6 +108,15 @@ const schema = [
 				<span aria-hidden="true">·</span>
 				<span>{post.minutes} min read</span>
 			</p>
+			{
+				post.meta.aiGenerated && (
+					<p class="mt-5">
+						<a href="/disclosure/#ai-generated" class="inline-flex items-center gap-2 border-2 border-ink bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase shadow-hard-sm hover:bg-ink hover:text-sun">
+							<span aria-hidden="true">✦</span> AI-generated guide
+						</a>
+					</p>
+				)
+			}
 		</div>
 	</div>
 
@@ -118,6 +127,7 @@ const schema = [
 			</div>
 			<p class="nb-card mt-12 max-w-2xl bg-sun-soft p-4 text-sm leading-relaxed text-body">
 				<strong class="font-mono uppercase text-ink">Not financial advice.</strong>
+				{post.meta.aiGenerated && "This guide was generated with AI and can contain mistakes, so verify rates, fees and rewards in the official app."}
 				{name} is independent and not affiliated with MariBank or Sea Group. Rates, fees and rewards change, so confirm current
 				terms in the app. See our <a href="/disclosure/" class="font-bold text-flame-dark underline hover:bg-sun hover:text-ink">referral disclosure</a>.
 			</p>

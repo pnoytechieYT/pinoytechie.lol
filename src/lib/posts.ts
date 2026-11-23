@@ -24,6 +24,8 @@ export interface PostMeta {
 	tags?: string[];
 	draft?: boolean;
 	image?: string;
+	/** Set `aiGenerated: true` on posts written with AI. Shows an "AI-generated guide" badge and note. */
+	aiGenerated?: boolean;
 }
 
 export interface Post {
