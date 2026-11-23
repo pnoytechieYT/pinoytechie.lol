@@ -33,7 +33,7 @@ const watch = (id: string) => `https://www.youtube.com/watch?v=${id}`;
 						{mainFeatured.category && (
 							<span class="nb-tag">{mainFeatured.category}</span>
 						)}
-						<h3 class="mt-3 text-2xl font-bold leading-snug tracking-tight text-ink">{mainFeatured.title}</h3>
+						<h3 class="mt-3 text-xl font-bold leading-snug tracking-tight text-ink sm:text-2xl">{mainFeatured.title}</h3>
 						{mainFeatured.description && <p class="mt-3 font-medium text-body">{mainFeatured.description}</p>}
 						<div class="mt-5 flex flex-wrap gap-3">
 							{social.youtube && (
@@ -61,9 +61,9 @@ const watch = (id: string) => `https://www.youtube.com/watch?v=${id}`;
 
 	{
 		moreFeatured.length > 0 && (
-			<div class="mt-10 grid gap-6 md:grid-cols-2">
+			<div class="mt-10 grid gap-8 lg:grid-cols-2">
 				{moreFeatured.map((v) => (
-					<div class="grid gap-4 sm:grid-cols-2">
+					<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
 						<YouTubeEmbed id={v.id} si={v.si} title={v.title} />
 						<div>
 							{v.category && <span class="nb-tag">{v.category}</span>}

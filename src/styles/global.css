@@ -431,7 +431,9 @@
 		}
 	}
 
-	/* Scrolling strip */
+	/* Scrolling strip (see Marquee.astro).
+	   The track holds two identical groups and slides one group-width, then restarts.
+	   Each group is at least one viewport wide, so the strip never runs out on wide screens. */
 	.marquee {
 		overflow: hidden;
 		background: var(--color-ink);
@@ -441,9 +443,17 @@
 	.marquee-track {
 		display: flex;
 		width: max-content;
-		animation: marquee 38s linear infinite;
+		will-change: transform;
+		animation: marquee 80s linear infinite;
 	}
 	.marquee-group {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: space-around;
+		min-width: 100vw;
+	}
+	.marquee-set {
 		display: flex;
 		flex-shrink: 0;
 		align-items: center;
@@ -453,14 +463,26 @@
 			transform: translateX(-50%);
 		}
 	}
+	/* Pause while hovering (only on devices that really hover) */
+	@media (hover: hover) {
+		.marquee:hover .marquee-track {
+			animation-play-state: paused;
+		}
+	}
 	@media (prefers-reduced-motion: reduce) {
 		.marquee-track {
 			animation: none;
 			width: auto;
 			justify-content: center;
-			flex-wrap: wrap;
 		}
-		.marquee-group[aria-hidden="true"] {
+		/* Show the facts once, wrapped and centred, with no duplicates */
+		.marquee-group {
+			min-width: 0;
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+		.marquee-group[aria-hidden="true"],
+		.marquee-set[aria-hidden="true"] {
 			display: none;
 		}
 		.nb-btn,
@@ -594,7 +616,7 @@
 .prose-article .heading-anchor:focus-visible {
 	opacity: 1;
 }
-@media (max-width: 767px) {
+@media (width < 48rem) {
 	.prose-article .heading-anchor {
 		display: none;
 	}
@@ -839,7 +861,7 @@
 	vertical-align: top;
 	min-width: 6.5rem;
 }
-@media (min-width: 640px) {
+@media (width >= 40rem) {
 	.prose-article th,
 	.prose-article td {
 		min-width: 8rem;

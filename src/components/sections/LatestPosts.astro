@@ -8,17 +8,17 @@ const posts = getPosts().slice(0, 3);
 {
 	posts.length > 0 && (
 		<section aria-labelledby="posts-title">
-			<div class="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+			<div class="mx-auto max-w-6xl px-4 py-12 sm:py-16 md:px-6 md:py-24">
 				<div class="flex flex-wrap items-end justify-between gap-5">
 					<div class="max-w-2xl">
 						<span class="nb-tag nb-tag-dark">Guides</span>
-						<h2 id="posts-title" class="mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-ink md:text-5xl">
+						<h2 id="posts-title" class="mt-4 text-3xl font-bold leading-[1.05] tracking-tight text-ink sm:text-4xl md:text-5xl">
 							Read <span class="hl">before</span> you sign up
 						</h2>
 					</div>
 					<a href="/blog/" class="nb-btn nb-btn-white">View all guides →</a>
 				</div>
-				<div class="mt-12 grid gap-8 md:grid-cols-3">
+				<div class="mt-10 grid gap-6 sm:grid-cols-2 sm:gap-8 lg:mt-12 lg:grid-cols-3">
 					{posts.map((post) => <PostCard post={post} />)}
 				</div>
 			</div>

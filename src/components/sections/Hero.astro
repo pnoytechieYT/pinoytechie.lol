@@ -13,20 +13,20 @@ const updated = new Date(referral.updated).toLocaleDateString(siteData.locale, {
 
 <section class="relative overflow-hidden border-b-[3px] border-ink bg-sun" aria-labelledby="hero-title">
 	<!-- lightning bolts from the logo -->
-	<svg aria-hidden="true" class="pointer-events-none absolute -left-6 top-24 hidden h-44 w-auto -rotate-12 text-amber lg:block" viewBox="0 0 24 32">
+	<svg aria-hidden="true" class="pointer-events-none absolute -left-14 top-24 hidden h-44 w-auto -rotate-12 text-amber xl:block" viewBox="0 0 24 32">
 		<polygon points="14,0 2,18 11,18 8,32 22,12 13,12 18,0" fill="currentColor" stroke="#111" stroke-width="1.2" stroke-linejoin="round"></polygon>
 	</svg>
-	<svg aria-hidden="true" class="pointer-events-none absolute bottom-6 left-[46%] hidden h-24 w-auto rotate-12 text-flame lg:block" viewBox="0 0 24 32">
+	<svg aria-hidden="true" class="pointer-events-none absolute bottom-10 right-4 hidden h-24 w-auto rotate-12 text-flame 2xl:block" viewBox="0 0 24 32">
 		<polygon points="14,0 2,18 11,18 8,32 22,12 13,12 18,0" fill="currentColor" stroke="#111" stroke-width="1.5" stroke-linejoin="round"></polygon>
 	</svg>
 
-	<div class="relative mx-auto grid max-w-6xl gap-14 px-4 py-14 md:grid-cols-12 md:items-center md:gap-10 md:px-6 md:py-20">
-		<div class="md:col-span-7">
+	<div class="relative mx-auto grid max-w-6xl gap-12 px-4 py-12 sm:py-14 md:px-6 md:py-20 lg:grid-cols-12 lg:items-center lg:gap-10">
+		<div class="lg:col-span-7">
 			<p class="inline-flex -rotate-2 items-center gap-2 border-2 border-ink bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wide shadow-hard-sm">
 				<span class="h-2.5 w-2.5 rounded-full bg-flame motion-safe:animate-pulse" aria-hidden="true"></span>
 				Updated {updated}
 			</p>
-			<h1 id="hero-title" class="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-ink md:text-5xl lg:text-[3.5rem]">
+			<h1 id="hero-title" class="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-ink sm:text-5xl xl:text-[3.5rem]">
 				MariBank referral code
 				<span class="mx-0.5 inline-block -rotate-1 bg-ink px-2.5 py-0.5 font-mono text-[0.88em] tracking-tight text-sun">{referral.code}</span>:
 				get <span class="hl">{referral.bonus}</span> when you sign up
@@ -35,9 +35,9 @@ const updated = new Date(referral.updated).toLocaleDateString(siteData.locale, {
 				Enter this code when you open a new MariBank account. Deposit {referral.minDeposit}, keep it in for {referral.holdDays}
 				days, and you receive the {referral.bonus} reward.
 			</p>
-			<div class="mt-8 flex flex-wrap items-center gap-4">
-				<a href="#download" class="nb-btn nb-btn-dark px-6 py-3.5 text-lg">Download MariBank</a>
-				<a href="#how-it-works" class="nb-btn nb-btn-white px-6 py-3.5 text-lg">See how it works</a>
+			<div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+				<a href="#download" class="nb-btn nb-btn-dark px-6 py-3.5 text-base sm:text-lg">Download MariBank</a>
+				<a href="#how-it-works" class="nb-btn nb-btn-white px-6 py-3.5 text-base sm:text-lg">See how it works</a>
 			</div>
 			<p class="mt-7 max-w-xl text-sm font-medium text-ink/75">
 				Reward terms are set by MariBank and can change at any time. Pinoy Techie is independent and not affiliated with MariBank.
@@ -45,8 +45,8 @@ const updated = new Date(referral.updated).toLocaleDateString(siteData.locale, {
 		</div>
 
 		<!-- Referral angpao -->
-		<div class="md:col-span-5" id="referral">
-			<div class="mx-auto w-full max-w-md transition-transform duration-200 md:rotate-2 md:hover:rotate-0">
+		<div class="lg:col-span-5" id="referral">
+			<div class="mx-auto w-full max-w-md transition-transform duration-200 lg:rotate-2 lg:hover:rotate-0">
 				<Angpao code={referral.code} bonus={referral.bonus} minDeposit={referral.minDeposit} holdDays={referral.holdDays} />
 			</div>
 		</div>
