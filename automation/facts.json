@@ -1,19 +1,30 @@
 {
   "asOf": "2026-11-25",
-  "global": [
+  "global": [],
+  "banks": [
     "PDIC insures deposits up to ₱1,000,000 per depositor per bank.",
     "Interest on bank deposits is subject to 20% withholding tax.",
     "A GCash or Maya wallet holds e-money, which is not a bank deposit and is not PDIC-insured. Savings products (GSave, Maya Savings, MariBank) are deposits at a bank."
   ],
+  "providers": [
+    "No verified provider facts yet. Never state plan names, prices, data allowances, speeds, validity periods, coverage claims, USSD or short codes. Tell the reader to check the provider's official app or website.",
+    "The SIM Registration Act (Republic Act No. 11934, signed October 2022) requires every SIM, including eSIMs, to be registered with the provider before activation. SIMs are sold deactivated. Registration is free, and minors register under a parent or legal guardian.",
+    "TM is a prepaid brand under Globe and is registered through Globe's registration system. TNT is a brand of Smart Communications, the wireless arm of PLDT."
+  ],
   "maribank": [
     "MariBank referral code on this site: MBPINOY2027. New users get ₱588 after a first ₱1,000 deposit that stays in the account for 3 days. Reward terms are set by MariBank and can change."
   ],
-  "gcash": [
-    "ADD YOUR CONFIRMED GCASH FACTS HERE (fees, limits, GSave partner banks). Until then the AI only sees your existing GCash posts as source material."
-  ],
+  "gcash": [],
   "maya": [
     "According to Maya Bank, Maya Savings pays a 3% base rate a year, credited daily, and the rate can be boosted up to 15% a year. The boost applies only to the part of the balance up to ₱100,000 and is not guaranteed.",
     "Maya Savings: transfers out to other banks via InstaPay cost ₱15 per transaction. PESONet is free until further notice. Wallet to Savings is instant and free.",
     "Maya referral on this site: username @arjaymarigondon. Bonus ₱50 after a first transaction of at least ₱100. Promo period shown ends 2026-11-30."
-  ]
+  ],
+  "more-banks-ewallets": [],
+  "globe-tm": [],
+  "smart-tnt-sun": [
+    "Sun Prepaid was rebranded to Smart Prepaid (completed October 21, 2020, according to PLDT). Sun Postpaid became Smart Postpaid on April 25, 2022, and existing subscribers kept their SIM, number and plan inclusions. The Sun brand is retired."
+  ],
+  "dito": [],
+  "more-internet-providers": []
 }

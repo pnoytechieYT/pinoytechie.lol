@@ -35,7 +35,11 @@ const CATEGORY = (process.env.CATEGORY || process.argv.find((a, i) => i > 1 && !
 const DRY = process.env.DRY_RUN === "1" || process.argv.includes("--dry");
 const RETRY_MS = Number(process.env.RETRY_DELAY_MS ?? 20_000);
 const MIN_WORDS = Number(process.env.MIN_WORDS ?? 400); // your existing posts have a median of about 490 words
-const BRAND = { maribank: "MariBank", gcash: "GCash", maya: "Maya" };
+// Which categories exist and what they are about: automation/config.json
+const CONFIG = JSON.parse(await fs.readFile(path.join(ROOT, "automation", "config.json"), "utf8"));
+const CFG = CONFIG[CATEGORY];
+const LABEL = CFG?.label ?? CATEGORY;
+const GROUP_LABEL = { banks: "Banks and e-wallets", providers: "Internet providers" };
 
 const PROVIDERS = {
 	gemini: {
@@ -137,19 +141,14 @@ function pickSources(existing, topic) {
 
 function factsText(facts) {
 	const block = (label, items) => (items?.length ? `${label}:\n${items.map((f) => `- ${f}`).join("\n")}` : "");
-	return [
-		block("General", facts.global),
-		block("MariBank", facts.maribank),
-		block("GCash", facts.gcash),
-		block("Maya", facts.maya),
-	]
+	return [block("General", facts.global), block(GROUP_LABEL[CFG.group], facts[CFG.group]), block(LABEL, facts[CATEGORY])]
 		.filter(Boolean)
 		.join("\n\n");
 }
 
 // ---------- prompt ----------
 
-const SYSTEM = `You write guides for Pinoy Techie, an independent Philippine website that explains MariBank, GCash and Maya in plain language.
+const SYSTEM = `You write guides for Pinoy Techie, an independent Philippine website that explains Philippine banks, e-wallets and internet providers in plain language.
 
 VOICE: clear, calm, helpful English for Filipino readers. Short paragraphs. Say "you". No hype, no "best ever", no promises of returns, no financial advice.
 
@@ -161,18 +160,29 @@ STRUCTURE (Markdown, no H1 because the page title is added separately):
 - 600 to 1,000 words in total.
 
 HARD RULES (follow them even if the topic seems to need otherwise):
-1. NUMBERS: never write a peso amount, percentage, interest rate, fee, limit, date or deadline unless it appears word for word in FACTS or SOURCE POSTS. If you need one that is missing, tell the reader to check the figure in the official app instead. Never estimate or round.
+1. NUMBERS: never write a peso amount, percentage, interest rate, fee, limit, plan name, price, data allowance, speed, validity period, date or deadline unless it appears word for word in FACTS or SOURCE POSTS. If you need one that is missing, tell the reader to check the figure in the official app instead. Never estimate or round.
 2. CLAIMS: when you state something a company says, say "According to <company>" and only if it is in FACTS or SOURCE POSTS.
-3. LINKS: no external links, no URLs, no phone numbers, no email addresses. Internal links are allowed only from the EXISTING GUIDES list, written as [anchor text](/blog/slug/).
+3. LINKS: no external links, no URLs, no phone numbers, no email addresses, no USSD or short codes (like *123#). Internal links are allowed only from the EXISTING GUIDES list, written as [anchor text](/blog/slug/).
 4. Do not write a "Sources" section, a date line, or any note about being an AI. Do not invent screens, menu names or steps you are not sure about; describe the general flow and say menus can differ by app version.
 5. No fake quotes, no fake reviews, no invented statistics.
 
 OUTPUT: only a JSON object, no code fences, with these keys:
 {"title": "...", "seoTitle": "50-60 characters", "description": "140-160 characters", "tags": ["3 to 5 short tags"], "body": "the Markdown article"}`;
 
-function buildUser({ topic, facts, sources, existing }) {
+function groupRules() {
+	const rules = [];
+	if (CFG.group === "banks") {
+		rules.push("TOPIC TYPE: a bank or e-wallet guide. Explain at a high level. Keep e-money wallets and bank deposits apart: PDIC coverage applies to bank deposits only, and only as stated in FACTS.");
+	} else {
+		rules.push("TOPIC TYPE: a mobile or internet provider guide. Plans, promos, prices, speeds and coverage change often and differ by location, so give the reader a checklist and tell them how to verify instead of giving figures. Never say a network is faster, better or has wider coverage than another.");
+	}
+	if (CFG.more) rules.push("This category covers other providers: the guide must be about the one named provider in the topic title (or the general question in it). Do not compare providers on numbers.");
+	return `\n\nCATEGORY RULES:\n${rules.join("\n")}`;
+}
+
+function buildUser({ topic, facts, sources, style, existing }) {
 	const guides = existing.map((p) => `- ${p.slug}: ${p.title}`).join("\n");
-	return `CATEGORY: ${BRAND[CATEGORY]}
+	return `CATEGORY: ${LABEL} (${CFG.what})
 TOPIC: ${topic.title}
 ANGLE: ${topic.angle ?? "Answer the reader's main question first, then explain the details."}
 
@@ -182,7 +192,7 @@ ${facts || "(none yet)"}
 SOURCE POSTS (already published on the site, treat as verified; match their tone):
 ${sources || "(none)"}
 
-EXISTING GUIDES you may link to:
+${style ? `STYLE EXAMPLE (from another category: copy the tone and structure only, never its facts or numbers):\n${style}\n\n` : ""}EXISTING GUIDES you may link to:
 ${guides}
 
 Write the guide now. Return only the JSON object.`;
@@ -285,7 +295,7 @@ function validateArticle(data) {
 
 // ---------- AI topic ideas (used only when the queue is empty) ----------
 
-const TOPIC_SYSTEM = `You plan the editorial calendar for Pinoy Techie, an independent Philippine website with plain-language guides about MariBank, GCash and Maya.
+const TOPIC_SYSTEM = `You plan the editorial calendar for Pinoy Techie, an independent Philippine website with plain-language guides about Philippine banks, e-wallets and internet providers.
 Propose NEW guide topics for ONE category. Each must answer a real question a Filipino reader would search for: how-to, fees explained, safety, comparisons, troubleshooting, beginner explainers.
 
 RULES:
@@ -353,8 +363,8 @@ function cleanBody(raw, validSlugs) {
 	return { body, removedLinks: removed };
 }
 
-const NUM = /₱\s?\d[\d,]*(?:\.\d+)?|\$\s?\d[\d,]*(?:\.\d+)?|\d+(?:\.\d+)?\s?%/g;
-const norm = (s) => s.replace(/\s+/g, "");
+const NUM = /₱\s?\d[\d,]*(?:\.\d+)?|\$\s?\d[\d,]*(?:\.\d+)?|\d+(?:\.\d+)?\s?%|\d+(?:\.\d+)?\s?(?:Mbps|Gbps|GB|MB|TB)\b|\*\d{2,4}(?:\*[\d*]+)?#/gi;
+const norm = (s) => s.replace(/\s+/g, "").toLowerCase();
 
 function unverifiedNumbers(body, corpus) {
 	const known = norm(corpus);
@@ -374,7 +384,7 @@ function cut(s, max) {
 
 // ---------- main ----------
 
-if (!BRAND[CATEGORY]) fail(`CATEGORY must be one of: ${Object.keys(BRAND).join(", ")} (got "${CATEGORY}")`);
+if (!CFG) fail(`CATEGORY must be one of: ${Object.keys(CONFIG).join(", ")} (got "${CATEGORY}")`);
 
 const existing = await loadExisting();
 const slugs = new Set(existing.map((p) => p.slug));
@@ -397,7 +407,7 @@ if (!topic) {
 	}
 	const published = existing.filter((p) => p.category === CATEGORY).map((p) => `- ${p.title}`).join("\n");
 	const queued = queue.map((t) => `- ${t.title}`).join("\n");
-	const ask = `CATEGORY: ${BRAND[CATEGORY]}
+	const ask = `CATEGORY: ${LABEL} (${CFG.what})
 
 FACTS (what we can write about with confidence):
 ${factsStr || "(none yet)"}
@@ -423,8 +433,10 @@ Propose 10 new topics now. Return only the JSON object.`;
 log(`topic: ${topic.title} (${topic.slug})`);
 
 const sources = pickSources(existing, topic);
-const system = SYSTEM;
-const user = buildUser({ topic, facts: factsStr, sources, existing });
+const system = SYSTEM + groupRules();
+// A brand-new category has no source posts yet: show one post from elsewhere as a style reference only.
+const style = sources ? "" : (existing.find((p) => p.category !== CATEGORY)?.body ?? "").split(/\n## Sources/i)[0].trim().slice(0, 1800);
+const user = buildUser({ topic, facts: factsStr, sources, style, existing });
 log(`prompt size: about ${Math.round((system.length + user.length) / 4)} tokens`);
 if (DRY) {
 	log("dry run, stopping before the API call");
@@ -442,7 +454,7 @@ const asDraft = unverified.length > 0;
 
 const description = cut(String(data.description || topic.title).replace(/\s+/g, " ").trim(), 170);
 const seoTitle = typeof data.seoTitle === "string" && data.seoTitle.length <= 65 ? data.seoTitle : "";
-const tags = [BRAND[CATEGORY], ...(Array.isArray(data.tags) ? data.tags : [])]
+const tags = [...(CFG.more ? [] : [LABEL]), ...(Array.isArray(data.tags) ? data.tags : [])]
 	.map((t) => String(t).trim())
 	.filter((t, i, arr) => t && arr.findIndex((x) => x.toLowerCase() === t.toLowerCase()) === i)
 	.slice(0, 5);

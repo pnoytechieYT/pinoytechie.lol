@@ -14,7 +14,7 @@ const { category } = Astro.props;
 				<img src={category.logo} alt="" width="72" height="72" class="h-[4.5rem] w-[4.5rem] rounded-2xl border-[3px] border-ink bg-white shadow-hard-sm" loading="lazy" />
 			) : (
 				<span class="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-2xl border-[3px] border-ink bg-ink font-mono text-3xl font-bold text-sun shadow-hard-sm" aria-hidden="true">
-					{category.name.charAt(0)}
+					{category.badge ?? category.name.charAt(0)}
 				</span>
 			)
 		}

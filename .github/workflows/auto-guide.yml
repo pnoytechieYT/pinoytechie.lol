@@ -1,9 +1,14 @@
 name: Auto guide (AI)
 
-# Writes one AI-assisted guide per run:
-#   9:00 AM Manila  -> MariBank     (01:00 UTC)
-#   12:00 PM Manila -> GCash        (04:00 UTC)
-#   3:00 PM Manila  -> Maya         (07:00 UTC)
+# Writes one AI-assisted guide per run, all times Philippine time (UTC+8):
+#   Mon 12:00 PM  MariBank                 (Banks & E-Wallets)
+#   Tue 12:00 PM  GCash
+#   Wed 12:00 PM  Maya
+#   Thu 12:00 PM  More Banks & E-Wallets
+#   Fri 12:00 PM  Globe / TM               (Internet Providers)
+#   Sat 12:00 PM  Smart / TNT / Sun
+#   Sun  9:00 AM  DITO
+#   Sun 12:00 PM  More Internet Providers
 # GitHub may start scheduled runs 5 to 30 minutes late when it is busy. That is normal.
 #
 # MODE (repository variable AUTO_GUIDE_MODE, Settings > Secrets and variables > Actions > Variables):
@@ -12,15 +17,22 @@ name: Auto guide (AI)
 
 on:
   schedule:
-    - cron: "0 1 * * *"
-    - cron: "0 4 * * *"
-    - cron: "0 7 * * *"
+    - cron: "0 1 * * 0" # Sunday 9:00 AM PH: DITO
+    - cron: "0 4 * * *" # every day 12:00 PM PH: category depends on the weekday
   workflow_dispatch:
     inputs:
       category:
         description: Which category to write
         type: choice
-        options: [maribank, gcash, maya]
+        options:
+          - maribank
+          - gcash
+          - maya
+          - more-banks-ewallets
+          - globe-tm
+          - smart-tnt-sun
+          - dito
+          - more-internet-providers
         default: maribank
       mode:
         description: pr = open a Pull Request, publish = commit to main
@@ -58,12 +70,22 @@ jobs:
           INPUT_MODE: ${{ inputs.mode }}
           VAR_MODE: ${{ vars.AUTO_GUIDE_MODE }}
         run: |
-          case "$SCHEDULE" in
-            "0 1 * * *") CATEGORY=maribank ;;
-            "0 4 * * *") CATEGORY=gcash ;;
-            "0 7 * * *") CATEGORY=maya ;;
-            *) CATEGORY="${INPUT_CATEGORY:-maribank}" ;;
-          esac
+          if [ "$SCHEDULE" = "0 1 * * 0" ]; then
+            CATEGORY=dito
+          elif [ -n "$SCHEDULE" ]; then
+            # Weekday in Manila time: 1=Monday ... 7=Sunday
+            case "$(TZ=Asia/Manila date +%u)" in
+              1) CATEGORY=maribank ;;
+              2) CATEGORY=gcash ;;
+              3) CATEGORY=maya ;;
+              4) CATEGORY=more-banks-ewallets ;;
+              5) CATEGORY=globe-tm ;;
+              6) CATEGORY=smart-tnt-sun ;;
+              *) CATEGORY=more-internet-providers ;;
+            esac
+          else
+            CATEGORY="${INPUT_CATEGORY:-maribank}"
+          fi
           MODE="${INPUT_MODE:-${VAR_MODE:-pr}}"
           echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"

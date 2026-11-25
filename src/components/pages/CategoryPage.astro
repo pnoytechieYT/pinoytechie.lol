@@ -3,6 +3,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import PageHero from "@/components/PageHero.astro";
 import PostListing from "@/components/PostListing.astro";
 import { siteData } from "@/data/site";
+import { categoryGroups } from "@/data/categories";
 import { getCategory, getPostsByCategory, getTags } from "@/lib/posts";
 import { paginate, pageUrl } from "@/lib/pagination";
 import { abs, breadcrumbNode, webPageNode } from "@/lib/seo";
@@ -19,6 +20,7 @@ const posts = getPostsByCategory(slug);
 const result = paginate(posts, page, siteData.paging.postsPerPage);
 const tags = getTags(posts);
 
+const groupLabel = categoryGroups.find((g) => g.id === category.group)?.label;
 const base = category.path;
 const path = pageUrl(base, result.page);
 const suffix = result.page > 1 ? ` (page ${result.page})` : "";
@@ -51,7 +53,7 @@ const schema = [
 	<PageHero
 		title={category.name}
 		icon={category.logo}
-		eyebrow={category.pinned ? "★ Pinned guides" : undefined}
+		eyebrow={category.pinned ? `★ Pinned · ${groupLabel}` : groupLabel}
 		lead={category.description}
 		crumbs={crumbs} />
 

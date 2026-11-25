@@ -58,6 +58,35 @@ function readPostLastmods() {
 
 const postLastmods = readPostLastmods();
 
+/**
+ * Category folders that have at least one LIVE post (not a draft, pubDate already passed).
+ * A category page without posts is noindex, so it must not be listed in the sitemap either
+ * (Search Console reports "Submitted URL marked noindex" otherwise).
+ */
+function readLiveCategories() {
+	const root = path.resolve("src/posts");
+	const live = new Set();
+	if (!fs.existsSync(root)) return live;
+	for (const folder of fs.readdirSync(root, { withFileTypes: true })) {
+		if (!folder.isDirectory()) continue;
+		for (const file of fs.readdirSync(path.join(root, folder.name))) {
+			if (!file.endsWith(".md")) continue;
+			const front = fs.readFileSync(path.join(root, folder.name, file), "utf8").match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? "";
+			if (/^draft:\s*true\s*$/m.test(front)) continue;
+			let raw = (front.match(/^pubDate:\s*(.+)$/m)?.[1] ?? "").trim().replace(/^["']|["']$/g, "").replace(" ", "T");
+			if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) raw += "T00:00:00";
+			if (raw && !/(Z|[+-]\d{2}:?\d{2})$/i.test(raw)) raw += PH_OFFSET;
+			const date = new Date(raw);
+			if (Number.isNaN(date.getTime()) || date > new Date()) continue;
+			live.add(folder.name);
+			break;
+		}
+	}
+	return live;
+}
+
+const liveCategories = readLiveCategories();
+
 // https://astro.build/config
 export default defineConfig({
 	site: SITE,
@@ -76,7 +105,12 @@ export default defineConfig({
 	integrations: [
 		sitemap({
 			// Tag archives are navigation aids, keep them out of the sitemap.
-			filter: (page) => !page.includes("/blog/tag/") && !page.includes("/404"),
+			// Empty category pages are noindex, so they are kept out too.
+			filter: (page) => {
+				if (page.includes("/blog/tag/") || page.includes("/404")) return false;
+				const category = page.match(/\/blog\/category\/([^/]+)\//)?.[1];
+				return !category || liveCategories.has(category);
+			},
 			serialize(item) {
 				const slug = item.url.match(/\/blog\/([^/]+)\/?$/)?.[1];
 				const lastmod = slug && slug !== "tag" ? postLastmods.get(slug) : undefined;

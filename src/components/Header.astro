@@ -1,6 +1,6 @@
 ---
 import { siteData } from "@/data/site";
-import { getCategories } from "@/lib/posts";
+import { getCategoryGroups } from "@/lib/posts";
 
 interface Props {
 	activeNav?: string;
@@ -9,23 +9,38 @@ const { activeNav } = Astro.props;
 
 interface NavChild {
 	label: string;
+	/** full name for screen readers (the label "More" appears twice) */
+	full: string;
 	href: string;
 	icon?: string;
+	badge: string;
+}
+interface NavGroup {
+	label: string;
+	items: NavChild[];
 }
 interface NavItem {
 	label: string;
 	href: string;
-	children?: NavChild[];
+	groups?: NavGroup[];
 }
 
-// The "Guide" item gets a dropdown with one entry (and logo) per category with inNav: true (src/data/categories.ts)
-const categoryItems: NavChild[] = getCategories()
-	.filter((c) => c.inNav)
-	.map((c) => ({ label: c.name, href: c.path, icon: c.logo }));
+// The "Guide" item gets a dropdown with labelled groups (Banks & E-Wallets, Internet Providers).
+// Each entry is a category with inNav: true (src/data/categories.ts). Empty categories stay hidden until their first post.
+const groups: NavGroup[] = getCategoryGroups({ onlyNav: true }).map((g) => ({
+	label: g.label,
+	items: g.categories.map((c) => ({
+		label: c.shortName ?? c.name,
+		full: c.name,
+		href: c.path,
+		icon: c.logo,
+		badge: c.badge ?? c.name.charAt(0),
+	})),
+}));
 const nav: NavItem[] = siteData.nav.map((item) => ({
 	label: item.label,
 	href: item.href,
-	children: "dropdown" in item && categoryItems.length ? categoryItems : undefined,
+	groups: "dropdown" in item && groups.length ? groups : undefined,
 }));
 
 const path = Astro.url.pathname;
@@ -54,7 +69,7 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 							<a
 								href={item.href}
 								aria-current={isActive(item.href) ? "page" : undefined}
-								aria-haspopup={item.children ? "true" : undefined}
+								aria-haspopup={item.groups ? "true" : undefined}
 								class:list={[
 									"flex items-center gap-1.5 whitespace-nowrap rounded-md border-2 px-3 py-1.5 transition-colors",
 									isActive(item.href)
@@ -62,30 +77,44 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 										: "border-transparent hover:border-ink hover:bg-sun-soft group-focus-within:border-ink group-focus-within:bg-sun-soft",
 								]}>
 								{item.label}
-								{item.children && (
+								{item.groups && (
 									<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" class="transition-transform group-hover:rotate-180 group-focus-within:rotate-180">
 										<path d="M5 9l7 7 7-7" />
 									</svg>
 								)}
 							</a>
-							{item.children && (
+							{item.groups && (
 								<div class="invisible absolute left-0 top-full z-50 min-w-64 pt-2 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-									<ul class="space-y-1 rounded-lg border-[3px] border-ink bg-cream p-2 shadow-hard">
-										{item.children.map((child) => (
-											<li>
-												<a
-													href={child.href}
-													aria-current={path.startsWith(child.href) ? "page" : undefined}
-													class:list={[
-														"flex items-center gap-3 whitespace-nowrap rounded-md border-2 px-3 py-2 transition-colors",
-														path.startsWith(child.href) ? "border-ink bg-sun" : "border-transparent hover:border-ink hover:bg-sun-soft",
-													]}>
-													{child.icon && <img src={child.icon} alt="" width="28" height="28" class="h-7 w-7 rounded-md border-2 border-ink bg-white" />}
-													{child.label}
-												</a>
-											</li>
+									<div class="max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg border-[3px] border-ink bg-cream p-2 shadow-hard">
+										{item.groups.map((group, gi) => (
+											<section aria-label={group.label} class:list={[gi > 0 && "mt-2 border-t-2 border-dashed border-ink pt-2"]}>
+												<p class="px-3 pb-1 pt-1 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-ink/70">{group.label}</p>
+												<ul class="space-y-1">
+													{group.items.map((child) => (
+														<li>
+															<a
+																href={child.href}
+																aria-label={child.full}
+																aria-current={path.startsWith(child.href) ? "page" : undefined}
+																class:list={[
+																	"flex items-center gap-3 whitespace-nowrap rounded-md border-2 px-3 py-2 transition-colors",
+																	path.startsWith(child.href) ? "border-ink bg-sun" : "border-transparent hover:border-ink hover:bg-sun-soft",
+																]}>
+																{child.icon ? (
+																	<img src={child.icon} alt="" width="28" height="28" class="h-7 w-7 rounded-md border-2 border-ink bg-white" />
+																) : (
+																	<span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-ink font-mono text-sm font-bold text-sun" aria-hidden="true">
+																		{child.badge}
+																	</span>
+																)}
+																{child.label}
+															</a>
+														</li>
+													))}
+												</ul>
+											</section>
 										))}
-									</ul>
+									</div>
 								</div>
 							)}
 						</li>
@@ -124,23 +153,37 @@ const isActive = (href: string) => (activeNav ? href === activeNav : href === "/
 								]}>
 								{item.label}
 							</a>
-							{item.children && (
-								<ul class="mt-2 space-y-2 border-l-[3px] border-ink pl-3">
-									{item.children.map((child) => (
-										<li>
-											<a
-												href={child.href}
-												aria-current={path.startsWith(child.href) ? "page" : undefined}
-												class:list={[
-													"flex items-center gap-3 rounded-md border-2 border-ink px-3 py-2.5",
-													path.startsWith(child.href) ? "bg-ink text-sun" : "bg-white",
-												]}>
-												{child.icon && <img src={child.icon} alt="" width="28" height="28" class="h-7 w-7 rounded-md border-2 border-ink bg-white" />}
-												{child.label}
-											</a>
-										</li>
+							{item.groups && (
+								<div class="mt-2 space-y-3 border-l-[3px] border-ink pl-3">
+									{item.groups.map((group) => (
+										<section aria-label={group.label}>
+											<p class="pb-1.5 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-ink/70">{group.label}</p>
+											<ul class="space-y-2">
+												{group.items.map((child) => (
+													<li>
+														<a
+															href={child.href}
+															aria-label={child.full}
+															aria-current={path.startsWith(child.href) ? "page" : undefined}
+															class:list={[
+																"flex items-center gap-3 rounded-md border-2 border-ink px-3 py-2.5",
+																path.startsWith(child.href) ? "bg-ink text-sun" : "bg-white",
+															]}>
+															{child.icon ? (
+																<img src={child.icon} alt="" width="28" height="28" class="h-7 w-7 rounded-md border-2 border-ink bg-white" />
+															) : (
+																<span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-ink font-mono text-sm font-bold text-sun" aria-hidden="true">
+																	{child.badge}
+																</span>
+															)}
+															{child.label}
+														</a>
+													</li>
+												))}
+											</ul>
+										</section>
 									))}
-								</ul>
+								</div>
 							)}
 						</li>
 					))

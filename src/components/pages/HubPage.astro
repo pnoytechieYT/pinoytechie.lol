@@ -4,7 +4,7 @@ import PageHero from "@/components/PageHero.astro";
 import CategoryCard from "@/components/CategoryCard.astro";
 import PostListing from "@/components/PostListing.astro";
 import { siteData } from "@/data/site";
-import { getCategories, getPosts, getTags } from "@/lib/posts";
+import { getCategoryGroups, getPosts, getTags } from "@/lib/posts";
 import { paginate, pageUrl } from "@/lib/pagination";
 import { abs, breadcrumbNode, webPageNode } from "@/lib/seo";
 
@@ -16,7 +16,7 @@ const { page } = Astro.props;
 
 const all = getPosts();
 const result = paginate(all, page, siteData.paging.postsPerPage);
-const categories = getCategories();
+const groups = getCategoryGroups();
 const tags = getTags(all);
 
 const base = "/blog/";
@@ -24,7 +24,7 @@ const path = pageUrl(base, result.page);
 const suffix = result.page > 1 ? ` (page ${result.page})` : "";
 const title = `Guides and Comparisons${suffix}`;
 const description =
-	"Plain-language guides on digital banking and money apps in the Philippines. Pick a topic, like MariBank, GCash or Maya, and decide before you deposit.";
+	"Plain-language guides on Philippine banks, e-wallets and internet providers, from MariBank and GCash to Globe, Smart and DITO. Decide before you sign up.";
 const crumbs = [
 	{ name: "Home", href: "/" },
 	{ name: "Guides", href: base },
@@ -52,14 +52,24 @@ const schema = [
 
 	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
 		{
-			categories.length > 0 && (
+			groups.length > 0 && (
 				<section aria-labelledby="topics-title">
 					<h2 id="topics-title" class="text-3xl font-bold tracking-tight text-ink">Topics</h2>
-					<div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-						{categories.map((category) => (
-							<CategoryCard category={category} />
-						))}
-					</div>
+					{groups.map((group) => (
+						<div class="mt-10" role="group" aria-labelledby={`group-${group.id}`}>
+							<div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b-[3px] border-ink pb-3">
+								<h3 id={`group-${group.id}`} class="text-xl font-bold uppercase tracking-tight text-ink">
+									<span class="nb-tag nb-tag-red mr-2 align-middle">{group.label}</span>
+								</h3>
+								<p class="text-sm text-body">{group.description}</p>
+							</div>
+							<div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+								{group.categories.map((category) => (
+									<CategoryCard category={category} />
+								))}
+							</div>
+						</div>
+					))}
 				</section>
 			)
 		}

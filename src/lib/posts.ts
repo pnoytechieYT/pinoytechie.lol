@@ -1,6 +1,6 @@
 import type { MarkdownInstance, MarkdownHeading } from "astro";
 import { siteData } from "@/data/site";
-import { categories, categoryPath, defaultCategory, type Category } from "@/data/categories";
+import { categories, categoryGroups, categoryPath, defaultCategory, type Category, type CategoryGroup } from "@/data/categories";
 
 /**
  * Frontmatter of a post in src/posts/<category>/<slug>.md
@@ -175,6 +175,18 @@ export function getCategories(opts: { includeEmpty?: boolean } = {}): CategoryIn
 		.sort((a, b) => Number(!!b.c.pinned) - Number(!!a.c.pinned) || a.i - b.i)
 		.map(({ c }) => ({ ...c, count: getPostsByCategory(c.slug, posts).length, path: categoryPath(c.slug) }))
 		.filter((c) => opts.includeEmpty || c.count > 0);
+}
+
+export interface CategoryGroupInfo extends CategoryGroup {
+	categories: CategoryInfo[];
+}
+
+/** The labelled sections (Banks & E-Wallets, Internet Providers) with their categories. Empty groups are left out. */
+export function getCategoryGroups(opts: { includeEmpty?: boolean; onlyNav?: boolean } = {}): CategoryGroupInfo[] {
+	const all = getCategories({ includeEmpty: opts.includeEmpty }).filter((c) => !opts.onlyNav || c.inNav);
+	return categoryGroups
+		.map((g) => ({ ...g, categories: all.filter((c) => c.group === g.id) }))
+		.filter((g) => g.categories.length > 0);
 }
 
 export function getCategory(slug: string): CategoryInfo | undefined {
