@@ -1,0 +1,27 @@
+---
+import PostCard from "@/components/PostCard.astro";
+import Pagination from "@/components/Pagination.astro";
+import TagCloud from "@/components/TagCloud.astro";
+import type { Post, TagInfo } from "@/lib/posts";
+import type { Page } from "@/lib/pagination";
+
+interface Props {
+	result: Page<Post>;
+	basePath: string;
+	tags: TagInfo[];
+	emptyText?: string;
+}
+const { result, basePath, tags, emptyText = "No guides here yet." } = Astro.props;
+---
+
+{
+	result.items.length > 0 ? (
+		<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+			{result.items.map((post) => <PostCard post={post} />)}
+		</div>
+	) : (
+		<p class="nb-card inline-block p-4 font-medium text-body">{emptyText}</p>
+	)
+}
+<Pagination page={result.page} totalPages={result.totalPages} basePath={basePath} from={result.from} to={result.to} total={result.total} />
+<TagCloud tags={tags} />

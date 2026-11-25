@@ -1,0 +1,39 @@
+---
+import { siteData } from "@/data/site";
+
+const { referral } = siteData;
+const items = [
+	`${referral.bonus} sign-up reward`,
+	`Code ${referral.code}`,
+	"₱1,000,000 PDIC insurance per depositor",
+	`Deposit ${referral.minDeposit}`,
+	`Keep it ${referral.holdDays} days`,
+	"Independent guides",
+];
+
+// One "group" = the facts repeated twice, and the track holds two identical groups.
+// The track slides exactly one group-width (-50%) and then restarts, so the loop is seamless.
+// Repeating the facts inside a group makes it wider than any normal screen, and CSS
+// (.marquee-group min-width: 100vw) covers the rest, so the end of the strip is never visible.
+// Only the first copy is read by screen readers; reduced-motion shows that copy alone.
+const groups = [0, 1];
+const copies = [0, 1];
+---
+
+<div class="marquee" role="region" aria-label="Quick facts">
+	<div class="marquee-track">
+		{groups.map((g) => (
+			<div class="marquee-group" aria-hidden={g === 1 ? "true" : undefined}>
+				{copies.map((c) => (
+					<div class="marquee-set" aria-hidden={g === 0 && c === 1 ? "true" : undefined}>
+						{items.map((item) => (
+							<span class="flex items-center whitespace-nowrap py-2.5 font-mono text-xs font-bold uppercase tracking-wider sm:py-3 sm:text-sm">
+								<span class="px-4 sm:px-6">{item}</span><span class="text-amber" aria-hidden="true">✦</span>
+							</span>
+						))}
+					</div>
+				))}
+			</div>
+		))}
+	</div>
+</div>

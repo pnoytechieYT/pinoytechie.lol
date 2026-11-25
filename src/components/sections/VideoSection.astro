@@ -1,0 +1,30 @@
+---
+import YouTubeEmbed from "@/components/YouTubeEmbed.astro";
+import { siteData } from "@/data/site";
+import { homeVideo } from "@/data/videos";
+
+const { video, social } = siteData;
+---
+
+<section class="border-b-[3px] border-ink bg-amber" aria-labelledby="video-title">
+	<div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:py-16 md:px-6 md:py-24 lg:grid-cols-12 lg:items-center lg:gap-12">
+		<div class="lg:col-span-5">
+			<span class="nb-tag nb-tag-dark">Video</span>
+			<h2 id="video-title" class="mt-4 text-3xl font-bold leading-[1.05] tracking-tight text-ink sm:text-4xl md:text-5xl">{video.heading}</h2>
+			<p class="mt-4 text-lg font-medium leading-relaxed text-ink/90">{video.text}</p>
+			<div class="mt-7 flex flex-wrap gap-4">
+				{
+					social.youtube && (
+						<a href={social.youtube} target="_blank" rel="noopener noreferrer" class="nb-btn nb-btn-dark">
+							Subscribe on YouTube
+						</a>
+					)
+				}
+				<a href="/videos/" class="nb-btn nb-btn-white">More videos</a>
+			</div>
+		</div>
+		<div class="lg:col-span-7">
+			<YouTubeEmbed id={homeVideo.id} si={homeVideo.si} title={homeVideo.title} />
+		</div>
+	</div>
+</section>

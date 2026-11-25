@@ -1,0 +1,29 @@
+{
+  "maribank": [
+    { "slug": "how-to-cash-in-to-maribank", "title": "How to Cash In to MariBank: Free and Paid Ways", "angle": "Explain the general ways to fund a MariBank account (e-wallet, bank transfer, over the counter) and tell the reader to check fees in the app." },
+    { "slug": "maribank-tax-on-interest-explained", "title": "Tax on MariBank Interest: How the 20% Withholding Works", "angle": "Explain withholding tax on deposit interest with a simple worked example using only numbers from the facts." },
+    { "slug": "is-maribank-good-for-emergency-fund", "title": "Is MariBank a Good Place for Your Emergency Fund?", "angle": "Balanced view: access to money, PDIC coverage, interest, and what to check. No hype." },
+    { "slug": "maribank-app-problems-login-otp-fixes", "title": "MariBank App Problems: Login, OTP and Verification Fixes", "angle": "Practical troubleshooting checklist. Do not invent menu names or support contacts; point to in-app help." },
+    { "slug": "how-to-withdraw-or-close-maribank-account", "title": "How to Withdraw Money or Close Your MariBank Account", "angle": "Explain the general options and what to check before closing, without inventing steps." },
+    { "slug": "maribank-for-freelancers-and-students", "title": "MariBank for Freelancers and Students: Receiving and Saving Income", "angle": "Who it suits, how to receive money, and what limits or verification to check." },
+    { "slug": "moving-money-between-maribank-and-gcash", "title": "Moving Money Between MariBank and GCash", "angle": "Explain the general options (InstaPay and similar) and why fees and limits should be checked in each app." }
+  ],
+  "gcash": [
+    { "slug": "gcash-cash-in-and-cash-out-options", "title": "GCash Cash In and Cash Out: Every Option Explained", "angle": "Overview of ways to add and take out money, with a comparison table that avoids exact fees unless they are in the sources." },
+    { "slug": "gcash-scams-and-how-to-stay-safe", "title": "GCash Scams: Common Tricks and How to Stay Safe", "angle": "Pattern-level warning signs (phishing links, fake support, OTP requests) and safe habits. No scripts or step-by-step scam instructions." },
+    { "slug": "how-to-link-bank-account-to-gcash", "title": "How to Link a Bank Account to GCash", "angle": "General flow and what to check (name match, partner banks), noting that screens can differ by app version." },
+    { "slug": "lost-sim-or-phone-recover-gcash-account", "title": "Lost Your SIM or Phone? How to Recover Your GCash Account", "angle": "What to do first to protect the account and where to get official help. No invented contact details." },
+    { "slug": "gcash-qr-payments-guide", "title": "How to Pay With GCash QR and Send Money Safely", "angle": "Explain scanning, showing your own QR, and safety checks before confirming a payment." },
+    { "slug": "gcash-vs-bank-account-when-to-use-which", "title": "GCash vs a Bank Account: When to Use Which", "angle": "Explain e-money versus bank deposit, PDIC coverage, and everyday use cases." },
+    { "slug": "gcash-ginvest-beginner-guide", "title": "GInvest in GCash: A Beginner Guide", "angle": "Explain at a high level what investing inside the app involves and the risks. Not investment advice; no return figures." }
+  ],
+  "maya": [
+    { "slug": "maya-cash-in-and-cash-out-guide", "title": "Maya Cash In and Cash Out: Options and What to Check", "angle": "General ways to add and withdraw money, noting that fees are set by Maya and partners and should be checked in the app." },
+    { "slug": "maya-scams-and-account-safety", "title": "Maya Scams: Warning Signs and How to Protect Your Account", "angle": "Pattern-level warning signs and safe habits. No scripts or step-by-step scam instructions." },
+    { "slug": "maya-card-virtual-and-physical-guide", "title": "Maya Card: Virtual and Physical, What to Know", "angle": "Explain the difference between virtual and physical cards and what to check (fees, limits) in the app." },
+    { "slug": "maya-qr-ph-payments-guide", "title": "How to Pay With Maya QR Ph", "angle": "Explain scanning and paying, and safety checks before confirming." },
+    { "slug": "maya-personal-goals-guide", "title": "Maya Personal Goals: How to Save for a Target", "angle": "Explain the idea of goal-based savings in Maya Savings using only facts and sources provided." },
+    { "slug": "how-to-recover-maya-account", "title": "Can't Log In to Maya? How to Recover Your Account", "angle": "Safe recovery habits and where to get official help. No invented contact details." },
+    { "slug": "maya-funds-beginner-guide", "title": "Maya Funds: A Beginner Guide to Investing in the App", "angle": "High-level explanation and risks. Not investment advice; no return figures." }
+  ]
+}

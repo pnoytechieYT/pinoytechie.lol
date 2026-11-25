@@ -1,0 +1,64 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import { siteData } from "@/data/site";
+
+const { social, referral, name } = siteData;
+---
+
+<PageLayout
+	title="About Pinoy Techie"
+	description="Pinoy Techie is a YouTube channel of Philippine facts and stories, plus plain-language MariBank, GCash and Maya guides. See what we make and how referral rewards work."
+	lead="Philippine facts and stories in long videos and Shorts, plus honest guides to MariBank, GCash, Maya and everyday money apps."
+	path="/about/"
+	type="AboutPage">
+	<h2>Who we are</h2>
+	<p>
+		{name} is a YouTube channel about the Philippines: facts worth knowing and stories worth sharing, in long videos and Shorts.
+		We began with tech how-tos, and those videos are still here, but our focus now is Philippine facts and stories.
+	</p>
+	<p>
+		This website brings it all together: the videos and Shorts, plus longer, searchable written guides on the money-app topics
+		people keep asking about, starting with MariBank.
+	</p>
+
+	<h2>What you will find here</h2>
+	<ul>
+		<li><strong>Videos</strong>: Philippine facts and stories in long form, plus our earlier tech how-tos, on the <a href="/videos/">videos page</a>.</li>
+		<li><strong>Shorts</strong>: quick facts, Filipino stories and viral moments in under a minute, on the <a href="/shorts/">Shorts page</a>.</li>
+		<li><strong>Guides</strong>: step-by-step how-tos, such as <a href="/blog/how-to-open-maribank-account/">opening a MariBank account</a>.</li>
+		<li><strong>Comparisons</strong>: side-by-side looks, such as <a href="/blog/maribank-vs-gcash/">MariBank vs GCash</a>.</li>
+		<li><strong>Safety checks</strong>: what to verify before you deposit, such as <a href="/blog/is-maribank-legit/">is MariBank legit</a>.</li>
+	</ul>
+
+	<h2>How we write and update guides</h2>
+	<ul>
+		<li>Each guide separates what is verified from what changes often, such as savings rates and promo terms.</li>
+		<li>Every article shows when it was published and, if it changed, when it was last updated.</li>
+		<li>We point you to the official app or regulator for the latest numbers instead of guessing.</li>
+		<li>Found a mistake in a guide or a video? <a href="/contact/">Tell us</a> and we will correct it and note the update date.</li>
+	</ul>
+
+	<h2 id="disclosure">Referral disclosure</h2>
+	<p>
+		This site shares the MariBank referral code <strong>{referral.code}</strong>. New users who sign up with it can receive
+		{referral.bonus} after meeting MariBank's deposit conditions. Referral programs usually reward the person who shared the code
+		too, so we may earn a reward when you sign up with it.
+	</p>
+	<p>
+		{name} is independent and is not affiliated with or endorsed by MariBank, Sea Group, GCash, Mynt, Globe, Maya or PLDT. MariBank and Maya set and can change
+		their reward terms. Nothing on this site is financial advice. Read the full <a href="/disclosure/">referral disclosure</a>.
+	</p>
+
+	<h2>Contact</h2>
+	<p>
+		{
+			social.email ? (
+				<>Email <a href={`mailto:${social.email}`}>{social.email}</a>, or visit the <a href="/contact/">contact page</a>.</>
+			) : social.youtube ? (
+				<>Message us on <a href={social.youtube} rel="noopener noreferrer" target="_blank">YouTube</a>, or visit the <a href="/contact/">contact page</a>.</>
+			) : (
+				<>Visit the <a href="/contact/">contact page</a>.</>
+			)
+		}
+	</p>
+</PageLayout>

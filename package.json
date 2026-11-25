@@ -1,0 +1,25 @@
+{
+  "name": "pinoytechie-lol",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "sync:youtube": "node scripts/sync-youtube.mjs",
+    "build": "node scripts/sync-youtube.mjs && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.10",
+    "@astrojs/rss": "^4.0.0",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/space-mono": "^5.3.0",
+    "@tailwindcss/vite": "^4.1.18",
+    "astro": "^7.3.5",
+    "github-slugger": "^2.0.0",
+    "tailwindcss": "^4.1.18",
+    "unist-util-visit": "^5.2.0"
+  }
+}

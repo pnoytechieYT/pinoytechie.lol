@@ -1,0 +1,41 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Hero from "@/components/sections/Hero.astro";
+import Marquee from "@/components/sections/Marquee.astro";
+import TrustBar from "@/components/sections/TrustBar.astro";
+import Steps from "@/components/sections/Steps.astro";
+import VideoSection from "@/components/sections/VideoSection.astro";
+import LatestPosts from "@/components/sections/LatestPosts.astro";
+import Faq from "@/components/sections/Faq.astro";
+import DownloadCta from "@/components/sections/DownloadCta.astro";
+import { siteData } from "@/data/site";
+import { webPageNode, faqNode } from "@/lib/seo";
+
+const { referral, faqs } = siteData;
+
+const schema = [
+	webPageNode({
+		path: "/",
+		title: referral.title,
+		description: referral.description,
+		dateModified: referral.updated,
+	}),
+	faqNode(faqs),
+];
+---
+
+<BaseLayout
+	title={referral.title}
+	description={referral.description}
+	suffix={false}
+	modifiedTime={referral.updated}
+	schema={schema}>
+	<Hero />
+	<Marquee />
+	<TrustBar />
+	<Steps />
+	<VideoSection />
+	<LatestPosts />
+	<Faq />
+	<DownloadCta />
+</BaseLayout>

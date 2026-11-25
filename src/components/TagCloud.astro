@@ -1,0 +1,29 @@
+---
+import { siteData } from "@/data/site";
+import type { TagInfo } from "@/lib/posts";
+
+interface Props {
+	tags: TagInfo[];
+	title?: string;
+}
+const { tags, title = "Browse by topic" } = Astro.props;
+// Only the most used tags are shown (the rest still have their own pages)
+const shown = tags.slice(0, siteData.paging.maxTags);
+---
+
+{
+	shown.length > 0 && (
+		<section class="mt-16 border-t-[3px] border-dashed border-ink pt-10" aria-labelledby="tags-title">
+			<h2 id="tags-title" class="nb-eyebrow">{title}</h2>
+			<ul class="mt-5 flex flex-wrap gap-3">
+				{shown.map((tag) => (
+					<li>
+						<a href={`/blog/tag/${tag.slug}/`} class="nb-chip">
+							{tag.name} <span class="rounded-full bg-ink px-1.5 font-mono text-xs text-sun">{tag.count}</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	)
+}

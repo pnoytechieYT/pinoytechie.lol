@@ -1,0 +1,33 @@
+---
+import { siteData } from "@/data/site";
+---
+
+<section class="border-y-[3px] border-ink bg-sun-soft" aria-labelledby="faq-title">
+	<div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:py-16 md:px-6 md:py-24 lg:grid-cols-12 lg:gap-12">
+		<div class="lg:col-span-4">
+			<div class="lg:sticky lg:top-28">
+				<span class="nb-tag nb-tag-dark">FAQ</span>
+				<h2 id="faq-title" class="mt-4 text-3xl font-bold leading-[1.05] tracking-tight text-ink sm:text-4xl xl:text-5xl">Common questions</h2>
+				<p class="mt-4 font-medium text-body">
+					Short answers about the referral code. For anything else, read our
+					<a href="/blog/" class="font-bold text-flame-dark underline decoration-2 underline-offset-4 hover:bg-sun hover:text-ink">guides</a>.
+				</p>
+			</div>
+		</div>
+		<div class="space-y-4 lg:col-span-8">
+			{
+				siteData.faqs.map((faq) => (
+					<details class="group nb-card open:bg-sun open:shadow-hard-lg [&_summary::-webkit-details-marker]:hidden">
+						<summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-4 text-base font-bold leading-snug text-ink sm:p-5 sm:text-lg">
+							{faq.question}
+							<span aria-hidden="true" class="flex h-9 w-9 shrink-0 items-center justify-center border-[3px] border-ink bg-white font-mono text-2xl font-bold leading-none transition-transform group-open:rotate-45 group-open:bg-ink group-open:text-sun">
+								+
+							</span>
+						</summary>
+						<p class="border-t-[3px] border-dashed border-ink px-4 pb-4 pt-4 sm:px-5 sm:pb-5 font-medium leading-relaxed text-body">{faq.answer}</p>
+					</details>
+				))
+			}
+		</div>
+	</div>
+</section>

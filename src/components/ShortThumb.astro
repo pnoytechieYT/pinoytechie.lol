@@ -1,0 +1,55 @@
+---
+import { shortThumbs, type Short } from "@/data/shorts";
+
+/**
+ * Vertical (9:16) thumbnail of a Short. The title is NOT shown; it is only the image
+ * description and the link's accessible name.
+ * Sizes: "card" = small grid card, "feature" = big pinned card with a larger play button.
+ */
+interface Props {
+	short: Short;
+	size?: "card" | "feature";
+	class?: string;
+	eager?: boolean;
+	/** Short label such as "1.6M". Shown bottom-left inside the thumbnail when given. */
+	views?: string;
+}
+const { short, size = "card", class: className, eager = false, views } = Astro.props;
+const [src, ...fallbacks] = shortThumbs(short.id);
+const feature = size === "feature";
+---
+
+<img
+	src={src}
+	alt={short.title}
+	width="405"
+	height="720"
+	loading={eager ? "eager" : "lazy"}
+	decoding="async"
+	data-yt-thumb
+	data-fallbacks={fallbacks.join(" ")}
+	class:list={["h-full w-full object-cover", className]} />
+<span
+	aria-hidden="true"
+	class:list={[
+		"pointer-events-none absolute bottom-2 right-2 flex items-center justify-center rounded-full sm:bottom-3 sm:right-3 border-[3px] border-ink bg-sun shadow-hard-sm transition-transform group-hover:scale-110",
+		feature ? "h-9 w-9 sm:h-14 sm:w-14" : "h-10 w-10",
+	]}>
+	<svg viewBox="0 0 24 24" class:list={[feature ? "h-4 w-4 sm:h-6 sm:w-6" : "h-4 w-4"]} fill="#111"><path d="M8 5v14l11-7z"></path></svg>
+</span>
+{
+	views && (
+		<span
+			aria-hidden="true"
+			class:list={[
+				"pointer-events-none absolute bottom-2 left-2 flex items-center gap-1 rounded-full sm:bottom-3 sm:left-3 sm:gap-1.5 border-[3px] border-ink bg-white font-mono font-bold leading-none text-ink shadow-hard-sm",
+				feature ? "h-9 px-2 text-[0.7rem] sm:h-14 sm:px-3.5 sm:text-base" : "h-8 px-2 text-xs",
+			]}>
+			<svg viewBox="0 0 24 24" class="h-3.5 w-3.5 sm:h-5 sm:w-5" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path>
+				<circle cx="12" cy="12" r="3"></circle>
+			</svg>
+			{views}
+		</span>
+	)
+}

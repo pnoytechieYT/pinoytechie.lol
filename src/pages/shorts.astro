@@ -1,0 +1,171 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import ShortThumb from "@/components/ShortThumb.astro";
+import { siteData } from "@/data/site";
+import { featuredShorts, otherShorts, shortUrl } from "@/data/shorts";
+import { formatCount, parseCount } from "@/lib/format";
+
+const { social } = siteData;
+const perPage = siteData.paging.shortsPerPage;
+---
+
+<PageLayout
+	title="Pinoy Techie Shorts"
+	description="Watch every Pinoy Techie YouTube Short: quick facts, Filipino stories and viral moments in under a minute. Pick one and press play."
+	lead="Quick Philippine facts, Filipino stories and viral moments. Every YouTube Short from the channel, in one place."
+	path="/shorts/"
+	prose={false}>
+	{
+		featuredShorts.length > 0 && (
+			<section aria-labelledby="featured-title">
+				<div class="flex items-center gap-3">
+					<h2 id="featured-title" class="text-3xl font-bold tracking-tight text-ink">Featured</h2>
+					<span class="nb-tag nb-tag-red">Pinned</span>
+				</div>
+				<ul class="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-7">
+					{featuredShorts.map((short, i) => {
+						const views = parseCount(short.views);
+						return (
+						<li>
+							<!-- A normal link (works without JavaScript). The script below turns the click into an inline player. -->
+							<a
+								href={shortUrl(short.id)}
+								target="_blank"
+								rel="noopener noreferrer"
+								data-short-play={short.id}
+								data-short-title={short.title}
+								aria-label={`Play: ${short.title}${views !== undefined ? ` (${views.toLocaleString("en-US")} views)` : ""}`}
+								class="group nb-card nb-card-lift relative block aspect-[9/16] overflow-hidden bg-ink shadow-hard-lg">
+								<ShortThumb short={short} size="feature" eager={i < 2} views={views !== undefined ? formatCount(views) : undefined} />
+							</a>
+						</li>
+						);
+					})}
+				</ul>
+			</section>
+		)
+	}
+
+	{
+		otherShorts.length > 0 && (
+			<section class={featuredShorts.length ? "mt-16" : ""} aria-labelledby="all-shorts-title">
+				<h2 id="all-shorts-title" class="text-3xl font-bold tracking-tight text-ink">
+					{featuredShorts.length ? "More shorts" : "All shorts"}
+				</h2>
+				<ul class="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5" data-short-grid data-per-page={perPage}>
+					{otherShorts.map((short, i) => (
+						<li data-short hidden={i >= perPage}>
+							<a
+								href={shortUrl(short.id)}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label={`Watch on YouTube: ${short.title}`}
+								class="group nb-card nb-card-lift relative block aspect-[9/16] overflow-hidden bg-ink hover:shadow-hard-lg">
+								<ShortThumb short={short} />
+							</a>
+						</li>
+					))}
+				</ul>
+				<div data-short-pager />
+				<noscript><style>li[data-short][hidden]{display:block!important}</style></noscript>
+			</section>
+		)
+	}
+
+	<section class="nb-card mt-16 bg-sun p-6 md:p-8">
+		<h2 class="text-2xl font-bold tracking-tight text-ink">Want a new one every day?</h2>
+		<p class="mt-2 max-w-2xl font-medium text-ink/90">Subscribe on YouTube so the next Short shows up in your feed.</p>
+		<div class="mt-5 flex flex-wrap gap-3">
+			{
+				social.youtube && (
+					<a href={social.youtube} target="_blank" rel="noopener noreferrer" class="nb-btn nb-btn-dark">
+						Subscribe on YouTube
+					</a>
+				)
+			}
+			<a href="/videos/" class="nb-btn nb-btn-white">Watch full videos</a>
+		</div>
+	</section>
+</PageLayout>
+
+<script>
+	import { pageWindow } from "@/lib/pagination";
+
+	// 1) Thumbnails: try the sharpest image first, fall back if YouTube doesn't have one.
+	//    (A missing maxresdefault comes back as a tiny 120px grey image, not an error.)
+	function swap(img: HTMLImageElement) {
+		const rest = (img.dataset.fallbacks ?? "").split(" ").filter(Boolean);
+		const next = rest.shift();
+		if (!next) return;
+		img.dataset.fallbacks = rest.join(" ");
+		img.src = next;
+	}
+	const isThumb = (el: EventTarget | null): el is HTMLImageElement => el instanceof HTMLImageElement && el.hasAttribute("data-yt-thumb");
+	document.addEventListener("load", (e) => { if (isThumb(e.target) && e.target.naturalWidth < 200) swap(e.target); }, true);
+	document.addEventListener("error", (e) => { if (isThumb(e.target)) swap(e.target); }, true);
+	document.querySelectorAll<HTMLImageElement>("img[data-yt-thumb]").forEach((img) => {
+		if (img.complete) (img.naturalWidth === 0 || img.naturalWidth < 200) && swap(img);
+	});
+
+	// 2) Featured shorts: click opens the player right there. No autoplay on purpose: YouTube does not
+	//    count autoplayed embeds as views, so the visitor presses YouTube's own play button.
+	document.addEventListener("click", (e) => {
+		const a = (e.target as HTMLElement).closest<HTMLAnchorElement>("a[data-short-play]");
+		if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+		e.preventDefault();
+		const iframe = document.createElement("iframe");
+		iframe.src = `https://www.youtube-nocookie.com/embed/${a.dataset.shortPlay}?rel=0&playsinline=1`;
+		iframe.title = a.dataset.shortTitle ?? "YouTube Short";
+		iframe.allow = "autoplay; encrypted-media; picture-in-picture; web-share";
+		iframe.allowFullscreen = true;
+		iframe.referrerPolicy = "strict-origin-when-cross-origin";
+		iframe.className = "absolute inset-0 h-full w-full";
+		a.replaceChildren(iframe);
+		a.removeAttribute("href");
+	});
+
+	// 3) Pagination for the grid. All shorts stay in the HTML (search engines and no-JS
+	//    visitors see them); this only shows one page at a time.
+	const grid = document.querySelector<HTMLElement>("[data-short-grid]");
+	const pager = document.querySelector<HTMLElement>("[data-short-pager]");
+	if (grid && pager) {
+		const perPage = Number(grid.dataset.perPage) || 20;
+		const items = [...grid.querySelectorAll<HTMLElement>("li[data-short]")];
+		const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+		let page = Math.max(1, parseInt(new URLSearchParams(location.search).get("page") ?? "1", 10) || 1);
+
+		function render(scrollToGrid: boolean) {
+			const totalPages = Math.max(1, Math.ceil(items.length / perPage));
+			page = Math.min(page, totalPages);
+			const start = (page - 1) * perPage;
+			items.forEach((li, i) => (li.hidden = i < start || i >= start + perPage));
+			history.replaceState(null, "", location.pathname + (page > 1 ? `?page=${page}` : ""));
+
+			if (totalPages <= 1) {
+				pager.innerHTML = "";
+			} else {
+				const btn = (label: string, target: number, o: { current?: boolean; disabled?: boolean; aria?: string } = {}) =>
+					`<li><button type="button" class="nb-page" data-page="${target}"${o.current ? ' aria-current="page"' : ""}${o.disabled ? " disabled" : ""} aria-label="${o.aria ?? `Page ${target}`}">${label}</button></li>`;
+				const nums = pageWindow(page, totalPages)
+					.map((n) => (n === "…" ? '<li><span class="nb-page-gap" aria-hidden="true">…</span></li>' : btn(String(n), n, { current: n === page })))
+					.join("");
+				const shown = Math.min(perPage, items.length - start);
+				pager.innerHTML =
+					`<nav aria-label="Pagination" class="mt-14 flex flex-col items-center gap-4"><ul class="flex flex-wrap items-center justify-center gap-2.5">` +
+					btn("← <span class='ml-1 hidden sm:inline'>Prev</span>", page - 1, { disabled: page === 1, aria: "Previous page" }) +
+					nums +
+					btn("<span class='mr-1 hidden sm:inline'>Next</span> →", page + 1, { disabled: page === totalPages, aria: "Next page" }) +
+					`</ul><p class="font-mono text-xs font-bold uppercase tracking-wide text-muted">Showing ${start + 1}–${start + shown} of ${items.length} shorts</p></nav>`;
+			}
+			if (scrollToGrid) document.getElementById("all-shorts-title")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+		}
+
+		pager.addEventListener("click", (e) => {
+			const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-page]");
+			if (!b || b.disabled) return;
+			page = Number(b.dataset.page);
+			render(true);
+		});
+		render(false);
+	}
+</script>

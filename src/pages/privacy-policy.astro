@@ -1,0 +1,91 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import { siteData } from "@/data/site";
+import { formatDate } from "@/lib/posts";
+
+const { name, social, legalUpdated } = siteData;
+const updated = formatDate(new Date(`${legalUpdated}T00:00:00${siteData.timezoneOffset}`));
+---
+
+<PageLayout
+	title="Privacy Policy"
+	description="How Pinoy Techie handles your information: no accounts, no ad or analytics cookies, third-party links, and your rights under the Data Privacy Act."
+	lead={`Last updated ${updated}`}
+	path="/privacy-policy/"
+	dateModified={`${legalUpdated}T00:00:00${siteData.timezoneOffset}`}>
+	<p>
+		This policy explains what information {name} ("we", "us") collects when you visit pinoytechie.lol, and your rights under the
+		Philippine Data Privacy Act of 2012 (Republic Act No. 10173).
+	</p>
+
+	<h2>The short version</h2>
+	<ul>
+		<li>You do not need an account, and this site has no sign-up, comment or newsletter forms.</li>
+		<li>We do not currently use advertising cookies or analytics tools.</li>
+		<li>We do not sell personal information.</li>
+	</ul>
+
+	<h2>Information we collect</h2>
+	<p>
+		<strong>Information you send us.</strong> If you contact us by email or through YouTube, we receive the details you choose to send,
+		such as your name, contact details and message. We use them only to reply and, if relevant, to correct a guide.
+	</p>
+	<p>
+		<strong>Technical data from hosting.</strong> This site is hosted on GitHub Pages. Like any web host, GitHub may process technical
+		data such as your IP address and browser details when your device requests a page. We do not receive this data as personal
+		information. See the <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener noreferrer" target="_blank">GitHub Privacy Statement</a>.
+	</p>
+
+	<h2>Cookies</h2>
+	<p>
+		We do not set cookies ourselves. Fonts are served from this site, not from Google Fonts. Embedded videos can set cookies only if you play
+		them (see below).
+	</p>
+
+	<h2>Third-party services</h2>
+	<ul>
+		<li>
+			<strong>YouTube.</strong> Our videos are embedded using YouTube's privacy-enhanced mode (youtube-nocookie.com). When you play a video,
+			Google may collect data about your viewing under the <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Google Privacy Policy</a>.
+		</li>
+		<li>
+			<strong>YouTube API Services.</strong> This site uses YouTube API Services to list our public videos and Shorts and show their titles and
+			view counts. This happens when the site is built, not in your browser, and it involves no personal data about visitors. By using this site you
+			are also subject to the <a href="https://www.youtube.com/t/terms" rel="noopener noreferrer" target="_blank">YouTube Terms of Service</a>, and
+			Google's handling of data is described in the <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Google Privacy Policy</a>.
+		</li>
+		<li>
+			<strong>Links to other sites.</strong> We link to MariBank, Google Play, the Apple App Store and other sites. Their privacy practices
+			are theirs, so read their policies before you share personal or financial details.
+		</li>
+	</ul>
+	<p>If we add analytics or advertising in future, we will update this page before we do.</p>
+
+	<h2>Your referral code and your bank details</h2>
+	<p>
+		Copying the referral code happens in your browser only. We never ask for your MariBank login, OTP, PIN, card number or password.
+		Never share those with anyone, including us.
+	</p>
+
+	<h2>Your rights</h2>
+	<p>Under the Data Privacy Act you have the right to be informed, to access, to object, to correct, to request erasure or blocking, to data portability, and to claim damages
+		where applicable. To exercise a right regarding information you sent us, <a href="/contact/">contact us</a>. You may also lodge a complaint with the
+		<a href="https://privacy.gov.ph" rel="noopener noreferrer" target="_blank">National Privacy Commission</a>.</p>
+
+	<h2>Children</h2>
+	<p>This site is not directed at children. Opening a bank account generally requires being of legal age.</p>
+
+	<h2>Changes</h2>
+	<p>We may update this policy and will change the date above when we do.</p>
+
+	<h2>Contact</h2>
+	<p>
+		{
+			social.email ? (
+				<>Questions about this policy: <a href={`mailto:${social.email}`}>{social.email}</a>.</>
+			) : (
+				<>Questions about this policy: use the <a href="/contact/">contact page</a>.</>
+			)
+		}
+	</p>
+</PageLayout>

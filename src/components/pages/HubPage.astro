@@ -1,0 +1,72 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/PageHero.astro";
+import CategoryCard from "@/components/CategoryCard.astro";
+import PostListing from "@/components/PostListing.astro";
+import { siteData } from "@/data/site";
+import { getCategories, getPosts, getTags } from "@/lib/posts";
+import { paginate, pageUrl } from "@/lib/pagination";
+import { abs, breadcrumbNode, webPageNode } from "@/lib/seo";
+
+/** The Guides hub: every category, then all guides (paginated), then topic tags. */
+interface Props {
+	page: number;
+}
+const { page } = Astro.props;
+
+const all = getPosts();
+const result = paginate(all, page, siteData.paging.postsPerPage);
+const categories = getCategories();
+const tags = getTags(all);
+
+const base = "/blog/";
+const path = pageUrl(base, result.page);
+const suffix = result.page > 1 ? ` (page ${result.page})` : "";
+const title = `Guides and Comparisons${suffix}`;
+const description =
+	"Plain-language guides on digital banking and money apps in the Philippines. Pick a topic, like MariBank, GCash or Maya, and decide before you deposit.";
+const crumbs = [
+	{ name: "Home", href: "/" },
+	{ name: "Guides", href: base },
+];
+
+const schema = [
+	{
+		...webPageNode({ type: "CollectionPage", path, title, description }),
+		mainEntity: {
+			"@type": "ItemList",
+			itemListElement: result.items.map((p, i) => ({
+				"@type": "ListItem",
+				position: result.from + i,
+				url: abs(`/blog/${p.slug}/`),
+				name: p.meta.title,
+			})),
+		},
+	},
+	breadcrumbNode(crumbs),
+];
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+	<PageHero title="Guides" lead="Choose a topic. Every guide is written so you can decide before you deposit." crumbs={crumbs} />
+
+	<div class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+		{
+			categories.length > 0 && (
+				<section aria-labelledby="topics-title">
+					<h2 id="topics-title" class="text-3xl font-bold tracking-tight text-ink">Topics</h2>
+					<div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+						{categories.map((category) => (
+							<CategoryCard category={category} />
+						))}
+					</div>
+				</section>
+			)
+		}
+
+		<section class="mt-16" aria-labelledby="all-title">
+			<h2 id="all-title" class="mb-8 text-3xl font-bold tracking-tight text-ink">All guides</h2>
+			<PostListing result={result} basePath={base} tags={tags} emptyText="No guides yet. Add a Markdown file to a folder in src/posts and it shows up here." />
+		</section>
+	</div>
+</BaseLayout>

@@ -1,0 +1,255 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import Angpao from "@/components/Angpao.astro";
+import PostCard from "@/components/PostCard.astro";
+import { getCategory, getPosts, getRelated, formatDateTime, slugify } from "@/lib/posts";
+import { siteData } from "@/data/site";
+import { abs, authorNode, breadcrumbNode, ids, webPageNode } from "@/lib/seo";
+
+export function getStaticPaths() {
+	return getPosts().map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = post;
+const { name, referral, mayaReferral } = siteData;
+
+const path = `/blog/${post.slug}/`;
+const pageUrl = abs(path);
+const image = post.meta.image ?? siteData.ogImage;
+const related = getRelated(post, 3);
+const category = getCategory(post.category)!;
+const toc = post.headings.filter((h) => (h.depth === 2 || h.depth === 3) && h.slug !== "footnote-label");
+const tocH2Count = toc.filter((h) => h.depth === 2).length;
+const seoTitle = post.meta.seoTitle ?? post.meta.title;
+// Only append the brand when the result still fits in a typical Google title (~60 chars).
+const withBrand = `${seoTitle} | ${name}`.length <= 62;
+// What the sidebar and the footer note say depends on the guide's category.
+const sidebar = {
+	maribank: {
+		heading: "Trying MariBank?",
+		note: "Enter the code during sign-up. Terms are set by MariBank and can change.",
+		link: { href: "/#download", label: "Get the app →" },
+	},
+	maya: {
+		heading: "Trying Maya?",
+		note: "Enter the @username when Maya asks for a referral code, and check the current promo in the app. Terms are set by Maya and can change.",
+		link: { href: "/blog/maya-referral-code-guide-50-reward/", label: "How the Maya reward works →" },
+	},
+	gcash: undefined,
+}[post.category as "maribank" | "maya" | "gcash"];
+const provider = { maribank: "MariBank or Sea Group", maya: "Maya or PLDT", gcash: "GCash, Mynt or Globe" }[
+	post.category as "maribank" | "maya" | "gcash"
+] ?? "the provider";
+const wasUpdated = post.updatedDate.getTime() - post.pubDate.getTime() > 60_000;
+
+const crumbs = [
+	{ name: "Home", href: "/" },
+	{ name: "Guides", href: "/blog/" },
+	{ name: category.name, href: category.path },
+	{ name: post.meta.title, href: path },
+];
+
+const schema = [
+	webPageNode({
+		path,
+		title: post.meta.title,
+		description: post.meta.description,
+		dateModified: post.updatedDate.toISOString(),
+	}),
+	{
+		"@type": "BlogPosting",
+		"@id": `${pageUrl}#article`,
+		headline: post.meta.title,
+		description: post.meta.description,
+		url: pageUrl,
+		mainEntityOfPage: { "@id": `${pageUrl}#webpage` },
+		datePublished: post.pubDate.toISOString(),
+		dateModified: post.updatedDate.toISOString(),
+		inLanguage: siteData.locale,
+		image: [abs(image)],
+		author: authorNode(),
+		publisher: { "@id": ids.org },
+		isPartOf: { "@id": ids.website },
+		wordCount: post.wordCount,
+		timeRequired: `PT${post.minutes}M`,
+		articleSection: category.name,
+		...(post.tags.length ? { keywords: post.tags.join(", ") } : {}),
+	},
+	breadcrumbNode(crumbs),
+];
+---
+
+<BaseLayout
+	title={seoTitle}
+	suffix={withBrand}
+	description={post.meta.description}
+	image={image}
+	type="article"
+	publishedTime={post.pubDate.toISOString()}
+	modifiedTime={post.updatedDate.toISOString()}
+	tags={post.tags}
+	activeNav="/blog/"
+	schema={schema}>
+	<div id="read-progress" class="fixed inset-x-0 top-0 z-50 h-2 origin-left scale-x-0 border-b-2 border-ink bg-flame" aria-hidden="true"></div>
+	<div class="border-b-[3px] border-ink bg-sun">
+		<div class="mx-auto max-w-6xl px-4 py-8 sm:py-10 md:px-6 md:py-14">
+			<Breadcrumbs items={crumbs} />
+			<div class="mt-5 flex flex-wrap items-center gap-2">
+				{
+					post.tags.map((tag) => (
+						<a href={`/blog/tag/${slugify(tag)}/`} class="nb-tag nb-tag-white hover:bg-ink hover:text-sun">
+							{tag}
+						</a>
+					))
+				}
+				{post.isScheduled && <span class="nb-tag nb-tag-red">Scheduled: not public yet (dev preview)</span>}
+			</div>
+			<h1 class="mt-5 max-w-3xl text-3xl font-bold leading-[1.08] tracking-tight text-ink sm:text-4xl lg:text-5xl">
+				{post.meta.title}
+			</h1>
+			<p class="mt-5 max-w-3xl text-base font-medium leading-relaxed text-ink/85 sm:text-lg">{post.meta.description}</p>
+			<p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs font-bold uppercase text-ink">
+				<span>By <a href="/about/" class="underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">{siteData.author.name}</a></span>
+				<span aria-hidden="true">·</span>
+				<span>Published <time datetime={post.pubDate.toISOString()}>{formatDateTime(post.pubDate)}</time></span>
+				{
+					wasUpdated && (
+						<>
+							<span aria-hidden="true">·</span>
+							<span>Updated <time datetime={post.updatedDate.toISOString()}>{formatDateTime(post.updatedDate)}</time></span>
+						</>
+					)
+				}
+				<span aria-hidden="true">·</span>
+				<span>{post.minutes} min read</span>
+			</p>
+			{
+				post.meta.aiGenerated && (
+					<p class="mt-5">
+						<a href="/disclosure/#ai-generated" class="inline-flex items-center gap-2 border-2 border-ink bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase shadow-hard-sm hover:bg-ink hover:text-sun">
+							<span aria-hidden="true">✦</span> AI-generated guide
+						</a>
+					</p>
+				)
+			}
+		</div>
+	</div>
+
+	<div class="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-4 py-8 sm:py-10 md:px-6 md:py-14 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
+		<article class="min-w-0">
+			<div class="prose-article">
+				<Content />
+			</div>
+			<p class="nb-card mt-12 max-w-2xl bg-sun-soft p-4 text-sm leading-relaxed text-body">
+				<strong class="font-mono uppercase text-ink">Not financial advice.</strong>
+				{post.meta.aiGenerated && "This guide was generated with AI and can contain mistakes, so verify rates, fees and rewards in the official app."}
+				{name} is independent and not affiliated with {provider}. Rates, fees and rewards change, so confirm current
+				terms in the app. See our <a href="/disclosure/" class="font-bold text-flame-dark underline hover:bg-sun hover:text-ink">referral disclosure</a>.
+			</p>
+		</article>
+
+		<aside class="min-w-0 space-y-6 md:grid md:grid-cols-2 md:items-start md:gap-8 md:space-y-0 lg:sticky lg:top-24 lg:block lg:space-y-6 lg:self-start" aria-label="Sidebar">
+			{
+				tocH2Count >= 3 && (
+					<nav aria-labelledby="toc-title" class="nb-card p-5 md:col-start-1">
+						<h2 id="toc-title" class="nb-eyebrow">On this page</h2>
+						<ul class="mt-4 space-y-2.5 border-t-[3px] border-dashed border-ink pt-4 text-sm font-medium">
+							{toc.map((h) => (
+								<li class={h.depth === 3 ? "ml-3 border-l-[3px] border-ink pl-3 text-[0.8125rem]" : ""}>
+									<a href={`#${h.slug}`} data-toc-link class="block px-1 text-ink transition-colors hover:bg-sun-soft [&.is-active]:bg-sun [&.is-active]:font-bold">
+										{h.text}
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)
+			}
+			{
+				sidebar && (
+					<div class="md:col-start-2 md:row-start-1 lg:col-auto lg:row-auto">
+						<h2 id="cta-title" class="mb-4 text-xl font-bold tracking-tight text-ink">{sidebar.heading}</h2>
+						{post.category === "maya" ? (
+							<Angpao
+								code={mayaReferral.username}
+								bonus={mayaReferral.bonus}
+								brand="Maya"
+								logo={null}
+								codeLabel="@username"
+								compactLine={`Upgrade, make a first transaction, get ${mayaReferral.bonus}.`}
+								compact />
+						) : (
+							<Angpao code={referral.code} bonus={referral.bonus} minDeposit={referral.minDeposit} holdDays={referral.holdDays} compact />
+						)}
+						<p class="mt-4 text-sm font-medium leading-relaxed text-body">{sidebar.note}</p>
+						<a href={sidebar.link.href} class="mt-2 inline-block text-sm font-bold text-ink underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">{sidebar.link.label}</a>
+					</div>
+				)
+			}
+		</aside>
+	</div>
+
+	{
+		related.length > 0 && (
+			<section class="border-t-[3px] border-ink bg-white" aria-labelledby="more-title">
+				<div class="mx-auto max-w-6xl px-4 py-12 sm:py-16 md:px-6">
+					<h2 id="more-title" class="text-3xl font-bold tracking-tight text-ink md:text-4xl">Keep <span class="hl">reading</span></h2>
+					<div class="mt-8 grid gap-6 sm:grid-cols-2 sm:gap-8 lg:mt-10 lg:grid-cols-3">
+						{related.map((p) => <PostCard post={p} />)}
+					</div>
+				</div>
+			</section>
+		)
+	}
+</BaseLayout>
+
+<script>
+	// Reading progress bar
+	const bar = document.getElementById("read-progress");
+	const article = document.querySelector("article");
+	if (bar && article) {
+		const update = () => {
+			const r = article.getBoundingClientRect();
+			const total = r.height - window.innerHeight * 0.6;
+			const done = Math.min(1, Math.max(0, -r.top / Math.max(total, 1)));
+			bar.style.transform = `scaleX(${done})`;
+		};
+		addEventListener("scroll", update, { passive: true });
+		addEventListener("resize", update);
+		update();
+	}
+
+	// Copy buttons on code blocks
+	document.querySelectorAll<HTMLButtonElement>("[data-copy-code]").forEach((btn) => {
+		btn.addEventListener("click", async () => {
+			const code = btn.closest(".code-block")?.querySelector("pre")?.innerText ?? "";
+			try {
+				await navigator.clipboard.writeText(code);
+				btn.textContent = "Copied!";
+			} catch {
+				btn.textContent = "Press Ctrl+C";
+			}
+			setTimeout(() => (btn.textContent = "Copy"), 1800);
+		});
+	});
+
+	// Highlight the current section in "On this page"
+	const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")];
+	const targets = links
+		.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+		.filter((el): el is HTMLElement => !!el);
+	if (targets.length && "IntersectionObserver" in window) {
+		const io = new IntersectionObserver(
+			(entries) => {
+				for (const e of entries) {
+					if (!e.isIntersecting) continue;
+					links.forEach((a) => a.classList.toggle("is-active", a.hash === `#${e.target.id}`));
+				}
+			},
+			{ rootMargin: "-80px 0px -70% 0px" },
+		);
+		targets.forEach((t) => io.observe(t));
+	}
+</script>

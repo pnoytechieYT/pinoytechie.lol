@@ -1,0 +1,12 @@
+---
+import HubPage from "@/components/pages/HubPage.astro";
+import { siteData } from "@/data/site";
+import { getPosts } from "@/lib/posts";
+import { extraPageParams } from "@/lib/pagination";
+
+export function getStaticPaths() {
+	return extraPageParams(getPosts().length, siteData.paging.postsPerPage).map((params) => ({ params }));
+}
+---
+
+<HubPage page={Number(Astro.params.page)} />

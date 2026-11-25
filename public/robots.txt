@@ -1,0 +1,5 @@
+# Pinoy Techie: everything public is crawlable, including AI search crawlers.
+User-agent: *
+Allow: /
+
+Sitemap: https://pinoytechie.lol/sitemap-index.xml

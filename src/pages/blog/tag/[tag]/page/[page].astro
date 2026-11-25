@@ -1,0 +1,17 @@
+---
+import TagPage from "@/components/pages/TagPage.astro";
+import { siteData } from "@/data/site";
+import { getPosts, getTags, slugify } from "@/lib/posts";
+import { extraPageParams } from "@/lib/pagination";
+
+export function getStaticPaths() {
+	const posts = getPosts();
+	return getTags().flatMap((t) =>
+		extraPageParams(posts.filter((p) => p.tags.some((x) => slugify(x) === t.slug)).length, siteData.paging.postsPerPage).map(
+			(p) => ({ params: { tag: t.slug, ...p } }),
+		),
+	);
+}
+---
+
+<TagPage slug={Astro.params.tag!} page={Number(Astro.params.page)} />

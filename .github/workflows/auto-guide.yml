@@ -1,0 +1,102 @@
+name: Auto guide (AI)
+
+# Writes one AI-assisted guide per run:
+#   9:00 AM Manila  -> MariBank     (01:00 UTC)
+#   12:00 PM Manila -> GCash        (04:00 UTC)
+#   3:00 PM Manila  -> Maya         (07:00 UTC)
+# GitHub may start scheduled runs 5 to 30 minutes late when it is busy. That is normal.
+#
+# MODE (repository variable AUTO_GUIDE_MODE, Settings > Secrets and variables > Actions > Variables):
+#   pr       (default) opens a Pull Request. The guide goes live only after you merge it.
+#   publish  commits straight to main. Posts with unverified numbers are still saved as draft.
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+    - cron: "0 4 * * *"
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      category:
+        description: Which category to write
+        type: choice
+        options: [maribank, gcash, maya]
+        default: maribank
+      mode:
+        description: pr = open a Pull Request, publish = commit to main
+        type: choice
+        options: [pr, publish]
+        default: pr
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-guide
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Decide category and mode
+        id: plan
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_CATEGORY: ${{ inputs.category }}
+          INPUT_MODE: ${{ inputs.mode }}
+          VAR_MODE: ${{ vars.AUTO_GUIDE_MODE }}
+        run: |
+          case "$SCHEDULE" in
+            "0 1 * * *") CATEGORY=maribank ;;
+            "0 4 * * *") CATEGORY=gcash ;;
+            "0 7 * * *") CATEGORY=maya ;;
+            *) CATEGORY="${INPUT_CATEGORY:-maribank}" ;;
+          esac
+          MODE="${INPUT_MODE:-${VAR_MODE:-pr}}"
+          echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "Writing a $CATEGORY guide, mode: $MODE"
+
+      - name: Write the guide
+        id: gen
+        run: node scripts/generate-guide.mjs
+        env:
+          CATEGORY: ${{ steps.plan.outputs.category }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+
+      - name: Open a Pull Request
+        if: steps.gen.outputs.slug != '' && steps.plan.outputs.mode == 'pr'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: src/posts
+          branch: auto-guide/${{ steps.gen.outputs.slug }}
+          delete-branch: true
+          commit-message: "Add AI guide: ${{ steps.gen.outputs.title }}"
+          title: "Review: ${{ steps.gen.outputs.title }}"
+          body-path: .autoguide-report.md
+
+      - name: Commit straight to main
+        if: steps.gen.outputs.slug != '' && steps.plan.outputs.mode == 'publish'
+        env:
+          TITLE: ${{ steps.gen.outputs.title }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/posts
+          git commit -m "Add AI guide: $TITLE"
+          git push
+          # Pushes made with the built-in token do not start the deploy workflow,
+          # but deploy.yml rebuilds every 30 minutes, so the guide goes live within half an hour.

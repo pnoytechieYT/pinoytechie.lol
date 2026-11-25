@@ -1,0 +1,25 @@
+---
+import { homeVideo } from "@/data/videos";
+
+interface Props {
+	id?: string;
+	si?: string;
+	title?: string;
+	class?: string;
+}
+const { id = homeVideo.id, si, title = homeVideo.title, class: className } = Astro.props;
+const query = si ? `?si=${encodeURIComponent(si)}` : "";
+---
+
+<!-- youtube-nocookie.com: the same player, but YouTube sets no tracking cookies until the video is played -->
+<div class:list={["aspect-video w-full overflow-hidden rounded-lg border-[3px] border-ink bg-ink shadow-hard-lg", className]}>
+	<iframe
+		class="h-full w-full"
+		src={`https://www.youtube-nocookie.com/embed/${id}${query}`}
+		title={title}
+		loading="lazy"
+		frameborder="0"
+		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+		referrerpolicy="strict-origin-when-cross-origin"
+		allowfullscreen></iframe>
+</div>

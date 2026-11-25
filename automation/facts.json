@@ -1,0 +1,19 @@
+{
+  "asOf": "2026-11-25",
+  "global": [
+    "PDIC insures deposits up to ₱1,000,000 per depositor per bank.",
+    "Interest on bank deposits is subject to 20% withholding tax.",
+    "A GCash or Maya wallet holds e-money, which is not a bank deposit and is not PDIC-insured. Savings products (GSave, Maya Savings, MariBank) are deposits at a bank."
+  ],
+  "maribank": [
+    "MariBank referral code on this site: MBPINOY2027. New users get ₱588 after a first ₱1,000 deposit that stays in the account for 3 days. Reward terms are set by MariBank and can change."
+  ],
+  "gcash": [
+    "ADD YOUR CONFIRMED GCASH FACTS HERE (fees, limits, GSave partner banks). Until then the AI only sees your existing GCash posts as source material."
+  ],
+  "maya": [
+    "According to Maya Bank, Maya Savings pays a 3% base rate a year, credited daily, and the rate can be boosted up to 15% a year. The boost applies only to the part of the balance up to ₱100,000 and is not guaranteed.",
+    "Maya Savings: transfers out to other banks via InstaPay cost ₱15 per transaction. PESONet is free until further notice. Wallet to Savings is instant and free.",
+    "Maya referral on this site: username @arjaymarigondon. Bonus ₱50 after a first transaction of at least ₱100. Promo period shown ends 2026-11-30."
+  ]
+}
