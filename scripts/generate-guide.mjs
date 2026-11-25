@@ -17,7 +17,7 @@
  *
  * Keys (GitHub: Settings > Secrets and variables > Actions). Use any one, or all for fallback:
  *   GEMINI_API_KEY, GROQ_API_KEY, DEEPSEEK_API_KEY
- * Optional: GEMINI_MODEL, GROQ_MODEL, DEEPSEEK_MODEL, AI_PROVIDERS="gemini,groq,deepseek"
+ * Optional: GEMINI_MODEL, GROQ_MODEL, DEEPSEEK_MODEL (each can be a comma-separated list tried in order), AI_PROVIDERS="gemini,groq,deepseek"
  */
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -37,17 +37,17 @@ const PROVIDERS = {
 	gemini: {
 		base: process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai",
 		key: process.env.GEMINI_API_KEY,
-		model: process.env.GEMINI_MODEL || "gemini-flash-latest",
+		models: (process.env.GEMINI_MODEL || "gemini-flash-latest,gemini-flash-lite-latest").split(","),
 	},
 	groq: {
 		base: process.env.GROQ_BASE_URL || "https://api.groq.com/openai/v1",
 		key: process.env.GROQ_API_KEY,
-		model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+		models: (process.env.GROQ_MODEL || "llama-3.3-70b-versatile").split(","),
 	},
 	deepseek: {
 		base: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
 		key: process.env.DEEPSEEK_API_KEY,
-		model: process.env.DEEPSEEK_MODEL || "deepseek-flash",
+		models: (process.env.DEEPSEEK_MODEL || "deepseek-flash").split(","),
 	},
 };
 
@@ -169,9 +169,9 @@ Write the guide now. Return only the JSON object.`;
 
 // ---------- calling the AI ----------
 
-async function chat(p, system, user) {
+async function chat(p, model, system, user) {
 	const body = {
-		model: p.model,
+		model,
 		temperature: 0.4,
 		max_tokens: 8000,
 		response_format: { type: "json_object" },
@@ -236,15 +236,17 @@ async function generate(system, user) {
 	const errors = [];
 	for (const name of order) {
 		const p = PROVIDERS[name];
-		try {
-			log(`asking ${name} (${p.model})`);
-			const data = parseJson(await chat(p, system, user));
-			if (typeof data.title !== "string" || typeof data.body !== "string") throw new Error("JSON is missing title or body");
-			if (countWords(data.body) < 600) throw new Error(`article too short (${countWords(data.body)} words)`);
-			return { data, provider: name, model: p.model };
-		} catch (e) {
-			log(`${name} failed: ${e.message}`);
-			errors.push(`${name}: ${e.message}`);
+		for (const model of p.models.map((m) => m.trim()).filter(Boolean)) {
+			try {
+				log(`asking ${name} (${model})`);
+				const data = parseJson(await chat(p, model, system, user));
+				if (typeof data.title !== "string" || typeof data.body !== "string") throw new Error("JSON is missing title or body");
+				if (countWords(data.body) < 600) throw new Error(`article too short (${countWords(data.body)} words)`);
+				return { data, provider: name, model };
+			} catch (e) {
+				log(`${name}/${model} failed: ${e.message}`);
+				errors.push(`${name}/${model}: ${e.message}`);
+			}
 		}
 	}
 	fail(`Every provider failed. ${errors.join(" | ")}`);
