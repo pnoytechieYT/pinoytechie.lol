@@ -5,8 +5,10 @@
  *   node scripts/generate-guide.mjs gcash --dry              (shows the chosen topic and prompt size, no API call)
  *
  * How it works
- *   1. Takes the next topic of that category from automation/topics.json
- *      (a topic is "done" when a file named <slug>.md already exists in src/posts).
+ *   1. Takes the next topic of that category from automation/topics.json (your own list) and
+ *      automation/topics-ai/<category>.json (topics the AI proposed). A topic is "done" when a file
+ *      named <slug>.md already exists in src/posts. When the queue is EMPTY the AI proposes about 10
+ *      new topics, which go into the same Pull Request as the guide, so you approve them there.
  *   2. Gives the AI your verified facts (automation/facts.json) plus your existing posts
  *      of that category as source material, and tells it NOT to invent numbers.
  *   3. Tries the providers in order (Gemini, GitHub Models, Groq, Mistral, DeepSeek). The first one with a key
@@ -251,7 +253,7 @@ function parseJson(text) {
 
 const countWords = (s) => s.split(/\s+/).filter(Boolean).length;
 
-async function generate(system, user) {
+async function generate(system, user, validate) {
 	const order = (process.env.AI_PROVIDERS || "gemini,github,groq,mistral,deepseek")
 		.split(",")
 		.map((s) => s.trim().toLowerCase())
@@ -264,10 +266,8 @@ async function generate(system, user) {
 		for (const model of p.models.map((m) => m.trim()).filter(Boolean)) {
 			try {
 				log(`asking ${name} (${model})`);
-				const data = parseJson(await chat(p, model, system, user));
-				if (typeof data.title !== "string" || typeof data.body !== "string") throw new Error("JSON is missing title or body");
-				if (countWords(data.body) < MIN_WORDS) throw new Error(`article too short (${countWords(data.body)} words, minimum ${MIN_WORDS})`);
-				return { data, provider: name, model };
+				const value = validate(parseJson(await chat(p, model, system, user)));
+				return { value, provider: name, model };
 			} catch (e) {
 				log(`${name}/${model} failed: ${e.message}`);
 				errors.push(`${name}/${model}: ${e.message}`);
@@ -275,6 +275,57 @@ async function generate(system, user) {
 		}
 	}
 	fail(`Every provider failed. ${errors.join(" | ")}`);
+}
+
+function validateArticle(data) {
+	if (typeof data.title !== "string" || typeof data.body !== "string") throw new Error("JSON is missing title or body");
+	if (countWords(data.body) < MIN_WORDS) throw new Error(`article too short (${countWords(data.body)} words, minimum ${MIN_WORDS})`);
+	return data;
+}
+
+// ---------- AI topic ideas (used only when the queue is empty) ----------
+
+const TOPIC_SYSTEM = `You plan the editorial calendar for Pinoy Techie, an independent Philippine website with plain-language guides about MariBank, GCash and Maya.
+Propose NEW guide topics for ONE category. Each must answer a real question a Filipino reader would search for: how-to, fees explained, safety, comparisons, troubleshooting, beginner explainers.
+
+RULES:
+1. Never repeat or closely rephrase a title listed under ALREADY PUBLISHED or ALREADY QUEUED.
+2. Prefer evergreen topics. Avoid topics that depend on exact current rates, promos or fees that are not in FACTS.
+3. No hype, no "best ever", no promo codes, no get-rich-quick angles, and nothing that teaches how to commit fraud.
+4. title: natural English, under 70 characters. slug: lowercase-with-hyphens, under 70 characters, unique.
+5. angle: ONE sentence telling the writer what to cover and what NOT to invent (for example fees, menu names or contact details).
+
+OUTPUT: only JSON, no code fences: {"topics":[{"slug":"...","title":"...","angle":"..."}]} with 10 topics.`;
+
+const jaccard = (a, b) => {
+	const A = words(a);
+	const B = words(b);
+	let inter = 0;
+	for (const w of A) if (B.has(w)) inter++;
+	return A.size + B.size - inter === 0 ? 0 : inter / (A.size + B.size - inter);
+};
+
+function makeTopicValidator(takenSlugs, knownTitles) {
+	return (data) => {
+		const list = Array.isArray(data?.topics) ? data.topics : [];
+		const out = [];
+		const titles = [...knownTitles];
+		const seen = new Set(takenSlugs);
+		for (const t of list) {
+			const slug = String(t?.slug ?? "").trim().toLowerCase();
+			const title = String(t?.title ?? "").replace(/\s+/g, " ").trim();
+			const angle = String(t?.angle ?? "").replace(/\s+/g, " ").trim();
+			if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug) || slug.length > 80) continue;
+			if (!title || title.length > 100 || !angle || seen.has(slug)) continue;
+			if (titles.some((x) => jaccard(x, title) >= 0.6)) continue; // too close to something we already have
+			seen.add(slug);
+			titles.push(title);
+			out.push({ slug, title, angle });
+			if (out.length === 10) break;
+		}
+		if (out.length < 3) throw new Error(`only ${out.length} usable new topics`);
+		return out;
+	};
 }
 
 // ---------- cleaning and checking ----------
@@ -330,15 +381,47 @@ const slugs = new Set(existing.map((p) => p.slug));
 const topics = JSON.parse(await fs.readFile(TOPICS_FILE, "utf8"));
 const facts = JSON.parse(await fs.readFile(FACTS_FILE, "utf8"));
 
-const topic = (topics[CATEGORY] ?? []).find((t) => !slugs.has(t.slug));
+const AI_TOPICS_FILE = path.join(ROOT, "automation", "topics-ai", `${CATEGORY}.json`);
+const aiTopics = await fs.readFile(AI_TOPICS_FILE, "utf8").then(JSON.parse, () => []);
+const queue = [...(topics[CATEGORY] ?? []), ...aiTopics];
+const factsStr = factsText(facts);
+
+let topic = queue.find((t) => !slugs.has(t.slug));
+let newTopics = [];
+let topicProvider = "";
 if (!topic) {
-	console.warn(`::warning title=Auto guide::No topics left for "${CATEGORY}". Add more to automation/topics.json.`);
-	log("nothing to write");
-	process.exit(0);
+	log(`no topics left for ${CATEGORY}, asking the AI for new topic ideas`);
+	if (DRY) {
+		log("dry run: would ask the AI for new topic ideas, then stop");
+		process.exit(0);
+	}
+	const published = existing.filter((p) => p.category === CATEGORY).map((p) => `- ${p.title}`).join("\n");
+	const queued = queue.map((t) => `- ${t.title}`).join("\n");
+	const ask = `CATEGORY: ${BRAND[CATEGORY]}
+
+FACTS (what we can write about with confidence):
+${factsStr || "(none yet)"}
+
+ALREADY PUBLISHED in this category:
+${published || "(none)"}
+
+ALREADY QUEUED (including finished ones):
+${queued || "(none)"}
+
+Propose 10 new topics now. Return only the JSON object.`;
+	const known = [...existing.filter((p) => p.category === CATEGORY).map((p) => p.title), ...queue.map((t) => t.title)];
+	const taken = [...slugs, ...queue.map((t) => t.slug)];
+	const res = await generate(TOPIC_SYSTEM, ask, makeTopicValidator(taken, known));
+	newTopics = res.value;
+	topicProvider = `${res.provider} (${res.model})`;
+	await fs.mkdir(path.dirname(AI_TOPICS_FILE), { recursive: true });
+	const all = [...aiTopics, ...newTopics];
+	await fs.writeFile(AI_TOPICS_FILE, `[\n${all.map((t) => "  " + JSON.stringify(t)).join(",\n")}\n]\n`, "utf8");
+	log(`added ${newTopics.length} new topic ideas to automation/topics-ai/${CATEGORY}.json`);
+	topic = newTopics[0];
 }
 log(`topic: ${topic.title} (${topic.slug})`);
 
-const factsStr = factsText(facts);
 const sources = pickSources(existing, topic);
 const system = SYSTEM;
 const user = buildUser({ topic, facts: factsStr, sources, existing });
@@ -348,7 +431,7 @@ if (DRY) {
 	process.exit(0);
 }
 
-const { data, provider, model } = await generate(system, user);
+const { value: data, provider, model } = await generate(system, user, validateArticle);
 const { body: cleaned, removedLinks } = cleanBody(data.body, slugs);
 const closing = `Last updated ${new Date().toLocaleDateString("en-US", { timeZone: "Asia/Manila", year: "numeric", month: "long", day: "numeric" })}. Fees, rates and limits can change at any time, so confirm them in the official app before you act.`;
 const body = `${cleaned}\n\n${closing}\n`;
@@ -392,6 +475,9 @@ const report = [
 		? `⚠️ **Saved as \`draft: true\`.** These numbers are not in your facts or source posts. Check each one, fix the post, then delete the \`draft: true\` line before merging:\n${unverified.map((n) => `- ${n}`).join("\n")}`
 		: "✅ Every peso amount and percentage in the post was found in your facts or existing posts. Still skim it before merging.",
 	removedLinks.length ? `\nLinks removed (not on the allowed list): ${removedLinks.map((l) => `\`${l}\``).join(", ")}` : "",
+	newTopics.length
+		? `\n### New topic ideas (${newTopics.length})\nThe queue was empty, so ${topicProvider} proposed these. They are saved in \`automation/topics-ai/${CATEGORY}.json\`. Edit that file in this PR to remove any you don't want, or just merge to approve them all.\n${newTopics.map((t, i) => `${i + 1}. ${t.title}${i === 0 ? " **(written in this PR)**" : ""}`).join("\n")}`
+		: "",
 	"",
 	"_AI-generated. The post shows the site's “AI-generated guide” badge._",
 ].join("\n");
