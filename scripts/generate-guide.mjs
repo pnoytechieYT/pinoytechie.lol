@@ -32,6 +32,7 @@ const REPORT_FILE = path.join(ROOT, ".autoguide-report.md");
 const CATEGORY = (process.env.CATEGORY || process.argv.find((a, i) => i > 1 && !a.startsWith("--")) || "").toLowerCase();
 const DRY = process.env.DRY_RUN === "1" || process.argv.includes("--dry");
 const RETRY_MS = Number(process.env.RETRY_DELAY_MS ?? 20_000);
+const MIN_WORDS = Number(process.env.MIN_WORDS ?? 400); // your existing posts have a median of about 490 words
 const BRAND = { maribank: "MariBank", gcash: "GCash", maya: "Maya" };
 
 const PROVIDERS = {
@@ -44,6 +45,7 @@ const PROVIDERS = {
 	// GitHub Models: free with the workflow's own GITHUB_TOKEN (needs `models: read`), no sign-up.
 	github: {
 		maxTokens: 3500, // the free tier caps output per request
+		headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
 		base: process.env.GITHUB_MODELS_BASE_URL || "https://models.github.ai/inference",
 		key: process.env.GITHUB_MODELS_TOKEN || process.env.GITHUB_TOKEN,
 		models: (process.env.GITHUB_MODELS_MODEL || "openai/gpt-4.1-mini,openai/gpt-4.1").split(","),
@@ -154,7 +156,7 @@ STRUCTURE (Markdown, no H1 because the page title is added separately):
 - Then 4 to 7 sections with "##" headings. Use "###" sparingly. Use bullet lists, numbered steps and one Markdown table when it helps.
 - You may add callouts in exactly this form: "> [!NOTE] Short title" or "> [!WARNING] Short title" on one line, then "> text" on the next line.
 - End with a short "##" section that helps the reader decide (who it suits, what to check first).
-- 900 to 1,400 words in total.
+- 600 to 1,000 words in total.
 
 HARD RULES (follow them even if the topic seems to need otherwise):
 1. NUMBERS: never write a peso amount, percentage, interest rate, fee, limit, date or deadline unless it appears word for word in FACTS or SOURCE POSTS. If you need one that is missing, tell the reader to check the figure in the official app instead. Never estimate or round.
@@ -202,7 +204,7 @@ async function chat(p, model, system, user) {
 		try {
 			res = await fetch(`${p.base}/chat/completions`, {
 				method: "POST",
-				headers: { "Content-Type": "application/json", Authorization: `Bearer ${p.key}` },
+				headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: `Bearer ${p.key}`, ...(p.headers ?? {}) },
 				body: JSON.stringify(body),
 				signal: AbortSignal.timeout(180_000),
 			});
@@ -214,9 +216,15 @@ async function chat(p, model, system, user) {
 			throw new Error(`network error (${e.cause?.code ?? e.message})`);
 		}
 		if (res.ok) {
-			const data = await res.json();
+			const raw = await res.text();
+			let data;
+			try {
+				data = JSON.parse(raw);
+			} catch {
+				throw new Error(`HTTP ${res.status} but the answer is not JSON (content-type ${res.headers.get("content-type")}): ${raw.replace(/\s+/g, " ").slice(0, 200)}`);
+			}
 			const text = data.choices?.[0]?.message?.content;
-			if (!text) throw new Error("empty answer");
+			if (!text) throw new Error(`empty answer: ${raw.replace(/\s+/g, " ").slice(0, 200)}`);
 			return text;
 		}
 		const detail = (await res.text()).replace(/\s+/g, " ").slice(0, 250);
@@ -224,7 +232,7 @@ async function chat(p, model, system, user) {
 			delete body.response_format; // some models reject JSON mode; the prompt already asks for JSON
 			continue;
 		}
-		if ((res.status === 429 || res.status >= 500) && attempt < 3) {
+		if (((res.status === 429 && attempt < 2) || (res.status >= 500 && attempt < 3))) {
 			await sleep(RETRY_MS * attempt);
 			continue;
 		}
@@ -258,7 +266,7 @@ async function generate(system, user) {
 				log(`asking ${name} (${model})`);
 				const data = parseJson(await chat(p, model, system, user));
 				if (typeof data.title !== "string" || typeof data.body !== "string") throw new Error("JSON is missing title or body");
-				if (countWords(data.body) < 600) throw new Error(`article too short (${countWords(data.body)} words)`);
+				if (countWords(data.body) < MIN_WORDS) throw new Error(`article too short (${countWords(data.body)} words, minimum ${MIN_WORDS})`);
 				return { data, provider: name, model };
 			} catch (e) {
 				log(`${name}/${model} failed: ${e.message}`);
