@@ -9,14 +9,15 @@
  *      (a topic is "done" when a file named <slug>.md already exists in src/posts).
  *   2. Gives the AI your verified facts (automation/facts.json) plus your existing posts
  *      of that category as source material, and tells it NOT to invent numbers.
- *   3. Tries the providers in order (Gemini, Groq, DeepSeek). The first one with a key
+ *   3. Tries the providers in order (Gemini, GitHub Models, Groq, Mistral, DeepSeek). The first one with a key
  *      that answers wins. All three speak the same OpenAI-style API.
  *   4. Cleans the result, checks internal links, flags every peso amount / percentage
  *      that is NOT found in your facts or source posts, and writes the file.
  *      Any flagged number => the post is saved with `draft: true` so it can never go live unseen.
  *
  * Keys (GitHub: Settings > Secrets and variables > Actions). Use any one, or all for fallback:
- *   GEMINI_API_KEY, GROQ_API_KEY, DEEPSEEK_API_KEY
+ *   GEMINI_API_KEY, GROQ_API_KEY, MISTRAL_API_KEY, DEEPSEEK_API_KEY
+ *   GitHub Models needs NO secret: the workflow passes its built-in GITHUB_TOKEN (permission `models: read`).
  * Optional: GEMINI_MODEL, GROQ_MODEL, DEEPSEEK_MODEL (each can be a comma-separated list tried in order), AI_PROVIDERS="gemini,groq,deepseek"
  */
 import fs from "node:fs/promises";
@@ -35,16 +36,32 @@ const BRAND = { maribank: "MariBank", gcash: "GCash", maya: "Maya" };
 
 const PROVIDERS = {
 	gemini: {
+		maxTokens: 8000,
 		base: process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai",
 		key: process.env.GEMINI_API_KEY,
 		models: (process.env.GEMINI_MODEL || "gemini-flash-latest,gemini-flash-lite-latest").split(","),
 	},
+	// GitHub Models: free with the workflow's own GITHUB_TOKEN (needs `models: read`), no sign-up.
+	github: {
+		maxTokens: 3500, // the free tier caps output per request
+		base: process.env.GITHUB_MODELS_BASE_URL || "https://models.github.ai/inference",
+		key: process.env.GITHUB_MODELS_TOKEN || process.env.GITHUB_TOKEN,
+		models: (process.env.GITHUB_MODELS_MODEL || "openai/gpt-4.1-mini,openai/gpt-4.1").split(","),
+	},
 	groq: {
+		maxTokens: 8000,
 		base: process.env.GROQ_BASE_URL || "https://api.groq.com/openai/v1",
 		key: process.env.GROQ_API_KEY,
 		models: (process.env.GROQ_MODEL || "llama-3.3-70b-versatile").split(","),
 	},
+	mistral: {
+		maxTokens: 8000,
+		base: process.env.MISTRAL_BASE_URL || "https://api.mistral.ai/v1",
+		key: process.env.MISTRAL_API_KEY,
+		models: (process.env.MISTRAL_MODEL || "mistral-small-latest").split(","),
+	},
 	deepseek: {
+		maxTokens: 8000,
 		base: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
 		key: process.env.DEEPSEEK_API_KEY,
 		models: (process.env.DEEPSEEK_MODEL || "deepseek-flash").split(","),
@@ -173,7 +190,7 @@ async function chat(p, model, system, user) {
 	const body = {
 		model,
 		temperature: 0.4,
-		max_tokens: 8000,
+		max_tokens: p.maxTokens ?? 8000,
 		response_format: { type: "json_object" },
 		messages: [
 			{ role: "system", content: system },
@@ -227,11 +244,11 @@ function parseJson(text) {
 const countWords = (s) => s.split(/\s+/).filter(Boolean).length;
 
 async function generate(system, user) {
-	const order = (process.env.AI_PROVIDERS || "gemini,groq,deepseek")
+	const order = (process.env.AI_PROVIDERS || "gemini,github,groq,mistral,deepseek")
 		.split(",")
 		.map((s) => s.trim().toLowerCase())
 		.filter((n) => PROVIDERS[n]?.key);
-	if (!order.length) fail("No AI key found. Add GEMINI_API_KEY, GROQ_API_KEY or DEEPSEEK_API_KEY as a repository secret.");
+	if (!order.length) fail("No AI key found. Add GEMINI_API_KEY (or GROQ/MISTRAL/DEEPSEEK) as a repository secret, or give the workflow `models: read`.");
 
 	const errors = [];
 	for (const name of order) {
