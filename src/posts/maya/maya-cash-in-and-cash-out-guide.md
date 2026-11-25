@@ -2,7 +2,7 @@
 title: "Maya Cash In and Cash Out: Options and What to Check"
 seoTitle: "Maya Cash In & Cash Out Options: Fees & Limits Guide"
 description: "Learn how to add and withdraw money from Maya. Discover cash-in options, over-the-counter channels, transfer rules, and why you should check app fees."
-pubDate: "2026-11-25T20:01:49+08:00"
+pubDate: "2026-11-28T20:01:49+08:00"
 tags: ["Maya", "Cash In", "Cash Out", "Fees", "Digital Wallet"]
 aiGenerated: true
 ---
