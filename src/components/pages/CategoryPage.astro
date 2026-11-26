@@ -29,7 +29,7 @@ const description = category.seoDescription ?? category.description;
 const crumbs = [
 	{ name: "Home", href: "/" },
 	{ name: "Guides", href: "/blog/" },
-	{ name: category.name, href: base },
+	{ name: category.name, href: base, icon: category.logo },
 ];
 
 const schema = [
@@ -52,7 +52,6 @@ const schema = [
 <BaseLayout title={title} description={description} schema={schema} noindex={posts.length === 0}>
 	<PageHero
 		title={category.name}
-		icon={category.logo}
 		eyebrow={category.pinned ? `★ Pinned · ${groupLabel}` : groupLabel}
 		lead={category.description}
 		crumbs={crumbs} />

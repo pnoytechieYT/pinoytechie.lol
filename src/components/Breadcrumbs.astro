@@ -14,9 +14,24 @@ const { items } = Astro.props;
 				<li class="flex items-center gap-2">
 					{i > 0 && <span aria-hidden="true">/</span>}
 					{i < items.length - 1 ? (
-						<a href={item.href} class="underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">{item.name}</a>
+						item.icon ? (
+							<a href={item.href} class="inline-flex items-center gap-1.5 hover:bg-ink hover:text-sun">
+								<img src={item.icon} alt="" width="16" height="16" class="h-4 w-4 shrink-0 rounded-[3px]" />
+								<span class="underline decoration-2 underline-offset-4">{item.name}</span>
+							</a>
+						) : (
+							<a href={item.href} class="underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">{item.name}</a>
+						)
 					) : (
-						<span aria-current="page" class="inline-block max-w-[14rem] truncate border-2 border-ink bg-white px-1.5 py-0.5 align-bottom sm:max-w-md">{item.name}</span>
+						<span
+							aria-current="page"
+							class:list={[
+								"max-w-[14rem] border-2 border-ink bg-white px-1.5 py-0.5 align-bottom sm:max-w-md",
+								item.icon ? "inline-flex items-center gap-1.5" : "inline-block truncate",
+							]}>
+							{item.icon && <img src={item.icon} alt="" width="16" height="16" class="h-4 w-4 shrink-0 rounded-[3px]" />}
+							{item.icon ? <span class="truncate">{item.name}</span> : item.name}
+						</span>
 					)}
 				</li>
 			))

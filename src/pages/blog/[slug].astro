@@ -47,7 +47,7 @@ const wasUpdated = post.updatedDate.getTime() - post.pubDate.getTime() > 60_000;
 const crumbs = [
 	{ name: "Home", href: "/" },
 	{ name: "Guides", href: "/blog/" },
-	{ name: category.name, href: category.path },
+	{ name: category.name, href: category.path, icon: category.logo },
 	{ name: post.meta.title, href: path },
 ];
 
@@ -142,12 +142,6 @@ const schema = [
 			<div class="prose-article">
 				<Content />
 			</div>
-			<p class="nb-card mt-12 max-w-2xl bg-sun-soft p-4 text-sm leading-relaxed text-body">
-				<strong class="font-mono uppercase text-ink">Not financial advice.</strong>
-				{post.meta.aiGenerated && "This guide was generated with AI and can contain mistakes, so verify rates, fees and rewards in the official app."}
-				{name} is independent and not affiliated with {provider}. Rates, fees and rewards change, so confirm current
-				terms in the app. See our <a href="/disclosure/" class="font-bold text-flame-dark underline hover:bg-sun hover:text-ink">referral disclosure</a>.
-			</p>
 		</article>
 
 		<aside class="min-w-0 space-y-6 md:grid md:grid-cols-2 md:items-start md:gap-8 md:space-y-0 lg:sticky lg:top-24 lg:block lg:space-y-6 lg:self-start" aria-label="Sidebar">

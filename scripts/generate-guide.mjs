@@ -34,7 +34,9 @@ const REPORT_FILE = path.join(ROOT, ".autoguide-report.md");
 const CATEGORY = (process.env.CATEGORY || process.argv.find((a, i) => i > 1 && !a.startsWith("--")) || "").toLowerCase();
 const DRY = process.env.DRY_RUN === "1" || process.argv.includes("--dry");
 const RETRY_MS = Number(process.env.RETRY_DELAY_MS ?? 20_000);
-const MIN_WORDS = Number(process.env.MIN_WORDS ?? 400); // your existing posts have a median of about 490 words
+const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS ?? 100_000);
+const MIN_WORDS = Number(process.env.MIN_WORDS ?? 300); // hard minimum: below this the answer is rejected (your posts: min 228, median 490 words)
+const SOFT_MIN_WORDS = Number(process.env.SOFT_MIN_WORDS ?? 500); // below this the AI is asked once for a fuller version
 // Which categories exist and what they are about: automation/config.json
 const CONFIG = JSON.parse(await fs.readFile(path.join(ROOT, "automation", "config.json"), "utf8"));
 const CFG = CONFIG[CATEGORY];
@@ -46,7 +48,7 @@ const PROVIDERS = {
 		maxTokens: 8000,
 		base: process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai",
 		key: process.env.GEMINI_API_KEY,
-		models: (process.env.GEMINI_MODEL || "gemini-flash-latest,gemini-flash-lite-latest").split(","),
+		models: (process.env.GEMINI_MODEL || "gemini-flash-lite-latest,gemini-flash-latest").split(","),
 	},
 	// GitHub Models: free with the workflow's own GITHUB_TOKEN (needs `models: read`), no sign-up.
 	github: {
@@ -200,6 +202,23 @@ Write the guide now. Return only the JSON object.`;
 
 // ---------- calling the AI ----------
 
+async function post(url, init) {
+	let target = url;
+	for (let hop = 0; hop < 4; hop++) {
+		const res = await fetch(target, { ...init, redirect: "manual" });
+		const location = res.headers.get("location");
+		if (res.status >= 300 && res.status < 400 && location) {
+			const next = new URL(location, target);
+			if (next.origin !== new URL(url).origin) throw new Error(`redirected to another host (${next.host}), not following`);
+			target = next.href;
+			continue;
+		}
+		res.finalUrl = target;
+		return res;
+	}
+	throw new Error("too many redirects");
+}
+
 async function chat(p, model, system, user) {
 	const body = {
 		model,
@@ -214,14 +233,16 @@ async function chat(p, model, system, user) {
 	for (let attempt = 1; attempt <= 3; attempt++) {
 		let res;
 		try {
-			res = await fetch(`${p.base}/chat/completions`, {
+			res = await post(`${p.base}/chat/completions`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: `Bearer ${p.key}`, ...(p.headers ?? {}) },
 				body: JSON.stringify(body),
-				signal: AbortSignal.timeout(180_000),
+				signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
 			});
 		} catch (e) {
-			if (attempt < 3) {
+			// A model that hangs will not recover in seconds: skip to the next one instead of waiting again.
+			if (e.name === "TimeoutError") throw new Error(`no answer within ${Math.round(REQUEST_TIMEOUT_MS / 1000)} seconds`);
+			if (attempt < 2 && !/redirect/i.test(e.message)) {
 				await sleep(RETRY_MS);
 				continue;
 			}
@@ -233,7 +254,7 @@ async function chat(p, model, system, user) {
 			try {
 				data = JSON.parse(raw);
 			} catch {
-				throw new Error(`HTTP ${res.status} but the answer is not JSON (content-type ${res.headers.get("content-type")}): ${raw.replace(/\s+/g, " ").slice(0, 200)}`);
+				throw new Error(`HTTP ${res.status} but the answer is not JSON (url ${res.finalUrl}, content-type ${res.headers.get("content-type")}, request-id ${res.headers.get("x-github-request-id") ?? res.headers.get("x-request-id") ?? "none"}): ${raw.replace(/\s+/g, " ").slice(0, 200)}`);
 			}
 			const text = data.choices?.[0]?.message?.content;
 			if (!text) throw new Error(`empty answer: ${raw.replace(/\s+/g, " ").slice(0, 200)}`);
@@ -263,7 +284,7 @@ function parseJson(text) {
 
 const countWords = (s) => s.split(/\s+/).filter(Boolean).length;
 
-async function generate(system, user, validate) {
+async function generate(system, user, validate, { expand = false } = {}) {
 	const order = (process.env.AI_PROVIDERS || "gemini,github,groq,mistral,deepseek")
 		.split(",")
 		.map((s) => s.trim().toLowerCase())
@@ -276,7 +297,19 @@ async function generate(system, user, validate) {
 		for (const model of p.models.map((m) => m.trim()).filter(Boolean)) {
 			try {
 				log(`asking ${name} (${model})`);
-				const value = validate(parseJson(await chat(p, model, system, user)));
+				let data = parseJson(await chat(p, model, system, user));
+				const wordsOf = (d) => (typeof d?.body === "string" ? countWords(d.body) : 0);
+				if (expand && wordsOf(data) > 0 && wordsOf(data) < SOFT_MIN_WORDS) {
+					log(`${name}/${model} wrote only ${wordsOf(data)} words, asking once for a fuller guide`);
+					const nudge = `${user}\n\nIMPORTANT: your previous attempt had only ${wordsOf(data)} words. Write a fuller guide of at least 650 words: more detail in each section, a checklist, common mistakes and what to check first. Do NOT add any price, number, code or contact detail that is not in FACTS or SOURCE POSTS. Return only the JSON object.`;
+					try {
+						const again = parseJson(await chat(p, model, system, nudge));
+						if (wordsOf(again) > wordsOf(data)) data = again;
+					} catch (e) {
+						log(`${name}/${model} second try failed (${e.message}), keeping the first answer`);
+					}
+				}
+				const value = validate(data);
 				return { value, provider: name, model };
 			} catch (e) {
 				log(`${name}/${model} failed: ${e.message}`);
@@ -443,7 +476,7 @@ if (DRY) {
 	process.exit(0);
 }
 
-const { value: data, provider, model } = await generate(system, user, validateArticle);
+const { value: data, provider, model } = await generate(system, user, validateArticle, { expand: true });
 const { body: cleaned, removedLinks } = cleanBody(data.body, slugs);
 const closing = `Last updated ${new Date().toLocaleDateString("en-US", { timeZone: "Asia/Manila", year: "numeric", month: "long", day: "numeric" })}. Fees, rates and limits can change at any time, so confirm them in the official app before you act.`;
 const body = `${cleaned}\n\n${closing}\n`;

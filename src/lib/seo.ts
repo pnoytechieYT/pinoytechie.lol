@@ -54,6 +54,8 @@ export function baseGraph() {
 export interface Crumb {
 	name: string;
 	href: string;
+	/** Small logo shown inside the box of the current (last) crumb */
+	icon?: string;
 }
 
 export function breadcrumbNode(crumbs: Crumb[]) {
