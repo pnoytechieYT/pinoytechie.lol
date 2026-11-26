@@ -511,6 +511,13 @@ await fs.mkdir(dir, { recursive: true });
 const file = path.join(dir, `${topic.slug}.md`);
 await fs.writeFile(file, `${frontmatter}\n\n${body}`, "utf8");
 
+// The workflow commits src/posts AND automation/topics-ai, and git stops with "pathspec did not match any files"
+// when a listed folder does not exist yet (it only exists after the AI first proposes topics). Make sure it does.
+// The empty .gitkeep also keeps the folder in the repository.
+const keepFile = path.join(ROOT, "automation", "topics-ai", ".gitkeep");
+await fs.mkdir(path.dirname(keepFile), { recursive: true });
+await fs.access(keepFile).catch(() => fs.writeFile(keepFile, ""));
+
 const report = [
 	`**Topic:** ${topic.title}`,
 	`**File:** \`src/posts/${CATEGORY}/${topic.slug}.md\``,
