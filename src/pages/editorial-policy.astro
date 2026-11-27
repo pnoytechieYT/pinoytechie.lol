@@ -1,0 +1,79 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import { siteData } from "@/data/site";
+import { formatDate } from "@/lib/posts";
+
+const { name, social, legalUpdated } = siteData;
+const updated = formatDate(new Date(`${legalUpdated}T00:00:00${siteData.timezoneOffset}`));
+---
+
+<PageLayout
+	title="How We Research, Verify and Update Our Guides"
+	description="How Pinoy Techie researches, verifies and updates its guides, how AI is used and checked, where the facts come from, and how to report a mistake."
+	lead={`Last reviewed ${updated}`}
+	path="/editorial-policy/"
+	dateModified={`${legalUpdated}T00:00:00${siteData.timezoneOffset}`}>
+	<p>
+		{name} publishes plain-language guides on banks, e-wallets and internet providers in the Philippines. Choices about money and mobile plans
+		affect real people, so this page explains the standard we hold our guides to.
+	</p>
+
+	<h2>Where our facts come from</h2>
+	<ul>
+		<li>The official apps and websites of the bank, e-wallet or provider, for rates, fees, limits, plans and rules.</li>
+		<li>Regulators and the law, such as the Bangko Sentral ng Pilipinas (BSP), the PDIC, the National Telecommunications Commission (NTC) and the text of Republic Acts.</li>
+		<li>Company announcements and newsrooms, and dated reports from reputable news outlets.</li>
+	</ul>
+	<p>
+		We keep a list of verified facts together with the date we last checked them, and our guides draw on it. When a figure is not confirmed, a guide
+		says to check the official app instead of guessing.
+	</p>
+
+	<h2>How a guide is made</h2>
+	<ol>
+		<li><strong>Topic.</strong> We choose topics from the questions readers ask and from what people search for, not from what pays the most.</li>
+		<li><strong>Draft.</strong> A guide is written by us or drafted with AI assistance (see below).</li>
+		<li><strong>Fact check.</strong> Numbers, dates and claims are matched against our verified facts and the official sources above.</li>
+		<li><strong>Review.</strong> A person reads each AI-assisted guide before it is published.</li>
+		<li><strong>Dates and sources.</strong> Every guide shows when it was published and, if it changed, when it was last updated. Guides that rely on official pages list them under "Sources".</li>
+	</ol>
+
+	<h2 id="ai-assisted">How we use AI, and how we check it</h2>
+	<p>
+		Some guides are drafted with the help of AI. They show an "AI-generated guide" label under the title. AI can get facts wrong, so we set rules for it:
+	</p>
+	<ul>
+		<li>It may only use facts from our verified list and from guides we have already published. It is told never to invent prices, plan names, speeds, codes, links or contact details.</li>
+		<li>Any peso amount, percentage, speed or code in a draft that we cannot match to our verified facts is flagged, and that draft is held back until a person checks it.</li>
+		<li>Links that are not on our approved list, and invented "Sources" sections, are removed automatically.</li>
+		<li>A person reads the guide before it is published.</li>
+	</ul>
+	<p>
+		We do not use AI to make up personal experience. If a guide does not say that we tested something ourselves, we have not. Even with these
+		checks, an AI-generated guide can contain mistakes, so confirm rates, fees and plans in the official app or website before you decide.
+	</p>
+
+	<h2>Keeping guides up to date</h2>
+	<p>
+		Rates, fees, plans and promos change often. When we notice an official change, or a reader tells us about one, we update the guide and show the
+		new "Updated" date. Guides are not a replacement for the provider's own current terms.
+	</p>
+
+	<h2>Corrections</h2>
+	<p>
+		Found a mistake in a guide or a video? <a href="/contact/">Tell us</a>{social.email && <> or email <a href={`mailto:${social.email}`}>{social.email}</a></>}.
+		We will check it, fix it and note the update date.
+	</p>
+
+	<h2>Independence and how we earn</h2>
+	<p>
+		{name} is independent and is not affiliated with or endorsed by the companies we write about. This site shows no ads. Where a guide links to
+		something we may earn a reward from, such as a referral code, we say so, and the <a href="/disclosure/">referral disclosure</a> explains how it works
+		and why it does not change what we write. Nothing on this site is financial advice.
+	</p>
+
+	<h2>Who is behind this site</h2>
+	<p>
+		{name} is an independent Philippine channel and website. Learn more on the <a href="/about/">About page</a>.
+	</p>
+</PageLayout>

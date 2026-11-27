@@ -500,6 +500,7 @@ const frontmatter = [
 	`pubDate: ${JSON.stringify(phNow())}`,
 	`tags: [${tags.map((t) => JSON.stringify(t)).join(", ")}]`,
 	"aiGenerated: true",
+	/^[\w-]{11}$/.test(topic.video ?? "") && `video: ${JSON.stringify(topic.video)}`,
 	asDraft && "draft: true",
 	"---",
 ]

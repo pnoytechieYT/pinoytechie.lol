@@ -32,6 +32,8 @@ export interface PostMeta {
 	image?: string;
 	/** Set `aiGenerated: true` on posts written with AI. Shows an "AI-generated guide" badge and note. */
 	aiGenerated?: boolean;
+	/** YouTube video id to show at the end of the guide, e.g. video: "qHHuN3Y3FzA". Without it, a closely matching video is picked automatically. */
+	video?: string;
 }
 
 export interface Post {

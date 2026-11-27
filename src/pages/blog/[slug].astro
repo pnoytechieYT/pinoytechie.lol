@@ -2,6 +2,9 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import Angpao from "@/components/Angpao.astro";
+import AuthorBox from "@/components/AuthorBox.astro";
+import YouTubeEmbed from "@/components/YouTubeEmbed.astro";
+import { relatedVideo } from "@/lib/related-video";
 import PostCard from "@/components/PostCard.astro";
 import { getCategory, getPosts, getRelated, formatDateTime, slugify } from "@/lib/posts";
 import { siteData } from "@/data/site";
@@ -17,7 +20,10 @@ const { name, referral, mayaReferral } = siteData;
 
 const path = `/blog/${post.slug}/`;
 const pageUrl = abs(path);
-const image = post.meta.image ?? siteData.ogImage;
+// Every guide gets its own share image from src/pages/og/[slug].png.ts, unless its frontmatter sets `image:`.
+const video = relatedVideo({ title: post.meta.title, tags: post.tags, video: post.meta.video });
+const image = post.meta.image ?? `/og/${post.slug}.png`;
+const imageAlt = `${name} guide: ${post.meta.title}`;
 const related = getRelated(post, 3);
 const category = getCategory(post.category)!;
 const toc = post.headings.filter((h) => (h.depth === 2 || h.depth === 3) && h.slug !== "footnote-label");
@@ -39,9 +45,17 @@ const sidebar = {
 	},
 	gcash: undefined,
 }[post.category as "maribank" | "maya" | "gcash"];
-const provider = { maribank: "MariBank or Sea Group", maya: "Maya or PLDT", gcash: "GCash, Mynt or Globe" }[
-	post.category as "maribank" | "maya" | "gcash"
-] ?? "the provider";
+const provider =
+	{
+		maribank: "MariBank or Sea Group",
+		maya: "Maya or PLDT",
+		gcash: "GCash, Mynt or Globe",
+		"globe-tm": "Globe",
+		"smart-tnt-sun": "Smart, TNT or PLDT",
+		dito: "DITO",
+		"more-banks-ewallets": "the banks and e-wallets mentioned",
+		"more-internet-providers": "the providers mentioned",
+	}[post.category as string] ?? "the provider";
 const wasUpdated = post.updatedDate.getTime() - post.pubDate.getTime() > 60_000;
 
 const crumbs = [
@@ -86,6 +100,7 @@ const schema = [
 	suffix={withBrand}
 	description={post.meta.description}
 	image={image}
+	imageAlt={imageAlt}
 	type="article"
 	publishedTime={post.pubDate.toISOString()}
 	modifiedTime={post.updatedDate.toISOString()}
@@ -106,7 +121,7 @@ const schema = [
 				}
 				{post.isScheduled && <span class="nb-tag nb-tag-red">Scheduled: not public yet (dev preview)</span>}
 			</div>
-			<h1 class="mt-5 max-w-3xl text-3xl font-bold leading-[1.08] tracking-tight text-ink sm:text-4xl lg:text-5xl">
+			<h1 data-pagefind-meta="title" class="mt-5 max-w-3xl text-3xl font-bold leading-[1.08] tracking-tight text-ink sm:text-4xl lg:text-5xl">
 				{post.meta.title}
 			</h1>
 			<p class="mt-5 max-w-3xl text-base font-medium leading-relaxed text-ink/85 sm:text-lg">{post.meta.description}</p>
@@ -128,7 +143,7 @@ const schema = [
 			{
 				post.meta.aiGenerated && (
 					<p class="mt-5">
-						<a href="/disclosure/#ai-generated" class="inline-flex items-center gap-2 border-2 border-ink bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase shadow-hard-sm hover:bg-ink hover:text-sun">
+						<a href="/editorial-policy/#ai-assisted" class="inline-flex items-center gap-2 border-2 border-ink bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase shadow-hard-sm hover:bg-ink hover:text-sun">
 							<span aria-hidden="true">✦</span> AI-generated guide
 						</a>
 					</p>
@@ -138,10 +153,26 @@ const schema = [
 	</div>
 
 	<div class="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-4 py-8 sm:py-10 md:px-6 md:py-14 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
-		<article class="min-w-0">
+		<article class="min-w-0" data-pagefind-body data-pagefind-filter={`category:${category.shortName ?? category.name}`}>
 			<div class="prose-article">
 				<Content />
 			</div>
+			{
+				video && (
+					<section class="mt-10 max-w-2xl" aria-labelledby="watch-title">
+						<h2 id="watch-title" class="text-2xl font-bold tracking-tight text-ink">Watch the video</h2>
+						<p class="mt-1 text-sm text-muted">{video.title}</p>
+						<YouTubeEmbed id={video.id} si={video.si} title={video.title} class="mt-4" />
+					</section>
+				)
+			}
+			<AuthorBox />
+			<p class="nb-card mt-8 max-w-2xl bg-sun-soft p-4 text-sm leading-relaxed text-body">
+				<strong class="font-mono uppercase text-ink">Not financial advice.</strong>
+				{post.meta.aiGenerated && "This guide was generated with AI and can contain mistakes, so verify rates, fees and rewards in the official app."}
+				{name} is independent and not affiliated with {provider}. Rates, fees and rewards change, so confirm current
+				terms in the app. See our <a href="/disclosure/" class="font-bold text-flame-dark underline hover:bg-sun hover:text-ink">referral disclosure</a>.
+			</p>
 		</article>
 
 		<aside class="min-w-0 space-y-6 md:grid md:grid-cols-2 md:items-start md:gap-8 md:space-y-0 lg:sticky lg:top-24 lg:block lg:space-y-6 lg:self-start" aria-label="Sidebar">

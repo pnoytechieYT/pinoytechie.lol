@@ -102,8 +102,39 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
 
+      # A pull request made with the built-in token cannot start other workflows, so the safety check runs here.
+      - name: Install dependencies
+        if: steps.gen.outputs.slug != ''
+        run: npm ci
+
+      - name: Check that the site still builds and every link works
+        id: verify
+        if: steps.gen.outputs.slug != ''
+        continue-on-error: true
+        run: |
+          npx astro build
+          node scripts/check-links.mjs --report .autoguide-report.md
+
+      - name: Warn in the pull request if the check failed
+        if: steps.gen.outputs.slug != '' && steps.verify.outcome == 'failure'
+        run: |
+          printf '\n\n### ❌ Check failed\nThe site did not build, or a link is broken, with this guide. Open the "Check that the site still builds" step in the Actions log, fix the guide, then merge.\n' >> .autoguide-report.md
+
+      - name: Decide how to deliver the guide
+        id: deliver
+        if: steps.gen.outputs.slug != ''
+        env:
+          PLANNED_MODE: ${{ steps.plan.outputs.mode }}
+          CHECK: ${{ steps.verify.outcome }}
+        run: |
+          MODE="$PLANNED_MODE"
+          # Never publish straight to the live site after a failed check: use a pull request instead.
+          if [ "$CHECK" != "success" ]; then MODE=pr; fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "Delivering by: $MODE"
+
       - name: Open a Pull Request
-        if: steps.gen.outputs.slug != '' && steps.plan.outputs.mode == 'pr'
+        if: steps.gen.outputs.slug != '' && steps.deliver.outputs.mode == 'pr'
         uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
@@ -116,7 +147,7 @@ jobs:
           body-path: .autoguide-report.md
 
       - name: Commit straight to main
-        if: steps.gen.outputs.slug != '' && steps.plan.outputs.mode == 'publish'
+        if: steps.gen.outputs.slug != '' && steps.deliver.outputs.mode == 'publish'
         env:
           TITLE: ${{ steps.gen.outputs.title }}
         run: |

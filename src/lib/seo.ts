@@ -13,8 +13,16 @@ export function abs(pathOrUrl: string): string {
 }
 
 export function authorNode() {
-	const { type, name: authorName, url: authorUrl } = siteData.author;
-	return { "@type": type, name: authorName, url: abs(authorUrl) };
+	const { type, name: authorName, url: authorUrl, jobTitle, bio, image, sameAs } = siteData.author;
+	return {
+		"@type": type,
+		name: authorName,
+		url: abs(authorUrl),
+		...(bio ? { description: bio } : {}),
+		...(image ? { image: abs(image) } : {}),
+		...(type === "Person" && jobTitle ? { jobTitle } : {}),
+		...(sameAs.length ? { sameAs } : {}),
+	};
 }
 
 /** Sitewide nodes: Organization (with logo) and WebSite. Added to every page. */

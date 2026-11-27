@@ -6,6 +6,7 @@ import "@/styles/global.css";
 import Seo from "@/components/Seo.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Analytics from "@/components/Analytics.astro";
 import { siteData } from "@/data/site";
 
 interface Props {
@@ -42,5 +43,6 @@ const fullTitle = suffix && !title.includes(siteData.name) ? `${title} | ${siteD
 			<slot />
 		</main>
 		<Footer />
+		<Analytics />
 	</body>
 </html>

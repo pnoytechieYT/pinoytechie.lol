@@ -91,6 +91,8 @@ const liveCategories = readLiveCategories();
 export default defineConfig({
 	site: SITE,
 	compressHTML: true,
+	// Start loading a page when a visitor hovers over (or touches) its link, so clicks feel instant.
+	prefetch: { prefetchAll: true, defaultStrategy: "hover" },
 	markdown: {
 		gfm: true, // tables, task lists, strikethrough, footnotes, autolinks
 		smartypants: true, // curly quotes, en/em dashes, ellipses
@@ -107,7 +109,7 @@ export default defineConfig({
 			// Tag archives are navigation aids, keep them out of the sitemap.
 			// Empty category pages are noindex, so they are kept out too.
 			filter: (page) => {
-				if (page.includes("/blog/tag/") || page.includes("/404")) return false;
+				if (page.includes("/blog/tag/") || page.includes("/404") || page.endsWith("/search/")) return false;
 				const category = page.match(/\/blog\/category\/([^/]+)\//)?.[1];
 				return !category || liveCategories.has(category);
 			},

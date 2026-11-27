@@ -31,7 +31,27 @@ export const siteData = {
 
 	// For E-E-A-T you can switch this to a real person:
 	// { type: "Person", name: "Your Name", url: "/about/" }
-	author: { type: "Organization" as "Organization" | "Person", name: "Pinoy Techie", url: "/about/" },
+	// Google looks for a real, named author on money topics. Fill in `name` (type "Person"), `bio`, `image` and `sameAs`
+	// when you are ready, and they appear in the author box under every guide and in the page's structured data.
+	// Leave bio/image/sameAs empty to keep the box simple.
+	author: {
+		type: "Organization" as "Organization" | "Person",
+		name: "Pinoy Techie",
+		url: "/about/",
+		jobTitle: "", // for a Person, e.g. "Independent tech and money-app creator"
+		bio: "", // 1 to 3 honest sentences: who you are and what you have actually used or tested
+		image: "", // e.g. "/images/author.jpg" (a square photo in /public)
+		sameAs: [] as string[], // links to your own profiles, e.g. your YouTube channel or LinkedIn
+	},
+
+	// Website analytics. Leave both empty to run with NO analytics. Fill in ONE of them.
+	//   umami.websiteId   the Website ID from Umami Cloud (cloud.umami.is) > Settings > Websites
+	//   cloudflare.token  the token from Cloudflare > Analytics & Logs > Web Analytics
+	// Both are cookie-free. Only added in the production build, never on localhost.
+	analytics: {
+		umami: { websiteId: "", scriptUrl: "https://cloud.umami.is/script.js" },
+		cloudflare: { token: "" },
+	},
 
 	googleSiteVerification: "vTIvCa0HAYNx_WC4BmJOGzhgaNgLdWyI0aM6nYGhOrw",
 
@@ -40,6 +60,7 @@ export const siteData = {
 		// "dropdown" = hover/focus menu listing every category with inNav: true (src/data/categories.ts).
 		// Clicking the label itself goes to href (the Guide section).
 		{ label: "Guide", href: "/blog/", dropdown: "categories" },
+		{ label: "Calculator", href: "/tools/savings-interest-calculator/" },
 		{ label: "Videos", href: "/videos/" },
 		{ label: "Shorts", href: "/shorts/" },
 		// { label: "About", href: "/about/" },
@@ -55,10 +76,13 @@ export const siteData = {
 			{ label: "Guides", href: "/blog/" },
 			{ label: "Videos", href: "/videos/" },
 			{ label: "Shorts", href: "/shorts/" },
+			{ label: "Savings calculator", href: "/tools/savings-interest-calculator/" },
+			{ label: "Search", href: "/search/" },
 			{ label: "RSS feed", href: "/rss.xml" },
 		],
 		discover: [
 			{ label: "About", href: "/about/" },
+			{ label: "How we verify", href: "/editorial-policy/" },
 			{ label: "Contact", href: "/contact/" },
 			{ label: "Referral disclosure", href: "/disclosure/" },
 		],
@@ -81,7 +105,7 @@ export const siteData = {
 		text: "Prefer to see it on screen? This video shows the sign-up flow so you know what to expect before you deposit.",
 	},
 
-	legalUpdated: "2026-11-21", // update whenever Privacy Policy / Terms / Disclosure change
+	legalUpdated: "2026-11-27", // update whenever Privacy Policy / Terms / Disclosure change
 
 	referral: {
 		code,

@@ -1,0 +1,21 @@
+---
+import { siteData } from "@/data/site";
+
+// Cookie-free analytics, only in the production build (never on localhost or in `astro dev`).
+// Configure it in src/data/site.ts > analytics. Leave the IDs empty to run with no analytics.
+const { umami, cloudflare } = siteData.analytics;
+const host = new URL(siteData.url).hostname;
+const useUmami = import.meta.env.PROD && Boolean(umami.websiteId);
+const useCloudflare = import.meta.env.PROD && !useUmami && Boolean(cloudflare.token);
+---
+
+{
+	useUmami && (
+		<script is:inline defer src={umami.scriptUrl} data-website-id={umami.websiteId} data-domains={host} data-do-not-track="true" />
+	)
+}
+{
+	useCloudflare && (
+		<script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cloudflare.token })} />
+	)
+}

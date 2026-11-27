@@ -1,0 +1,85 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+---
+
+<PageLayout
+	title="Search guides"
+	description="Search every Pinoy Techie guide on banks, e-wallets and internet providers in the Philippines."
+	lead="Type a question or a name, like “GCash fees” or “DITO SIM”."
+	path="/search/"
+	prose={false}
+	noindex>
+	<link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+	<div id="search" class="search-box"></div>
+	<noscript><p class="mt-4 font-bold text-ink">Search needs JavaScript. You can still <a href="/blog/" class="underline">browse all guides</a>.</p></noscript>
+
+	<script is:inline src="/pagefind/pagefind-ui.js"></script>
+	<script is:inline>
+		(function () {
+			var box = document.getElementById("search");
+			if (typeof PagefindUI === "undefined") {
+				// The search index is created when the site is built. It does not exist in `astro dev`.
+				box.innerHTML =
+					'<p class="font-bold text-ink">Search is available on the live site. <a class="underline" href="/blog/">Browse all guides</a> instead.</p>';
+				return;
+			}
+			var ui = new PagefindUI({
+				element: "#search",
+				showSubResults: true,
+				showImages: false,
+				autofocus: true,
+				pageSize: 8,
+				resetStyles: false,
+				translations: {
+					placeholder: "Search guides",
+					zero_results: "No guides found for [SEARCH_TERM]. Try a shorter or different word.",
+					many_results: "[COUNT] guides found for [SEARCH_TERM]",
+					one_result: "[COUNT] guide found for [SEARCH_TERM]",
+					clear_search: "Clear",
+					load_more: "Show more guides",
+				},
+			});
+			var q = new URLSearchParams(location.search).get("q");
+			if (q) ui.triggerSearch(q);
+		})();
+	</script>
+</PageLayout>
+
+<style is:global>
+	/* Make the search box match the site: cream, thick black borders, hard shadow. */
+	.search-box {
+		--pagefind-ui-scale: 1;
+		--pagefind-ui-primary: #111111;
+		--pagefind-ui-text: #262626;
+		--pagefind-ui-background: #fffdf2;
+		--pagefind-ui-border: #111111;
+		--pagefind-ui-tag: #fff7a8;
+		--pagefind-ui-border-width: 3px;
+		--pagefind-ui-border-radius: 6px;
+		--pagefind-ui-image-border-radius: 6px;
+		--pagefind-ui-image-box-ratio: 3 / 2;
+		--pagefind-ui-font: var(--font-sans);
+		max-width: 46rem;
+	}
+	.search-box .pagefind-ui__search-input {
+		font-weight: 700;
+		box-shadow: 5px 5px 0 0 #111111;
+	}
+	.search-box .pagefind-ui__result-link {
+		font-weight: 700;
+		color: #111111;
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+	.search-box .pagefind-ui__result-link:hover {
+		background: #ffea00;
+	}
+	.search-box .pagefind-ui__result {
+		border-top-width: 3px;
+	}
+	.search-box mark {
+		background: #ffea00;
+		color: #111111;
+	}
+</style>

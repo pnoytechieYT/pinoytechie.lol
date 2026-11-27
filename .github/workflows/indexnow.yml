@@ -1,0 +1,52 @@
+name: IndexNow (tell Bing about new pages)
+
+# After every successful deploy, send NEW or CHANGED pages to IndexNow (Bing, DuckDuckGo, Yandex, Naver, Seznam).
+# Google does not support IndexNow: it finds pages through the sitemap you submitted in Search Console.
+# An ordinary rebuild with nothing new sends nothing. No secret is needed: the key is the public file in /public.
+
+on:
+  workflow_run:
+    workflows: ["Deploy to GitHub Pages"] # must match the name: in deploy.yml
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore the list of pages already sent
+        uses: actions/cache/restore@v4
+        with:
+          path: .indexnow-state.json
+          key: indexnow-state-${{ github.run_id }}
+          restore-keys: indexnow-state-
+
+      - name: Wait for GitHub Pages to serve the new version
+        run: sleep 45
+
+      - name: Send new and changed pages
+        run: node scripts/indexnow.mjs
+
+      - name: Save the list of pages already sent
+        if: ${{ always() && hashFiles('.indexnow-state.json') != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .indexnow-state.json
+          key: indexnow-state-${{ github.run_id }}

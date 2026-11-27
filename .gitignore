@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # AI guide generator scratch report
 .autoguide-report.md
+
+# IndexNow list of pages already sent (kept in the Actions cache)
+.indexnow-state.json

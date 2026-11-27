@@ -10,7 +10,7 @@
   ],
   "gcash": [
     {"slug": "gcash-cash-in-and-cash-out-options", "title": "GCash Cash In and Cash Out: Every Option Explained", "angle": "Overview of ways to add and take out money, with a comparison table that avoids exact fees unless they are in the sources."},
-    {"slug": "gcash-scams-and-how-to-stay-safe", "title": "GCash Scams: Common Tricks and How to Stay Safe", "angle": "Pattern-level warning signs (phishing links, fake support, OTP requests) and safe habits. No scripts or step-by-step scam instructions."},
+    {"slug": "gcash-scams-and-how-to-stay-safe", "title": "GCash Scams: Common Tricks and How to Stay Safe", "angle": "Pattern-level warning signs (phishing links, fake support, OTP requests) and safe habits. No scripts or step-by-step scam instructions.", "video": "7V5RExVHpbc"},
     {"slug": "how-to-link-bank-account-to-gcash", "title": "How to Link a Bank Account to GCash", "angle": "General flow and what to check (name match, partner banks), noting that screens can differ by app version."},
     {"slug": "lost-sim-or-phone-recover-gcash-account", "title": "Lost Your SIM or Phone? How to Recover Your GCash Account", "angle": "What to do first to protect the account and where to get official help. No invented contact details."},
     {"slug": "gcash-qr-payments-guide", "title": "How to Pay With GCash QR and Send Money Safely", "angle": "Explain scanning, showing your own QR, and safety checks before confirming a payment."},
@@ -19,11 +19,11 @@
   ],
   "maya": [
     {"slug": "maya-cash-in-and-cash-out-guide", "title": "Maya Cash In and Cash Out: Options and What to Check", "angle": "General ways to add and withdraw money, noting that fees are set by Maya and partners and should be checked in the app."},
-    {"slug": "maya-scams-and-account-safety", "title": "Maya Scams: Warning Signs and How to Protect Your Account", "angle": "Pattern-level warning signs and safe habits. No scripts or step-by-step scam instructions."},
+    {"slug": "maya-scams-and-account-safety", "title": "Maya Scams: Warning Signs and How to Protect Your Account", "angle": "Pattern-level warning signs and safe habits. No scripts or step-by-step scam instructions.", "video": "7V5RExVHpbc"},
     {"slug": "maya-card-virtual-and-physical-guide", "title": "Maya Card: Virtual and Physical, What to Know", "angle": "Explain the difference between virtual and physical cards and what to check (fees, limits) in the app."},
     {"slug": "maya-qr-ph-payments-guide", "title": "How to Pay With Maya QR Ph", "angle": "Explain scanning and paying, and safety checks before confirming."},
     {"slug": "maya-personal-goals-guide", "title": "Maya Personal Goals: How to Save for a Target", "angle": "Explain the idea of goal-based savings in Maya Savings using only facts and sources provided."},
-    {"slug": "how-to-recover-maya-account", "title": "Can't Log In to Maya? How to Recover Your Account", "angle": "Safe recovery habits and where to get official help. No invented contact details."},
+    {"slug": "how-to-recover-maya-account", "title": "Can't Log In to Maya? How to Recover Your Account", "angle": "Safe recovery habits and where to get official help. No invented contact details.", "video": "pXyV9B2vjxU"},
     {"slug": "maya-funds-beginner-guide", "title": "Maya Funds: A Beginner Guide to Investing in the App", "angle": "High-level explanation and risks. Not investment advice; no return figures."}
   ],
   "more-banks-ewallets": [
@@ -42,7 +42,7 @@
     {"slug": "how-to-fix-no-signal-or-slow-data-globe-tm", "title": "How to Fix No Signal or Slow Data on Globe or TM", "angle": "Practical troubleshooting checklist (restart, airplane mode, APN, SIM, location). Do not promise fixes."},
     {"slug": "how-to-set-up-a-globe-or-tm-esim", "title": "How to Set Up a Globe or TM eSIM", "angle": "Explain what an eSIM is, phone compatibility to check, and the general flow. Say availability can vary."},
     {"slug": "how-to-pay-your-globe-bill-online", "title": "How to Pay Your Globe Bill Online", "angle": "Explain the general payment options and safety tips. Do not invent prices, plan names, data allowances, speeds, codes or contact details; tell the reader to check the official app or website."},
-    {"slug": "globe-at-home-prepaid-wifi-what-to-know-before-you-buy", "title": "Globe At Home Prepaid WiFi: What to Know Before You Buy", "angle": "Qualitative checklist of what to consider. Do not invent prices, plan names, data allowances, speeds, codes or contact details; tell the reader to check the official app or website."}
+    {"slug": "globe-at-home-prepaid-wifi-what-to-know-before-you-buy", "title": "Globe At Home Prepaid WiFi: What to Know Before You Buy", "angle": "Qualitative checklist of what to consider. Do not invent prices, plan names, data allowances, speeds, codes or contact details; tell the reader to check the official app or website.", "video": "6wksJ7ZzxWI"}
   ],
   "smart-tnt-sun": [
     {"slug": "smart-vs-tnt-vs-sun-what-is-the-difference", "title": "Smart vs TNT vs Sun: What Is the Difference?", "angle": "Explain how the brands relate and who each suits. Do not invent prices, plan names, data allowances, speeds, codes or contact details; tell the reader to check the official app or website."},
@@ -51,7 +51,7 @@
     {"slug": "how-to-fix-slow-data-on-smart-or-tnt", "title": "How to Fix Slow Data on Smart or TNT", "angle": "Practical troubleshooting checklist. Do not promise fixes."},
     {"slug": "how-to-set-up-a-smart-or-tnt-esim", "title": "How to Set Up a Smart or TNT eSIM", "angle": "Explain what an eSIM is, phone compatibility to check, and the general flow. Say availability can vary."},
     {"slug": "how-to-pay-your-smart-bill-online", "title": "How to Pay Your Smart Bill Online", "angle": "Explain the general payment options and safety tips. Do not invent prices, plan names, data allowances, speeds, codes or contact details; tell the reader to check the official app or website."},
-    {"slug": "smart-bro-prepaid-wifi-what-to-know-before-you-buy", "title": "Smart Bro Prepaid WiFi: What to Know Before You Buy", "angle": "Qualitative checklist of what to consider. Do not invent prices, plan names, data allowances, speeds, codes or contact details; tell the reader to check the official app or website."}
+    {"slug": "smart-bro-prepaid-wifi-what-to-know-before-you-buy", "title": "Smart Bro Prepaid WiFi: What to Know Before You Buy", "angle": "Qualitative checklist of what to consider. Do not invent prices, plan names, data allowances, speeds, codes or contact details; tell the reader to check the official app or website.", "video": "qRXQLmo4JJA"}
   ],
   "dito": [
     {"slug": "how-to-register-your-dito-sim", "title": "How to Register Your DITO SIM", "angle": "Explain the general registration steps and what you need. Do not invent deadlines or menu names."},
@@ -59,7 +59,7 @@
     {"slug": "how-to-check-dito-coverage-before-you-switch", "title": "How to Check DITO Coverage Before You Switch", "angle": "Explain how to check coverage where you live and how to test a SIM. Make no coverage claims."},
     {"slug": "how-to-port-your-number-to-dito", "title": "How to Port Your Number to DITO", "angle": "Explain the general idea of number portability and what to prepare. Do not invent fees, timelines or requirements."},
     {"slug": "how-to-set-up-a-dito-esim", "title": "How to Set Up a DITO eSIM", "angle": "Explain what an eSIM is, phone compatibility to check, and the general flow. Say availability can vary."},
-    {"slug": "dito-vs-globe-vs-smart-what-to-compare-before-switching", "title": "DITO vs Globe vs Smart: What to Compare Before Switching", "angle": "A checklist of what to compare (coverage where you live, plan terms, support). No claims about which is better."},
+    {"slug": "dito-vs-globe-vs-smart-what-to-compare-before-switching", "title": "DITO vs Globe vs Smart: What to Compare Before Switching", "angle": "A checklist of what to compare (coverage where you live, plan terms, support). No claims about which is better.", "video": "MTgfE7fXhac"},
     {"slug": "how-to-fix-no-signal-or-slow-data-on-dito", "title": "How to Fix No Signal or Slow Data on DITO", "angle": "Practical troubleshooting checklist. Do not promise fixes."}
   ],
   "more-internet-providers": [

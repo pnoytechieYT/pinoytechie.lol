@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "sync:youtube": "node scripts/sync-youtube.mjs",
-    "build": "node scripts/sync-youtube.mjs && astro build",
+    "build": "node scripts/sync-youtube.mjs && astro build && pagefind --site dist",
+    "check:links": "node scripts/check-links.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -19,7 +20,13 @@
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^7.3.5",
     "github-slugger": "^2.0.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.1.18",
     "unist-util-visit": "^5.2.0"
+  },
+  "devDependencies": {
+    "@fontsource/space-grotesk": "^5.3.0",
+    "pagefind": "^1.6.0",
+    "satori": "^0.63.2"
   }
 }

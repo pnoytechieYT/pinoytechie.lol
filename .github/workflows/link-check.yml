@@ -1,0 +1,35 @@
+name: Weekly link check
+
+# Every Monday 9:00 AM Manila time (01:00 UTC), build the site and check ALL links, including links to other websites
+# (the "Sources" lists in guides). If a link is broken the run fails, and GitHub emails you about the failed run.
+# Open the run to see which links and which pages. Websites that block bots are not counted as broken.
+
+on:
+  schedule:
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the site
+        run: npx astro build
+
+      - name: Check internal and external links
+        run: node scripts/check-links.mjs --external

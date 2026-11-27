@@ -28,6 +28,14 @@ The schedule lives in `.github/workflows/auto-guide.yml`. Each category is one f
 - `automation/topics-ai/<category>.json`: topics the AI proposed. **You don't write these.** When a category's queue is empty, the AI proposes about 10 new topics and they arrive in the same Pull Request as that day's guide.
 - `automation/config.json`: what each category is about (used in the AI prompt).
 
+## Checks before every Pull Request
+After the AI writes a guide, the workflow builds the whole site and checks every internal link. The result is written at the bottom of the
+Pull Request ("Link check"). If the build or a link fails, the PR says so, and in `publish` mode the guide is sent as a PR instead of going live.
+
+## Pairing a topic with your own video
+Add `"video": "<YouTube id>"` to a topic in `topics.json` (the 11 characters after `v=` in the video's address). The guide then shows that video at the end.
+Several queued topics are already paired with videos from your channel.
+
 ## Safety nets
 - Any peso amount, percentage, speed (Mbps/GB) or USSD code that is not in `facts.json` or your existing posts => the post is saved with `draft: true` and the PR lists what to check.
 - External links and unknown internal links are removed. Invented "Sources" sections are removed.
