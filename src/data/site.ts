@@ -27,7 +27,8 @@ export const siteData = {
 	// MariBank's own app icon, shown so visitors can recognise it
 	maribankLogo: "/maribank-logo.png",
 	ogImage: "/og-default.png",
-	ogImageAlt: "Pinoy Techie logo: an eagle with lightning bolts on a yellow circle",
+	ogImageAlt:
+		"Pinoy Techie logo: an eagle with lightning bolts on a yellow circle",
 
 	// For E-E-A-T you can switch this to a real person:
 	// { type: "Person", name: "Your Name", url: "/about/" }
@@ -38,10 +39,10 @@ export const siteData = {
 		type: "Organization" as "Organization" | "Person",
 		name: "Pinoy Techie",
 		url: "/about/",
-		jobTitle: "", // for a Person, e.g. "Independent tech and money-app creator"
-		bio: "", // 1 to 3 honest sentences: who you are and what you have actually used or tested
-		image: "", // e.g. "/images/author.jpg" (a square photo in /public)
-		sameAs: [] as string[], // links to your own profiles, e.g. your YouTube channel or LinkedIn
+		jobTitle: "",
+		bio: "Pinoy Techie covers technology, internet services, telecommunications, and interesting discoveries in the Philippines.",
+		image: "/my-profile.png",
+		sameAs: ["https://www.youtube.com/@pinoy.techie"],
 	},
 
 	// Website analytics. Leave both empty to run with NO analytics. Fill in ONE of them.
@@ -68,7 +69,12 @@ export const siteData = {
 	],
 
 	/** How many items per page, and how many topic tags to show under the list */
-	paging: { postsPerPage: 9, videosPerPage: 12, shortsPerPage: 20, maxTags: 10 },
+	paging: {
+		postsPerPage: 9,
+		videosPerPage: 12,
+		shortsPerPage: 20,
+		maxTags: 10,
+	},
 
 	footer: {
 		explore: [
@@ -76,7 +82,10 @@ export const siteData = {
 			{ label: "Guides", href: "/blog/" },
 			{ label: "Videos", href: "/videos/" },
 			{ label: "Shorts", href: "/shorts/" },
-			{ label: "Savings calculator", href: "/tools/savings-interest-calculator/" },
+			{
+				label: "Savings calculator",
+				href: "/tools/savings-interest-calculator/",
+			},
 			{ label: "Search", href: "/search/" },
 			{ label: "RSS feed", href: "/rss.xml" },
 		],
