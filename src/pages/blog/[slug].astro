@@ -6,7 +6,7 @@ import AuthorBox from "@/components/AuthorBox.astro";
 import YouTubeEmbed from "@/components/YouTubeEmbed.astro";
 import { relatedVideo } from "@/lib/related-video";
 import PostCard from "@/components/PostCard.astro";
-import { getCategory, getPosts, getRelated, formatDateTime, slugify } from "@/lib/posts";
+import { getCategory, getPosts, getRelated, formatDateShort, slugify } from "@/lib/posts";
 import { siteData } from "@/data/site";
 import { abs, authorNode, breadcrumbNode, ids, webPageNode } from "@/lib/seo";
 
@@ -126,29 +126,23 @@ const schema = [
 			</h1>
 			<p class="mt-5 max-w-3xl text-base font-medium leading-relaxed text-ink/85 sm:text-lg">{post.meta.description}</p>
 			<p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs font-bold uppercase text-ink">
-				<span>By <a href="/about/" class="underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">{siteData.author.name}</a></span>
+				<span>
+					By <a href="/about/" class="underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">{siteData.author.name}</a>
+					{post.meta.aiGenerated && (<> via <a href="/editorial-policy/#ai-assisted" title="This guide was drafted with AI. Read how we use AI and check it." class="underline decoration-2 underline-offset-4 hover:bg-ink hover:text-sun">AI</a></>)}
+				</span>
 				<span aria-hidden="true">·</span>
-				<span>Published <time datetime={post.pubDate.toISOString()}>{formatDateTime(post.pubDate)}</time></span>
+				<span>Published <time datetime={post.pubDate.toISOString()}>{formatDateShort(post.pubDate)}</time></span>
 				{
 					wasUpdated && (
 						<>
 							<span aria-hidden="true">·</span>
-							<span>Updated <time datetime={post.updatedDate.toISOString()}>{formatDateTime(post.updatedDate)}</time></span>
+							<span>Updated <time datetime={post.updatedDate.toISOString()}>{formatDateShort(post.updatedDate)}</time></span>
 						</>
 					)
 				}
 				<span aria-hidden="true">·</span>
 				<span>{post.minutes} min read</span>
 			</p>
-			{
-				post.meta.aiGenerated && (
-					<p class="mt-5">
-						<a href="/editorial-policy/#ai-assisted" class="inline-flex items-center gap-2 border-2 border-ink bg-white px-3 py-1.5 font-mono text-xs font-bold uppercase shadow-hard-sm hover:bg-ink hover:text-sun">
-							<span aria-hidden="true">✦</span> AI-generated guide
-						</a>
-					</p>
-				)
-			}
 		</div>
 	</div>
 

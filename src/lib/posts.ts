@@ -150,7 +150,8 @@ function loadPosts(): Post[] {
  * so you can preview them; they are never part of a production build.
  */
 export function getPosts(): Post[] {
-	const preview = import.meta.env.DEV;
+	// INCLUDE_SCHEDULED=1 is set by the auto-guide check so a guide with a future pubDate is still built and link-checked.
+	const preview = import.meta.env.DEV || process.env.INCLUDE_SCHEDULED === "1";
 	return loadPosts()
 		.filter((post) => !post.meta.draft && (preview || !post.isScheduled))
 		.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
@@ -255,6 +256,18 @@ const dateTimeFmt = new Intl.DateTimeFormat(siteData.locale, {
 /** "November 21, 2026" in Philippine time */
 export function formatDate(date: Date): string {
 	return dateFmt.format(date);
+}
+
+const dateShortFmt = new Intl.DateTimeFormat(siteData.locale, {
+	year: "numeric",
+	month: "short",
+	day: "numeric",
+	timeZone: siteData.timezone,
+});
+
+/** "Nov 21, 2026" in Philippine time (used in the guide header; the exact time stays in the <time datetime>) */
+export function formatDateShort(date: Date): string {
+	return dateShortFmt.format(date);
 }
 
 /** "November 21, 2026 at 9:00 AM PHT" in Philippine time */

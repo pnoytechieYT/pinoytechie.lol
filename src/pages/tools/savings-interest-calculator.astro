@@ -29,7 +29,7 @@ const latestCheck = [...products].map((p) => p.asOf).sort().at(-1)!;
 		<form id="calc" class="nb-card space-y-5 bg-white p-5" novalidate>
 			<div>
 				<label for="amount" class="block font-mono text-sm font-bold uppercase text-ink">How much do you save? (₱)</label>
-				<input id="amount" name="amount" type="number" inputmode="decimal" min="1" step="any" value={DEFAULT.amount}
+				<input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" maxlength="16" placeholder="50,000" value={DEFAULT.amount.toLocaleString("en-PH")} aria-describedby="error"
 					class="mt-2 w-full rounded-md border-[3px] border-ink bg-cream px-3 py-2.5 text-lg font-bold text-ink shadow-hard-sm focus:outline-none focus:ring-4 focus:ring-sun" />
 				<div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quick amounts">
 					{[10_000, 50_000, 100_000, 500_000].map((v) => (
@@ -39,7 +39,7 @@ const latestCheck = [...products].map((p) => p.asOf).sort().at(-1)!;
 			</div>
 			<div>
 				<label for="months" class="block font-mono text-sm font-bold uppercase text-ink">For how many months?</label>
-				<input id="months" name="months" type="number" inputmode="numeric" min="1" max="120" step="1" value={DEFAULT.months}
+				<input id="months" name="months" type="text" inputmode="numeric" autocomplete="off" maxlength="3" placeholder="12" value={DEFAULT.months}
 					class="mt-2 w-full rounded-md border-[3px] border-ink bg-cream px-3 py-2.5 text-lg font-bold text-ink shadow-hard-sm focus:outline-none focus:ring-4 focus:ring-sun" />
 				<div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quick periods">
 					{[1, 3, 6, 12, 24].map((v) => (
@@ -137,10 +137,35 @@ const latestCheck = [...products].map((p) => p.asOf).sort().at(-1)!;
 	const summaryEl = $<HTMLElement>("summary");
 	const errorEl = $<HTMLElement>("error");
 
+	/** "1234567.5" -> "1,234,567.5". Keeps digits and ONE dot, at most 2 decimals, no leading zeros. */
+	function formatMoney(raw: string): string {
+		const clean = raw.replace(/[^\d.]/g, "");
+		const dot = clean.indexOf(".");
+		let int = (dot < 0 ? clean : clean.slice(0, dot)).replace(/^0+(?=\d)/, "");
+		const dec = dot < 0 ? null : clean.slice(dot + 1).replace(/\./g, "").slice(0, 2);
+		int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		return dec === null ? int : `${int || "0"}.${dec}`;
+	}
+
+	/** Re-formats the box while typing or pasting and keeps the cursor next to the same digit. */
+	function maskAmount() {
+		const caret = amountEl.selectionStart ?? amountEl.value.length;
+		const typed = amountEl.value.slice(0, caret).replace(/[^\d.]/g, "").length;
+		amountEl.value = formatMoney(amountEl.value);
+		let seen = 0;
+		let pos = 0;
+		while (pos < amountEl.value.length && seen < typed) if (/[\d.]/.test(amountEl.value[pos++])) seen++;
+		amountEl.setSelectionRange(pos, pos);
+	}
+
 	function update() {
-		const amount = Number(amountEl.value);
+		const amountText = amountEl.value.replace(/,/g, "").trim();
+		const amount = Number(amountText);
 		const months = Number(monthsEl.value);
-		if (!(amount >= 1) || amount > 1_000_000_000) return fail("Enter an amount of at least ₱1.");
+		if (amountText === "" || amountText === ".") return fail("Enter how much you save, for example 50,000.");
+		if (!Number.isFinite(amount) || amount < 1) return fail("Enter an amount of at least ₱1.");
+		if (amount > 1_000_000_000) return fail("Enter an amount of ₱1,000,000,000 or less.");
+		if (monthsEl.value.trim() === "") return fail("Enter a number of months from 1 to 120.");
 		if (!Number.isInteger(months) || months < 1 || months > 120) return fail("Enter a whole number of months from 1 to 120.");
 		errorEl.classList.add("hidden");
 
@@ -163,11 +188,21 @@ const latestCheck = [...products].map((p) => p.asOf).sort().at(-1)!;
 	}
 
 	document.getElementById("calc")!.addEventListener("submit", (e) => e.preventDefault());
-	[amountEl, monthsEl].forEach((el) => el.addEventListener("input", update));
+	amountEl.addEventListener("input", () => {
+		maskAmount();
+		update();
+	});
+	amountEl.addEventListener("blur", () => {
+		amountEl.value = formatMoney(amountEl.value).replace(/\.$/, "");
+	});
+	monthsEl.addEventListener("input", () => {
+		monthsEl.value = monthsEl.value.replace(/\D/g, "").slice(0, 3);
+		update();
+	});
 	[compoundEl, bestEl].forEach((el) => el.addEventListener("change", update));
 	document.querySelectorAll<HTMLButtonElement>("[data-amount]").forEach((b) =>
 		b.addEventListener("click", () => {
-			amountEl.value = b.dataset.amount!;
+			amountEl.value = formatMoney(b.dataset.amount!);
 			update();
 		}),
 	);

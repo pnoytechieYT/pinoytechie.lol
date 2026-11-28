@@ -16,6 +16,13 @@
  *   4. Cleans the result, checks internal links, flags every peso amount / percentage
  *      that is NOT found in your facts or source posts, and writes the file.
  *      Any flagged number => the post is saved with `draft: true` so it can never go live unseen.
+ *   5. SOURCES: the AI may only pick sources by id from automation/sources.json (official sites). The script writes the
+ *      "Sources" section itself, so a URL can never be invented. No valid source => `draft: true`.
+ *   6. SCHEDULE: every category has a weekly slot (automation/config.json: day + time, Philippine time). The guide gets
+ *      that slot as its pubDate (usually tomorrow, so you can review it first). If the category already has a post on
+ *      that date, nothing is written.
+ *
+ * Optional env: TARGET_DATE=YYYY-MM-DD (the day to publish; the workflow sets it. Empty = next free weekly slot)
  *
  * Keys (GitHub: Settings > Secrets and variables > Actions). Use any one, or all for fallback:
  *   GEMINI_API_KEY, GROQ_API_KEY, MISTRAL_API_KEY, DEEPSEEK_API_KEY
@@ -42,6 +49,26 @@ const CONFIG = JSON.parse(await fs.readFile(path.join(ROOT, "automation", "confi
 const CFG = CONFIG[CATEGORY];
 const LABEL = CFG?.label ?? CATEGORY;
 const GROUP_LABEL = { banks: "Banks and e-wallets", providers: "Internet providers" };
+const SOURCES_FILE = path.join(ROOT, "automation", "sources.json");
+const TARGET_DATE = (process.env.TARGET_DATE || "").trim();
+
+// ---------- Philippine time helpers (UTC+8, no daylight saving) ----------
+const PH_MS = 8 * 3600_000;
+const phDay = (ms) => new Date(ms + PH_MS).toISOString().slice(0, 10); // 2026-11-27
+const phWeekday = (day) => ((new Date(`${day}T00:00:00Z`).getUTCDay() + 6) % 7) + 1; // 1=Mon .. 7=Sun
+const addDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
+const slotIso = (day, time) => `${day}T${time}:00+08:00`;
+const prettyDay = (day) => new Date(`${day}T12:00:00Z`).toLocaleDateString("en-US", { timeZone: "UTC", year: "numeric", month: "long", day: "numeric" });
+
+/** Reads a frontmatter date the way the site does: quoted ISO, date only, or no offset (= Philippine time). */
+function parseMs(value) {
+	let raw = String(value ?? "").trim().replace(" ", "T");
+	if (!raw) return null;
+	if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) raw += "T00:00:00";
+	if (!/(Z|[+-]\d{2}:?\d{2})$/i.test(raw)) raw += "+08:00";
+	const ms = Date.parse(raw);
+	return Number.isNaN(ms) ? null : ms;
+}
 
 const PROVIDERS = {
 	gemini: {
@@ -113,11 +140,17 @@ async function loadExisting() {
 			title: fmField(fm, "title"),
 			description: fmField(fm, "description"),
 			tags: fmField(fm, "tags"),
+			pubMs: parseMs(fmField(fm, "pubDate")),
+			draft: /^draft:\s*true\s*$/m.test(fm),
 			body,
 		});
 	}
 	return posts;
 }
+
+// A heading that is exactly "Sources" / "References". (Not "Sources of funds": that is a normal section.)
+const SOURCES_HEADING = /\n#{1,3}[ \t]*(?:Sources?|References?)[ \t]*:?[ \t]*(?:\r?\n|$)/i;
+const withoutSources = (text) => text.split(SOURCES_HEADING)[0].trim();
 
 const STOP = new Set("the a an and or of to in on for with how what is are your you from vs 2026 guide".split(" "));
 const words = (s) => new Set(s.toLowerCase().match(/[a-z0-9]+/g)?.filter((w) => w.length > 2 && !STOP.has(w)) ?? []);
@@ -135,7 +168,7 @@ function pickSources(existing, topic) {
 		.sort((a, b) => b.score - a.score)
 		.slice(0, 3)
 		.map(({ p }) => {
-			const clean = p.body.split(/\n## Sources/i)[0].trim().slice(0, 3000);
+			const clean = withoutSources(p.body).slice(0, 3000);
 			return `### ${p.title}\n${clean}`;
 		})
 		.join("\n\n");
@@ -165,11 +198,12 @@ HARD RULES (follow them even if the topic seems to need otherwise):
 1. NUMBERS: never write a peso amount, percentage, interest rate, fee, limit, plan name, price, data allowance, speed, validity period, date or deadline unless it appears word for word in FACTS or SOURCE POSTS. If you need one that is missing, tell the reader to check the figure in the official app instead. Never estimate or round.
 2. CLAIMS: when you state something a company says, say "According to <company>" and only if it is in FACTS or SOURCE POSTS.
 3. LINKS: no external links, no URLs, no phone numbers, no email addresses, no USSD or short codes (like *123#). Internal links are allowed only from the EXISTING GUIDES list, written as [anchor text](/blog/slug/).
-4. Do not write a "Sources" section, a date line, or any note about being an AI. Do not invent screens, menu names or steps you are not sure about; describe the general flow and say menus can differ by app version.
+4. Do not write a "Sources" section, a date line, or any note about being an AI (the site adds the sources itself). Do not invent screens, menu names or steps you are not sure about; describe the general flow and say menus can differ by app version.
 5. No fake quotes, no fake reviews, no invented statistics.
+6. SOURCES: base the guide only on FACTS, SOURCE POSTS and what official sources publish. Never rely on blogs, forums, social media, news rumours or "people say". In "sources", list the ids (from OFFICIAL SOURCES) of the pages a reader should open to confirm the guide: the company that is the subject, plus the regulator (BSP, PDIC, BIR, NTC, DICT) when the guide touches rules, deposit insurance, tax or telecom regulation. Use 1 to 4 ids, copied exactly from the list. If nothing in the list fits, return an empty list. Never write a URL yourself.
 
 OUTPUT: only a JSON object, no code fences, with these keys:
-{"title": "...", "seoTitle": "50-60 characters", "description": "140-160 characters", "tags": ["3 to 5 short tags"], "body": "the Markdown article"}`;
+{"title": "...", "seoTitle": "50-60 characters", "description": "140-160 characters", "tags": ["3 to 5 short tags"], "sources": ["id", "id"], "body": "the Markdown article"}`;
 
 function groupRules() {
 	const rules = [];
@@ -182,8 +216,9 @@ function groupRules() {
 	return `\n\nCATEGORY RULES:\n${rules.join("\n")}`;
 }
 
-function buildUser({ topic, facts, sources, style, existing }) {
-	const guides = existing.map((p) => `- ${p.slug}: ${p.title}`).join("\n");
+function buildUser({ topic, facts, sources, style, linkable, official }) {
+	const guides = linkable.map((p) => `- ${p.slug}: ${p.title}`).join("\n");
+	const officialList = official.map((s) => `- ${s.id}: ${s.label}`).join("\n");
 	return `CATEGORY: ${LABEL} (${CFG.what})
 TOPIC: ${topic.title}
 ANGLE: ${topic.angle ?? "Answer the reader's main question first, then explain the details."}
@@ -196,6 +231,9 @@ ${sources || "(none)"}
 
 ${style ? `STYLE EXAMPLE (from another category: copy the tone and structure only, never its facts or numbers):\n${style}\n\n` : ""}EXISTING GUIDES you may link to:
 ${guides}
+
+OFFICIAL SOURCES (pick ids for the "sources" key; these are the only sources allowed):
+${officialList || "(none)"}
 
 Write the guide now. Return only the JSON object.`;
 }
@@ -383,7 +421,7 @@ const slugify = (s) =>
 function cleanBody(raw, validSlugs) {
 	let body = raw.replace(/\r\n/g, "\n").trim();
 	body = body.replace(/^#\s+.+\n+/, ""); // the page already renders the title
-	body = body.split(/\n#{1,3}\s*Sources?\b/i)[0].trim(); // no invented sources
+	body = withoutSources(body); // the site writes the Sources section itself, from automation/sources.json
 	const removed = [];
 	// external links -> plain text; unknown internal links -> plain text
 	body = body.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, text, url) => {
@@ -396,18 +434,15 @@ function cleanBody(raw, validSlugs) {
 	return { body, removedLinks: removed };
 }
 
-const NUM = /₱\s?\d[\d,]*(?:\.\d+)?|\$\s?\d[\d,]*(?:\.\d+)?|\d+(?:\.\d+)?\s?%|\d+(?:\.\d+)?\s?(?:Mbps|Gbps|GB|MB|TB)\b|\*\d{2,4}(?:\*[\d*]+)?#/gi;
-const norm = (s) => s.replace(/\s+/g, "").toLowerCase();
+const NUM = /(?:₱|PHP\s?|PhP\s?)\s?\d[\d,]*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:pesos?)\b|\$\s?\d[\d,]*(?:\.\d+)?|\d+(?:\.\d+)?\s?%|\d+(?:\.\d+)?\s?(?:Mbps|Gbps|GB|MB|TB)\b|\*\d{2,4}(?:\*[\d*]+)?#/gi;
+const norm = (s) => s.replace(/\s+/g, "").replace(/[.,]+$/, "").toLowerCase();
 
+// Compares whole numbers, not pieces of text: "₱1,000" must NOT pass just because "₱1,000,000" is in the facts,
+// and "5%" must not pass because "15%" is.
 function unverifiedNumbers(body, corpus) {
-	const known = norm(corpus);
+	const known = new Set((corpus.match(NUM) ?? []).map(norm));
 	const found = new Set((body.match(NUM) ?? []).map(norm));
-	return [...found].filter((n) => !known.includes(n));
-}
-
-function phNow() {
-	const d = new Date(Date.now() + 8 * 3600_000);
-	return d.toISOString().slice(0, 19) + "+08:00";
+	return [...found].filter((n) => !known.has(n));
 }
 
 function cut(s, max) {
@@ -428,6 +463,39 @@ const AI_TOPICS_FILE = path.join(ROOT, "automation", "topics-ai", `${CATEGORY}.j
 const aiTopics = await fs.readFile(AI_TOPICS_FILE, "utf8").then(JSON.parse, () => []);
 const queue = [...(topics[CATEGORY] ?? []), ...aiTopics];
 const factsStr = factsText(facts);
+const registry = JSON.parse(await fs.readFile(SOURCES_FILE, "utf8")).sources ?? [];
+const official = registry.filter((x) => x.appliesTo?.some((a) => a === "all" || a === CATEGORY || a === CFG.group));
+
+// ---------- which day does this guide publish on? ----------
+// One guide per category per day. Drafts and scheduled posts count too, so a day can never get two guides.
+const takenDays = new Set(existing.filter((p) => p.category === CATEGORY && p.pubMs != null).map((p) => phDay(p.pubMs)));
+const slotTime = /^\d{2}:\d{2}$/.test(CFG.time ?? "") ? CFG.time : "12:00";
+let slotDay = TARGET_DATE;
+if (slotDay && !/^\d{4}-\d{2}-\d{2}$/.test(slotDay)) fail(`TARGET_DATE must look like 2026-11-30 (got "${slotDay}")`);
+if (slotDay) {
+	if (takenDays.has(slotDay)) {
+		const msg = `${LABEL} already has a guide dated ${slotDay}. Nothing was written, so that day keeps one guide.`;
+		console.log(`::notice title=Auto guide::${msg}`);
+		log(msg);
+		if (process.env.GITHUB_OUTPUT) await fs.appendFile(process.env.GITHUB_OUTPUT, "skipped=true\n");
+		process.exit(0);
+	}
+} else {
+	// No date given (manual run): the next weekly slot of this category that is still in the future and still free.
+	const today = phDay(Date.now());
+	for (let i = 0; i < 120 && !slotDay; i++) {
+		const d = addDays(today, i);
+		if (CFG.day && phWeekday(d) !== CFG.day) continue;
+		if (takenDays.has(d) || Date.parse(slotIso(d, slotTime)) <= Date.now()) continue;
+		slotDay = d;
+	}
+	if (!slotDay) fail(`No free slot found for ${LABEL} in the next 120 days.`);
+}
+const pubDate = slotIso(slotDay, slotTime);
+log(`publish slot: ${pubDate}`);
+// Only link to guides that will be live (not drafts) by the time this one is.
+const linkable = existing.filter((p) => !p.draft && (p.pubMs ?? 0) <= Date.parse(pubDate));
+const linkableSlugs = new Set(linkable.map((p) => p.slug));
 
 let topic = queue.find((t) => !slugs.has(t.slug));
 let newTopics = [];
@@ -468,8 +536,8 @@ log(`topic: ${topic.title} (${topic.slug})`);
 const sources = pickSources(existing, topic);
 const system = SYSTEM + groupRules();
 // A brand-new category has no source posts yet: show one post from elsewhere as a style reference only.
-const style = sources ? "" : (existing.find((p) => p.category !== CATEGORY)?.body ?? "").split(/\n## Sources/i)[0].trim().slice(0, 1800);
-const user = buildUser({ topic, facts: factsStr, sources, style, existing });
+const style = sources ? "" : withoutSources(existing.find((p) => p.category !== CATEGORY)?.body ?? "").slice(0, 1800);
+const user = buildUser({ topic, facts: factsStr, sources, style, linkable, official });
 log(`prompt size: about ${Math.round((system.length + user.length) / 4)} tokens`);
 if (DRY) {
 	log("dry run, stopping before the API call");
@@ -477,13 +545,31 @@ if (DRY) {
 }
 
 const { value: data, provider, model } = await generate(system, user, validateArticle, { expand: true });
-const { body: cleaned, removedLinks } = cleanBody(data.body, slugs);
-const closing = `Last updated ${new Date().toLocaleDateString("en-US", { timeZone: "Asia/Manila", year: "numeric", month: "long", day: "numeric" })}. Fees, rates and limits can change at any time, so confirm them in the official app before you act.`;
-const body = `${cleaned}\n\n${closing}\n`;
+const { body: cleaned, removedLinks } = cleanBody(data.body, linkableSlugs);
+
+// Sources: only ids from automation/sources.json count. The script writes the section, the AI never writes a URL.
+const askedIds = [...new Set((Array.isArray(data.sources) ? data.sources : []).map((x) => String(x).trim().toLowerCase()).filter(Boolean))];
+const picked = askedIds.map((id) => official.find((x) => x.id === id)).filter(Boolean).slice(0, 4);
+const unknownIds = askedIds.filter((id) => !official.some((x) => x.id === id));
+const sourceStatus = await Promise.all(
+	picked.map(async (x) => {
+		try {
+			const res = await fetch(x.url, { redirect: "follow", signal: AbortSignal.timeout(12_000), headers: { "User-Agent": "Mozilla/5.0 (compatible; PinoyTechieLinkCheck/1.0)" } });
+			return { ...x, ok: res.ok, status: res.status };
+		} catch (e) {
+			return { ...x, ok: false, status: e.name === "TimeoutError" ? "timeout" : "network error" };
+		}
+	}),
+);
+const sourcesMd = picked.length ? `## Sources\n\n${picked.map((x) => `- [${x.label}](${x.url})`).join("\n")}` : "";
+const closing = `Last updated ${prettyDay(slotDay)}. Fees, rates and limits can change at any time, so confirm them in the official app or on the official website before you act.`;
+const body = `${cleaned}\n\n${sourcesMd ? `${sourcesMd}\n\n` : ""}${closing}\n`;
 
 const corpus = [factsStr, sources, topic.title, topic.angle ?? ""].join("\n");
 const unverified = unverifiedNumbers(cleaned, corpus);
-const asDraft = unverified.length > 0;
+const noSources = picked.length === 0;
+const asDraft = unverified.length > 0 || noSources;
+const factsAgeDays = facts.asOf && parseMs(facts.asOf) ? Math.floor((Date.now() - parseMs(facts.asOf)) / 86_400_000) : null;
 
 const description = cut(String(data.description || topic.title).replace(/\s+/g, " ").trim(), 170);
 const seoTitle = typeof data.seoTitle === "string" && data.seoTitle.length <= 65 ? data.seoTitle : "";
@@ -497,7 +583,7 @@ const frontmatter = [
 	`title: ${JSON.stringify(String(data.title).trim())}`,
 	seoTitle && `seoTitle: ${JSON.stringify(seoTitle)}`,
 	`description: ${JSON.stringify(description)}`,
-	`pubDate: ${JSON.stringify(phNow())}`,
+	`pubDate: ${JSON.stringify(pubDate)}`,
 	`tags: [${tags.map((t) => JSON.stringify(t)).join(", ")}]`,
 	"aiGenerated: true",
 	/^[\w-]{11}$/.test(topic.video ?? "") && `video: ${JSON.stringify(topic.video)}`,
@@ -523,23 +609,27 @@ const report = [
 	`**Topic:** ${topic.title}`,
 	`**File:** \`src/posts/${CATEGORY}/${topic.slug}.md\``,
 	`**Written by:** ${provider} (${model}), ${countWords(body)} words`,
+	`**Goes live:** ${prettyDay(slotDay)}, ${slotTime} Philippine time (\`pubDate\` ${pubDate}). Merge before then and it appears at that time; merge later and it appears right away.`,
 	"",
 	asDraft
-		? `⚠️ **Saved as \`draft: true\`.** These numbers are not in your facts or source posts. Check each one, fix the post, then delete the \`draft: true\` line before merging:\n${unverified.map((n) => `- ${n}`).join("\n")}`
+		? `⚠️ **Saved as \`draft: true\`.** Fix the points below, then delete the \`draft: true\` line before merging:${unverified.length ? `\n\nThese numbers are not in your facts or source posts:\n${unverified.map((n) => `- ${n}`).join("\n")}` : ""}${noSources ? "\n\nNo valid official source was chosen. Add a source from `automation/sources.json` under a `## Sources` heading." : ""}`
 		: "✅ Every peso amount and percentage in the post was found in your facts or existing posts. Still skim it before merging.",
+	picked.length ? `\n**Sources used:**\n${sourceStatus.map((x) => `- ${x.ok ? "✅" : "⚠️"} ${x.label} (${x.ok ? "opens" : `could not open: ${x.status}; some official sites block bots, so open it yourself`})`).join("\n")}` : "",
+	unknownIds.length ? `\nSource ids ignored (not in \`automation/sources.json\`): ${unknownIds.map((x) => `\`${x}\``).join(", ")}` : "",
+	factsAgeDays !== null && factsAgeDays > 30 ? `\n⚠️ \`automation/facts.json\` was last checked ${factsAgeDays} days ago. Update it so the AI works from current numbers.` : "",
 	removedLinks.length ? `\nLinks removed (not on the allowed list): ${removedLinks.map((l) => `\`${l}\``).join(", ")}` : "",
 	newTopics.length
 		? `\n### New topic ideas (${newTopics.length})\nThe queue was empty, so ${topicProvider} proposed these. They are saved in \`automation/topics-ai/${CATEGORY}.json\`. Edit that file in this PR to remove any you don't want, or just merge to approve them all.\n${newTopics.map((t, i) => `${i + 1}. ${t.title}${i === 0 ? " **(written in this PR)**" : ""}`).join("\n")}`
 		: "",
 	"",
-	"_AI-generated. The post shows the site's “AI-generated guide” badge._",
+	"_AI-generated. The post shows “By Pinoy Techie via AI” under the title and its official sources at the end._",
 ].join("\n");
 await fs.writeFile(REPORT_FILE, report, "utf8");
 
 if (process.env.GITHUB_OUTPUT) {
 	await fs.appendFile(
 		process.env.GITHUB_OUTPUT,
-		`slug=${topic.slug}\ntitle=${String(data.title).replace(/[\r\n]+/g, " ")}\nstatus=${asDraft ? "draft" : "ready"}\n`,
+		`slug=${topic.slug}\ntitle=${String(data.title).replace(/[\r\n]+/g, " ")}\nstatus=${asDraft ? "draft" : "ready"}\npubdate=${slotDay}\n`,
 	);
 }
 log(`saved ${path.relative(ROOT, file)} (${asDraft ? `DRAFT, ${unverified.length} unverified number(s)` : "ready"}) via ${provider}`);

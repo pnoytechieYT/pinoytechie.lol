@@ -2,6 +2,8 @@
 
 Writes one guide per run and opens a Pull Request for you to review. Times are Philippine time.
 
+**The guide is written the evening before it goes live** (6:17 PM, and 6:47 PM on Saturday for DITO). It gets the slot below as its `pubDate`, so you can review and merge ahead of time: the site hides it until that time and the 30-minute deploy then publishes it. If you merge after the slot, it goes live right away.
+
 | Day | Time | Category | Group |
 | --- | --- | --- | --- |
 | Monday | 12:00 PM | MariBank | Banks & E-Wallets |
@@ -13,7 +15,7 @@ Writes one guide per run and opens a Pull Request for you to review. Times are P
 | Sunday | 9:00 AM | DITO | Internet Providers |
 | Sunday | 12:00 PM | More Internet Providers | Internet Providers |
 
-The schedule lives in `.github/workflows/auto-guide.yml`. Each category is one folder in `src/posts/<slug>/`:
+The weekly slot (day + time) of each category lives in `automation/config.json` (`day` 1=Mon..7=Sun, `time` HH:MM). The run times live in `.github/workflows/auto-guide.yml`. Each category is one folder in `src/posts/<slug>/`:
 `maribank`, `gcash`, `maya`, `more-banks-ewallets`, `globe-tm`, `smart-tnt-sun`, `dito`, `more-internet-providers`.
 
 ## One-time setup
@@ -39,7 +41,10 @@ Several queued topics are already paired with videos from your channel.
 ## Safety nets
 - Any peso amount, percentage, speed (Mbps/GB) or USSD code that is not in `facts.json` or your existing posts => the post is saved with `draft: true` and the PR lists what to check.
 - External links and unknown internal links are removed. Invented "Sources" sections are removed.
-- Every post gets `aiGenerated: true` (the site's AI badge).
+- Every post gets `aiGenerated: true` (the site shows "By Pinoy Techie via AI" under the title).
+- **Sources are required.** The AI can only pick source ids from `automation/sources.json` (official sites). The script writes the "Sources" section and checks the pages open. No valid source => `draft: true`. Add or correct entries in that file; prefer the exact page you checked.
+- **One guide per category per day.** Drafts and scheduled posts count. If the day is taken the run writes nothing. A manual run with no date picks the category's next free weekly slot; type a date (YYYY-MM-DD) to choose one.
+- A very late run (after midnight in Manila) still writes for the correct day.
 - A category with no live post stays hidden from the menu and hub, its page is `noindex`, and it is left out of the sitemap, until its first post goes live.
 
 ## Modes

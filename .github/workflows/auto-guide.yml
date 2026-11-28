@@ -1,6 +1,7 @@
 name: Auto guide (AI)
 
-# Writes one AI-assisted guide per run, all times Philippine time (UTC+8):
+# Writes one AI-assisted guide per run, ONE DAY BEFORE it goes live, so you can review the Pull Request first.
+# The guide gets the category's weekly slot as its pubDate (Philippine time, set in automation/config.json):
 #   Mon 12:00 PM  MariBank                 (Banks & E-Wallets)
 #   Tue 12:00 PM  GCash
 #   Wed 12:00 PM  Maya
@@ -9,16 +10,20 @@ name: Auto guide (AI)
 #   Sat 12:00 PM  Smart / TNT / Sun
 #   Sun  9:00 AM  DITO
 #   Sun 12:00 PM  More Internet Providers
+# The writing runs the evening before at 6:17 PM PH (and 6:47 PM PH on Saturday for the 9:00 AM Sunday DITO slot).
+# The site hides a post until its pubDate and the 30-minute deploy then publishes it, so merging early is safe.
 # GitHub may start scheduled runs 5 to 30 minutes late when it is busy. That is normal.
+# If a run is delayed past midnight (Philippine time) it still writes for that same day, never a day too late or early.
+# If the category already has a guide on that date (drafts and scheduled ones count), nothing is written.
 #
 # MODE (repository variable AUTO_GUIDE_MODE, Settings > Secrets and variables > Actions > Variables):
 #   pr       (default) opens a Pull Request. The guide goes live only after you merge it.
-#   publish  commits straight to main. Posts with unverified numbers are still saved as draft.
+#   publish  commits straight to main. Posts with unverified numbers or no source are still saved as draft.
 
 on:
   schedule:
-    - cron: "0 1 * * 0" # Sunday 9:00 AM PH: DITO
-    - cron: "0 4 * * *" # every day 12:00 PM PH: category depends on the weekday
+    - cron: "17 10 * * *" # every day 6:17 PM PH: writes tomorrow's guide (Sunday's 12:00 PM guide on Saturday)
+    - cron: "47 10 * * 6" # Saturday 6:47 PM PH: writes Sunday's 9:00 AM guide (DITO)
   workflow_dispatch:
     inputs:
       category:
@@ -34,6 +39,10 @@ on:
           - dito
           - more-internet-providers
         default: maribank
+      date:
+        description: "Publish date, YYYY-MM-DD (leave empty = this category's next free weekly slot)"
+        type: string
+        required: false
       mode:
         description: pr = open a Pull Request, publish = commit to main
         type: choice
@@ -62,40 +71,45 @@ jobs:
         with:
           node-version: 22
 
-      - name: Decide category and mode
+      - name: Decide category, publish date and mode
         id: plan
         env:
           SCHEDULE: ${{ github.event.schedule }}
           INPUT_CATEGORY: ${{ inputs.category }}
+          INPUT_DATE: ${{ inputs.date }}
           INPUT_MODE: ${{ inputs.mode }}
           VAR_MODE: ${{ vars.AUTO_GUIDE_MODE }}
         run: |
-          if [ "$SCHEDULE" = "0 1 * * 0" ]; then
-            CATEGORY=dito
-          elif [ -n "$SCHEDULE" ]; then
-            # Weekday in Manila time: 1=Monday ... 7=Sunday
-            case "$(TZ=Asia/Manila date +%u)" in
-              1) CATEGORY=maribank ;;
-              2) CATEGORY=gcash ;;
-              3) CATEGORY=maya ;;
-              4) CATEGORY=more-banks-ewallets ;;
-              5) CATEGORY=globe-tm ;;
-              6) CATEGORY=smart-tnt-sun ;;
-              *) CATEGORY=more-internet-providers ;;
-            esac
+          set -euo pipefail
+          if [ -n "$SCHEDULE" ]; then
+            # Normal case (evening run): the guide is for tomorrow. After a very late start (past midnight in Manila,
+            # before noon) the day has already changed, so the guide is for today.
+            HOUR=$((10#$(TZ=Asia/Manila date +%H)))
+            if [ "$HOUR" -lt 12 ]; then
+              TARGET=$(TZ=Asia/Manila date +%F)
+            else
+              TARGET=$(TZ=Asia/Manila date -d tomorrow +%F)
+            fi
+            # The schedule lives in automation/config.json. The Saturday 6:47 PM run takes the earliest slot of Sunday (DITO).
+            WHICH=last
+            if [ "$SCHEDULE" = "47 10 * * 6" ]; then WHICH=first; fi
+            CATEGORY=$(node scripts/pick-category.mjs "$TARGET" "$WHICH")
           else
             CATEGORY="${INPUT_CATEGORY:-maribank}"
+            TARGET="${INPUT_DATE:-}"
           fi
           MODE="${INPUT_MODE:-${VAR_MODE:-pr}}"
           echo "category=$CATEGORY" >> "$GITHUB_OUTPUT"
+          echo "date=$TARGET" >> "$GITHUB_OUTPUT"
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
-          echo "Writing a $CATEGORY guide, mode: $MODE"
+          echo "Writing a $CATEGORY guide for ${TARGET:-the next free slot}, mode: $MODE"
 
       - name: Write the guide
         id: gen
         run: node scripts/generate-guide.mjs
         env:
           CATEGORY: ${{ steps.plan.outputs.category }}
+          TARGET_DATE: ${{ steps.plan.outputs.date }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -111,6 +125,9 @@ jobs:
         id: verify
         if: steps.gen.outputs.slug != ''
         continue-on-error: true
+        env:
+          # The new guide has a future pubDate. Without this the build would leave it out and the link check would pass for nothing.
+          INCLUDE_SCHEDULED: "1"
         run: |
           npx astro build
           node scripts/check-links.mjs --report .autoguide-report.md
@@ -143,7 +160,7 @@ jobs:
           branch: auto-guide/${{ steps.gen.outputs.slug }}
           delete-branch: true
           commit-message: "Add AI guide: ${{ steps.gen.outputs.title }}"
-          title: "Review: ${{ steps.gen.outputs.title }}"
+          title: "Review: ${{ steps.gen.outputs.title }} (live ${{ steps.gen.outputs.pubdate }})"
           body-path: .autoguide-report.md
 
       - name: Commit straight to main
@@ -155,6 +172,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/posts automation/topics-ai
           git commit -m "Add AI guide: $TITLE"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
           # Pushes made with the built-in token do not start the deploy workflow,
-          # but deploy.yml rebuilds every 30 minutes, so the guide goes live within half an hour.
+          # but deploy.yml rebuilds every 30 minutes, so the guide goes live at its pubDate (within half an hour).

@@ -2,43 +2,59 @@
   "maribank": {
     "label": "MariBank",
     "group": "banks",
+    "day": 1,
+    "time": "12:00",
     "what": "MariBank, a digital bank in the Philippines"
   },
   "gcash": {
     "label": "GCash",
     "group": "banks",
+    "day": 2,
+    "time": "12:00",
     "what": "GCash, the e-wallet by Mynt"
   },
   "maya": {
     "label": "Maya",
     "group": "banks",
+    "day": 3,
+    "time": "12:00",
     "what": "Maya, the e-wallet and digital bank"
   },
   "more-banks-ewallets": {
     "label": "More Banks & E-Wallets",
     "group": "banks",
     "more": true,
+    "day": 4,
+    "time": "12:00",
     "what": "other Philippine banks and e-wallets (not MariBank, GCash or Maya), one named bank or e-wallet per guide, or digital vs traditional banking in general"
   },
   "globe-tm": {
     "label": "Globe and TM",
     "group": "providers",
+    "day": 5,
+    "time": "12:00",
     "what": "Globe and its budget brand TM (mobile and home internet)"
   },
   "smart-tnt-sun": {
     "label": "Smart, TNT and Sun",
     "group": "providers",
+    "day": 6,
+    "time": "12:00",
     "what": "Smart and its prepaid brand TNT (mobile and home internet). The Sun brand is retired: Sun Prepaid became Smart Prepaid in 2020 and Sun Postpaid became Smart Postpaid on April 25, 2022, so write about Sun only as history and never as a current brand."
   },
   "dito": {
     "label": "DITO",
     "group": "providers",
+    "day": 7,
+    "time": "09:00",
     "what": "DITO Telecommunity (mobile and home internet)"
   },
   "more-internet-providers": {
     "label": "More Internet Providers",
     "group": "providers",
     "more": true,
+    "day": 7,
+    "time": "12:00",
     "what": "other Philippine internet providers (not Globe, TM, Smart, TNT, Sun or DITO), one named provider per guide, or how to choose a home connection in general"
   }
 }

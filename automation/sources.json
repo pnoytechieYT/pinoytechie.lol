@@ -1,0 +1,213 @@
+{
+  "_readme": "Official sources the AI may cite. It can only pick an id from this list, so it can never invent a URL. appliesTo = category slugs, or banks / providers / all. Add only official pages (company sites, BSP, PDIC, BIR, NTC, DICT). Prefer the exact page you checked over a home page.",
+  "sources": [
+    {
+      "id": "bsp",
+      "label": "Bangko Sentral ng Pilipinas (BSP)",
+      "url": "https://www.bsp.gov.ph/",
+      "appliesTo": [
+        "all"
+      ]
+    },
+    {
+      "id": "pdic",
+      "label": "Philippine Deposit Insurance Corporation (PDIC)",
+      "url": "https://www.pdic.gov.ph/",
+      "appliesTo": [
+        "banks"
+      ]
+    },
+    {
+      "id": "bir",
+      "label": "Bureau of Internal Revenue (BIR)",
+      "url": "https://www.bir.gov.ph/",
+      "appliesTo": [
+        "banks"
+      ]
+    },
+    {
+      "id": "ntc",
+      "label": "National Telecommunications Commission (NTC)",
+      "url": "https://ntc.gov.ph/",
+      "appliesTo": [
+        "providers"
+      ]
+    },
+    {
+      "id": "dict",
+      "label": "Department of Information and Communications Technology (DICT)",
+      "url": "https://dict.gov.ph/",
+      "appliesTo": [
+        "providers"
+      ]
+    },
+    {
+      "id": "maribank-savings",
+      "label": "MariBank, Savings",
+      "url": "https://www.maribank.ph/product/savings",
+      "appliesTo": [
+        "maribank"
+      ]
+    },
+    {
+      "id": "maribank-fees",
+      "label": "MariBank, Fees & Rates",
+      "url": "https://www.maribank.ph/fees-rates",
+      "appliesTo": [
+        "maribank"
+      ]
+    },
+    {
+      "id": "maribank",
+      "label": "MariBank, official website",
+      "url": "https://www.maribank.ph/",
+      "appliesTo": [
+        "maribank"
+      ]
+    },
+    {
+      "id": "gcash-help",
+      "label": "GCash Help Center",
+      "url": "https://help.gcash.com/",
+      "appliesTo": [
+        "gcash"
+      ]
+    },
+    {
+      "id": "gcash",
+      "label": "GCash, official website",
+      "url": "https://www.gcash.com/",
+      "appliesTo": [
+        "gcash"
+      ]
+    },
+    {
+      "id": "maya",
+      "label": "Maya, official website",
+      "url": "https://www.maya.ph/",
+      "appliesTo": [
+        "maya"
+      ]
+    },
+    {
+      "id": "maya-bank-savings",
+      "label": "Maya Bank, Savings",
+      "url": "https://www.mayabank.ph/savings/",
+      "appliesTo": [
+        "maya"
+      ]
+    },
+    {
+      "id": "tonik",
+      "label": "Tonik Digital Bank, official website",
+      "url": "https://tonikbank.com/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "gotyme",
+      "label": "GoTyme Bank, official website",
+      "url": "https://www.gotyme.com.ph/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "cimb",
+      "label": "CIMB Bank Philippines, official website",
+      "url": "https://www.cimbbank.com.ph/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "unionbank",
+      "label": "UnionBank of the Philippines, official website",
+      "url": "https://www.unionbankph.com/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "bdo",
+      "label": "BDO Unibank, official website",
+      "url": "https://www.bdo.com.ph/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "bpi",
+      "label": "Bank of the Philippine Islands (BPI), official website",
+      "url": "https://www.bpi.com.ph/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "metrobank",
+      "label": "Metrobank, official website",
+      "url": "https://www.metrobank.com.ph/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "landbank",
+      "label": "Land Bank of the Philippines, official website",
+      "url": "https://www.landbank.com/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "securitybank",
+      "label": "Security Bank, official website",
+      "url": "https://www.securitybank.com/",
+      "appliesTo": [
+        "more-banks-ewallets"
+      ]
+    },
+    {
+      "id": "globe",
+      "label": "Globe Telecom, official website",
+      "url": "https://www.globe.com.ph/",
+      "appliesTo": [
+        "globe-tm"
+      ]
+    },
+    {
+      "id": "smart",
+      "label": "Smart Communications, official website",
+      "url": "https://smart.com.ph/",
+      "appliesTo": [
+        "smart-tnt-sun"
+      ]
+    },
+    {
+      "id": "dito",
+      "label": "DITO Telecommunity, official website",
+      "url": "https://dito.ph/",
+      "appliesTo": [
+        "dito"
+      ]
+    },
+    {
+      "id": "pldt-home",
+      "label": "PLDT Home, official website",
+      "url": "https://pldthome.com/",
+      "appliesTo": [
+        "more-internet-providers"
+      ]
+    },
+    {
+      "id": "converge",
+      "label": "Converge ICT, official website",
+      "url": "https://www.convergeict.com/",
+      "appliesTo": [
+        "more-internet-providers"
+      ]
+    }
+  ]
+}
