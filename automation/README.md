@@ -34,6 +34,11 @@ The weekly slot (day + time) of each category lives in `automation/config.json` 
 After the AI writes a guide, the workflow builds the whole site and checks every internal link. The result is written at the bottom of the
 Pull Request ("Link check"). If the build or a link fails, the PR says so, and in `publish` mode the guide is sent as a PR instead of going live.
 
+## Choosing your own topic
+Actions > **Auto guide (AI)** > Run workflow > fill **Topic** with one sentence, for example `How to open a line on the Smart 5G Max WiFi`, and pick the category.
+Leave it empty and the next unwritten topic from the queue is used. A typed topic does not use up the queue. Typos are fine: the AI writes a clean title and the web address comes from that title.
+The AI still has no verified facts about a product unless they are in `automation/facts.json` or an existing post, so it writes a general guide and tells readers to check the official app or website. Add the product's details to `facts.json` first if you want specifics.
+
 ## Pairing a topic with your own video
 Add `"video": "<YouTube id>"` to a topic in `topics.json` (the 11 characters after `v=` in the video's address). The guide then shows that video at the end.
 Several queued topics are already paired with videos from your channel.

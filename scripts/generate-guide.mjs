@@ -22,7 +22,9 @@
  *      that slot as its pubDate (usually tomorrow, so you can review it first). If the category already has a post on
  *      that date, nothing is written.
  *
- * Optional env: TARGET_DATE=YYYY-MM-DD (the day to publish; the workflow sets it. Empty = next free weekly slot)
+ * Optional env: TOPIC="How to open a line on the Smart 5G Max WiFi" (your own topic for this run; empty = the next unwritten
+ *               topic from the queue. The queue is not touched, so the queued topic is still written on a later run)
+ *               TARGET_DATE=YYYY-MM-DD (the day to publish; the workflow sets it. Empty = next free weekly slot)
  *
  * Keys (GitHub: Settings > Secrets and variables > Actions). Use any one, or all for fallback:
  *   GEMINI_API_KEY, GROQ_API_KEY, MISTRAL_API_KEY, DEEPSEEK_API_KEY
@@ -51,6 +53,7 @@ const LABEL = CFG?.label ?? CATEGORY;
 const GROUP_LABEL = { banks: "Banks and e-wallets", providers: "Internet providers" };
 const SOURCES_FILE = path.join(ROOT, "automation", "sources.json");
 const TARGET_DATE = (process.env.TARGET_DATE || "").trim();
+const CUSTOM_TOPIC = (process.env.TOPIC || "").replace(/\s+/g, " ").trim(); // typed in the "Run workflow" form
 
 // ---------- Philippine time helpers (UTC+8, no daylight saving) ----------
 const PH_MS = 8 * 3600_000;
@@ -497,7 +500,25 @@ log(`publish slot: ${pubDate}`);
 const linkable = existing.filter((p) => !p.draft && (p.pubMs ?? 0) <= Date.parse(pubDate));
 const linkableSlugs = new Set(linkable.map((p) => p.slug));
 
-let topic = queue.find((t) => !slugs.has(t.slug));
+let topic;
+let topicNote = "";
+if (CUSTOM_TOPIC) {
+	if (CUSTOM_TOPIC.length < 8 || CUSTOM_TOPIC.length > 200) fail(`The topic must be 8 to 200 characters (got ${CUSTOM_TOPIC.length}). Describe the guide in one sentence.`);
+	const base = slugify(CUSTOM_TOPIC).slice(0, 70).replace(/-+$/, "");
+	if (!base) fail("The topic needs some letters or numbers.");
+	let slug = base;
+	for (let n = 2; slugs.has(slug); n++) slug = `${base}-${n}`;
+	topic = {
+		slug,
+		title: CUSTOM_TOPIC,
+		angle: `The site owner asked for exactly this topic: "${CUSTOM_TOPIC}". The wording may be informal or have typos, so write a clean, natural English title that keeps the meaning. Cover what a reader needs to know, but use only numbers and product details found in FACTS or SOURCE POSTS. For anything else (plans, prices, speeds, app steps, what a product includes) tell the reader to check the official app or website. Do not guess what the product includes or how its menus look.`,
+	};
+	const twins = existing.filter((p) => p.category === CATEGORY && jaccard(p.title, CUSTOM_TOPIC) >= 0.5).map((p) => p.title);
+	topicNote = `**Topic:** typed by you in the Run workflow form: “${CUSTOM_TOPIC}”.${twins.length ? `\n⚠️ Similar guide(s) already exist: ${twins.map((t) => `“${t}”`).join(", ")}. Check this one adds something new.` : ""}`;
+	log(`custom topic: ${CUSTOM_TOPIC}`);
+} else {
+	topic = queue.find((t) => !slugs.has(t.slug));
+}
 let newTopics = [];
 let topicProvider = "";
 if (!topic) {
@@ -545,6 +566,13 @@ if (DRY) {
 }
 
 const { value: data, provider, model } = await generate(system, user, validateArticle, { expand: true });
+// A typed topic may have typos, so the web address comes from the clean title the AI wrote, not from your wording.
+if (CUSTOM_TOPIC) {
+	const base = slugify(String(data.title)).slice(0, 70).replace(/-+$/, "") || topic.slug;
+	let slug = base;
+	for (let i = 2; slugs.has(slug); i++) slug = `${base}-${i}`;
+	topic.slug = slug;
+}
 const { body: cleaned, removedLinks } = cleanBody(data.body, linkableSlugs);
 
 // Sources: only ids from automation/sources.json count. The script writes the section, the AI never writes a URL.
@@ -606,7 +634,7 @@ await fs.mkdir(path.dirname(keepFile), { recursive: true });
 await fs.access(keepFile).catch(() => fs.writeFile(keepFile, ""));
 
 const report = [
-	`**Topic:** ${topic.title}`,
+	topicNote || `**Topic:** ${topic.title}`,
 	`**File:** \`src/posts/${CATEGORY}/${topic.slug}.md\``,
 	`**Written by:** ${provider} (${model}), ${countWords(body)} words`,
 	`**Goes live:** ${prettyDay(slotDay)}, ${slotTime} Philippine time (\`pubDate\` ${pubDate}). Merge before then and it appears at that time; merge later and it appears right away.`,
