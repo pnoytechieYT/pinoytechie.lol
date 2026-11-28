@@ -39,6 +39,9 @@ Actions > **Auto guide (AI)** > Run workflow > fill **Topic** with one sentence,
 Leave it empty and the next unwritten topic from the queue is used. A typed topic does not use up the queue. Typos are fine: the AI writes a clean title and the web address comes from that title.
 The AI still has no verified facts about a product unless they are in `automation/facts.json` or an existing post, so it writes a general guide and tells readers to check the official app or website. Add the product's details to `facts.json` first if you want specifics.
 
+## Embedding a video you choose
+In the same Run workflow form, paste a YouTube link into **Video** (watch, youtu.be, shorts or embed links all work, or the 11-character id). It is embedded at the end of the guide, with a typed topic or a queued one. The PR report tells you if YouTube could not confirm the video (wrong, private or deleted), so check it before merging. Empty = no video, unless a queued topic has its own or the site finds a clear match.
+
 ## Pairing a topic with your own video
 Add `"video": "<YouTube id>"` to a topic in `topics.json` (the 11 characters after `v=` in the video's address). The guide then shows that video at the end.
 Several queued topics are already paired with videos from your channel.

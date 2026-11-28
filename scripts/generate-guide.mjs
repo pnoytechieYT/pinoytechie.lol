@@ -24,6 +24,8 @@
  *
  * Optional env: TOPIC="How to open a line on the Smart 5G Max WiFi" (your own topic for this run; empty = the next unwritten
  *               topic from the queue. The queue is not touched, so the queued topic is still written on a later run)
+ *               VIDEO="https://youtu.be/xxxxxxxxxxx" (a YouTube link or the 11-character id; embedded at the end of the guide.
+ *               Works with a typed topic and with a queued one)
  *               TARGET_DATE=YYYY-MM-DD (the day to publish; the workflow sets it. Empty = next free weekly slot)
  *
  * Keys (GitHub: Settings > Secrets and variables > Actions). Use any one, or all for fallback:
@@ -53,6 +55,7 @@ const LABEL = CFG?.label ?? CATEGORY;
 const GROUP_LABEL = { banks: "Banks and e-wallets", providers: "Internet providers" };
 const SOURCES_FILE = path.join(ROOT, "automation", "sources.json");
 const TARGET_DATE = (process.env.TARGET_DATE || "").trim();
+const VIDEO_INPUT = (process.env.VIDEO || "").trim(); // typed in the "Run workflow" form
 const CUSTOM_TOPIC = (process.env.TOPIC || "").replace(/\s+/g, " ").trim(); // typed in the "Run workflow" form
 
 // ---------- Philippine time helpers (UTC+8, no daylight saving) ----------
@@ -414,6 +417,25 @@ function makeTopicValidator(takenSlugs, knownTitles) {
 
 // ---------- cleaning and checking ----------
 
+/** watch?v=ID, youtu.be/ID, /shorts/ID, /embed/ID, /live/ID, m.youtube.com, music.youtube.com or the bare 11-character id. */
+function youtubeId(input) {
+	const t = input.trim();
+	if (/^[\w-]{11}$/.test(t)) return t;
+	let u;
+	try {
+		u = new URL(/^https?:\/\//i.test(t) ? t : `https://${t}`);
+	} catch {
+		return null;
+	}
+	const host = u.hostname.replace(/^(www|m|music)\./i, "").toLowerCase();
+	let id = null;
+	if (host === "youtu.be") id = u.pathname.split("/")[1];
+	else if (host === "youtube.com" || host === "youtube-nocookie.com") {
+		id = u.searchParams.get("v") ?? u.pathname.match(/^\/(?:shorts|embed|live|v)\/([\w-]{11})/)?.[1] ?? null;
+	}
+	return id && /^[\w-]{11}$/.test(id) ? id : null;
+}
+
 const slugify = (s) =>
 	s
 		.toLowerCase()
@@ -519,6 +541,20 @@ if (CUSTOM_TOPIC) {
 } else {
 	topic = queue.find((t) => !slugs.has(t.slug));
 }
+let videoNote = "";
+let videoId = "";
+if (VIDEO_INPUT) {
+	const id = youtubeId(VIDEO_INPUT);
+	videoId = id ?? "";
+	if (!id) fail(`Could not find a YouTube video id in "${VIDEO_INPUT}". Paste the video link (watch?v=..., youtu.be/..., shorts/...) or the 11-character id.`);
+	if (topic) topic.video = id;
+	// Report-only check: a wrong, private or deleted video would show a broken player on the site.
+	const state = await fetch(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`, { signal: AbortSignal.timeout(10_000) })
+		.then(async (r) => (r.ok ? { ok: true, title: (await r.json()).title } : { ok: false, why: `YouTube answered ${r.status}` }))
+		.catch((e) => ({ ok: false, why: e.name === "TimeoutError" ? "timeout" : "network error" }));
+	videoNote = `**Video:** \`${id}\` is embedded at the end of the guide. ${state.ok ? `✅ YouTube knows it: “${state.title}”.` : `⚠️ Could not confirm it (${state.why}). Open https://youtu.be/${id} and check it is public before merging.`}`;
+	log(`video: ${id}`);
+}
 let newTopics = [];
 let topicProvider = "";
 if (!topic) {
@@ -551,6 +587,7 @@ Propose 10 new topics now. Return only the JSON object.`;
 	await fs.writeFile(AI_TOPICS_FILE, `[\n${all.map((t) => "  " + JSON.stringify(t)).join(",\n")}\n]\n`, "utf8");
 	log(`added ${newTopics.length} new topic ideas to automation/topics-ai/${CATEGORY}.json`);
 	topic = newTopics[0];
+	if (videoId) topic.video = videoId; // the topic was only just created, so attach the typed video now
 }
 log(`topic: ${topic.title} (${topic.slug})`);
 
@@ -635,6 +672,7 @@ await fs.access(keepFile).catch(() => fs.writeFile(keepFile, ""));
 
 const report = [
 	topicNote || `**Topic:** ${topic.title}`,
+	videoNote,
 	`**File:** \`src/posts/${CATEGORY}/${topic.slug}.md\``,
 	`**Written by:** ${provider} (${model}), ${countWords(body)} words`,
 	`**Goes live:** ${prettyDay(slotDay)}, ${slotTime} Philippine time (\`pubDate\` ${pubDate}). Merge before then and it appears at that time; merge later and it appears right away.`,

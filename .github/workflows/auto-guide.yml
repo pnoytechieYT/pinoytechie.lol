@@ -43,6 +43,10 @@ on:
         description: "Topic (optional). Describe the guide you want, e.g. How to open a line on the Smart 5G Max WiFi. Empty = the next unwritten topic"
         type: string
         required: false
+      video:
+        description: "YouTube video link (optional). It is embedded at the end of the guide, e.g. https://youtu.be/xxxxxxxxxxx"
+        type: string
+        required: false
       date:
         description: "Publish date, YYYY-MM-DD (leave empty = this category's next free weekly slot)"
         type: string
@@ -115,6 +119,7 @@ jobs:
           CATEGORY: ${{ steps.plan.outputs.category }}
           TARGET_DATE: ${{ steps.plan.outputs.date }}
           TOPIC: ${{ inputs.topic }}
+          VIDEO: ${{ inputs.video }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
